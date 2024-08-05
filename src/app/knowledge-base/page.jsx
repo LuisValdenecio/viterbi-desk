@@ -4,12 +4,15 @@ import { Heading } from '@/components/heading'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 import { getOrders } from '@/data'
 
+import { getContacts } from '@/server-actions/contacts'
+
 export const metadata = {
   title: 'Orders',
 }
 
 export default async function Orders() {
-  let orders = await getOrders()
+  let contacts = await getContacts()
+  console.log(contacts)
 
   return (
     <>

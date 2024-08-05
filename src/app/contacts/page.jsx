@@ -1,3 +1,5 @@
+//'use client';
+
 import { Badge } from '@/components/badge'
 import { Button } from '@/components/button'
 import { Divider } from '@/components/divider'
@@ -9,18 +11,27 @@ import { Select } from '@/components/select'
 import { getEvents } from '@/data'
 import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 
+import { Btns_and_dialog } from '@/components/btns-and-dialogs'
+
+
+
 export const metadata = {
   title: 'Events',
 }
 
 export default async function Events() {
   let events = await getEvents()
+  //let [isNewContactOpen, setNewContactToOpen] = useState(false)
 
   return (
     <>
+
+      
+     
+      <Heading>Contacts</Heading>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-sm:w-full sm:flex-1">
-          <Heading>Events</Heading>
+          
           <div className="mt-4 flex max-w-xl gap-4">
             <div className="flex-1">
               <InputGroup>
@@ -37,7 +48,11 @@ export default async function Events() {
             </div>
           </div>
         </div>
-        <Button>Create event</Button>
+
+        <div className="mt-4 flex max-w-xl gap-4">
+          <Btns_and_dialog button_title={"New Contact"}/>
+        </div>
+        
       </div>
       <ul className="mt-10">
         {events.map((event, index) => (
