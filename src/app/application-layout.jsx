@@ -27,11 +27,14 @@ import {
   ArrowRightStartOnRectangleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  CircleStackIcon,
   Cog8ToothIcon,
+  DocumentTextIcon,
   LightBulbIcon,
   PlusIcon,
   ShieldCheckIcon,
   UserCircleIcon,
+  UsersIcon,
 } from '@heroicons/react/16/solid'
 import {
   Cog6ToothIcon,
@@ -124,13 +127,17 @@ export function ApplicationLayout({ events, children }) {
                 <HomeIcon />
                 <SidebarLabel>Home</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="/events" current={pathname.startsWith('/events')}>
-                <Square2StackIcon />
-                <SidebarLabel>Events</SidebarLabel>
+              <SidebarItem href="/contacts" current={pathname.startsWith('/contacts')}>
+                <UsersIcon/>
+                <SidebarLabel>Contacts</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/orders" current={pathname.startsWith('/orders')}>
-                <TicketIcon />
-                <SidebarLabel>Orders</SidebarLabel>
+                <DocumentTextIcon />
+                <SidebarLabel>Drafts</SidebarLabel>
+              </SidebarItem>
+              <SidebarItem href="/knowledge-base" current={pathname.startsWith('/knowledge-base')}>
+                <CircleStackIcon />
+                <SidebarLabel>Knowledge base</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/settings" current={pathname.startsWith('/settings')}>
                 <Cog6ToothIcon />
