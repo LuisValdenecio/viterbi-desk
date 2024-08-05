@@ -9,9 +9,19 @@ import { Input, InputGroup } from '@/components/input'
 import { Link } from '@/components/link'
 import { Select } from '@/components/select'
 import { getEvents } from '@/data'
+import { getContacts } from '@/server-actions/contacts'
 import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 
-import { Btns_and_dialog } from '@/components/btns-and-dialogs'
+import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
+import { Remove_Contact_Dialog } from '@/components/remove-contact-dialog'
+import {
+  Pagination,
+  PaginationGap,
+  PaginationList,
+  PaginationNext,
+  PaginationPage,
+  PaginationPrevious,
+} from '@/components/pagination'
 
 
 
@@ -21,6 +31,8 @@ export const metadata = {
 
 export default async function Events() {
   let events = await getEvents()
+  const contacts = await getContacts()
+  console.log(contacts)
   //let [isNewContactOpen, setNewContactToOpen] = useState(false)
 
   return (
@@ -50,46 +62,40 @@ export default async function Events() {
         </div>
 
         <div className="mt-4 flex max-w-xl gap-4">
-          <Btns_and_dialog button_title={"New Contact"}/>
+          <New_Contact_Dialog button_title={"New Contact"}/>
         </div>
         
       </div>
       <ul className="mt-10">
-        {events.map((event, index) => (
+        {contacts.data.map((contact, index) => (
           <>
-            <li key={event.id}>
+            <li key={contact._id.toString()}>
               <Divider soft={index > 0} />
               <div className="flex items-center justify-between">
-                <div key={event.id} className="flex gap-6 py-6">
-                  <div className="w-32 shrink-0">
-                    <Link href={event.url} aria-hidden="true">
-                      <img className="aspect-[3/2] rounded-lg shadow" src={event.imgUrl} alt="" />
-                    </Link>
-                  </div>
+                <div key={contact._id.toString()} className="flex gap-6 py-6">
+                  
                   <div className="space-y-1.5">
                     <div className="text-base/6 font-semibold">
-                      <Link href={event.url}>{event.name}</Link>
+                      <Link href={contact.email}>{contact.name}</Link>
                     </div>
                     <div className="text-xs/6 text-zinc-500">
-                      {event.date} at {event.time} <span aria-hidden="true">·</span> {event.location}
+                      {contact.createdAt} at {contact.updatedAt} <span aria-hidden="true">·</span> {contact.name}
                     </div>
-                    <div className="text-xs/6 text-zinc-600">
-                      {event.ticketsSold}/{event.ticketsAvailable} tickets sold
-                    </div>
+                    
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Badge className="max-sm:hidden" color={event.status === 'On Sale' ? 'lime' : 'zinc'}>
-                    {event.status}
+                  <Badge className="max-sm:hidden" color={true ? 'lime' : 'zinc'}>
+                    Active
                   </Badge>
                   <Dropdown>
                     <DropdownButton plain aria-label="More options">
                       <EllipsisVerticalIcon />
                     </DropdownButton>
                     <DropdownMenu anchor="bottom end">
-                      <DropdownItem href={event.url}>View</DropdownItem>
+                      <DropdownItem href={contact.email}>View</DropdownItem>
                       <DropdownItem>Edit</DropdownItem>
-                      <DropdownItem>Delete</DropdownItem>
+                      <Remove_Contact_Dialog id={contact._id.toString()} name={contact.name} />
                     </DropdownMenu>
                   </Dropdown>
                 </div>
@@ -98,6 +104,21 @@ export default async function Events() {
           </>
         ))}
       </ul>
+      <Pagination className="mt-10">
+      <PaginationPrevious href="?page=2" />
+      <PaginationList>
+        <PaginationPage href="?page=1">1</PaginationPage>
+        <PaginationPage href="?page=2">2</PaginationPage>
+        <PaginationPage href="?page=3" current>
+          3
+        </PaginationPage>
+        <PaginationPage href="?page=4">4</PaginationPage>
+        <PaginationGap />
+        <PaginationPage href="?page=65">65</PaginationPage>
+        <PaginationPage href="?page=66">66</PaginationPage>
+      </PaginationList>
+      <PaginationNext href="?page=4" />
+    </Pagination>
     </>
   )
 }
