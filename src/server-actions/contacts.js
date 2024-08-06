@@ -19,6 +19,21 @@ export async function getContacts(){
   }
 }
 
+export async function updateContact(contactId, newName, newEmail) {
+  try {
+    console.log("id equals to",contactId)
+    await connectDB()
+    const contact = await ContactModel.findOne({_id : contactId})
+    contact.name = newName
+    contact.email = newEmail
+    contact.save()
+    revalidatePath('/contacts')
+  } catch(error) {
+    console.log(error)
+    return {errMsg : 'error updating contact'}
+  }
+}
+
 export async function deleteContact(contactId) {
   try {
     await ContactModel.deleteOne({_id : contactId})

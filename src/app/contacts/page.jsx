@@ -14,6 +14,7 @@ import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/s
 
 import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
 import { Remove_Contact_Dialog } from '@/components/remove-contact-dialog'
+import { Alter_Contact_Dialog } from '@/components/alter-contact-dialog'
 import {
   Pagination,
   PaginationGap,
@@ -94,7 +95,7 @@ export default async function Events() {
                     </DropdownButton>
                     <DropdownMenu anchor="bottom end">
                       <DropdownItem href={contact.email}>View</DropdownItem>
-                      <DropdownItem>Edit</DropdownItem>
+                      <Alter_Contact_Dialog id={contact._id.toString()} name={contact.name} email={contact.email} />
                       <Remove_Contact_Dialog id={contact._id.toString()} name={contact.name} />
                     </DropdownMenu>
                   </Dropdown>
