@@ -15,32 +15,35 @@ import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/s
 import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
 import { Remove_Contact_Dialog } from '@/components/remove-contact-dialog'
 import { Alter_Contact_Dialog } from '@/components/alter-contact-dialog'
-import {
-  Pagination,
-  PaginationGap,
-  PaginationList,
-  PaginationNext,
-  PaginationPage,
-  PaginationPrevious,
-} from '@/components/pagination'
-
-
-
+import { Workable_Pagination } from '@/components/workable-pagination'
 export const metadata = {
   title: 'Events',
 }
 
-export default async function Events() {
-  let events = await getEvents()
-  const contacts = await getContacts()
-  console.log(contacts)
-  //let [isNewContactOpen, setNewContactToOpen] = useState(false)
+function createArrayFromConstant(number) {
+  let arr = []
+  for (let i = 0; i < number; i++) {
+    arr.push(i+1)
+  }
+  return arr
+}
+
+export default async function Page({searchParams}) {
+
+  let page = parseInt(searchParams.page, 10)
+  page = !page || page < 1 ? 1 : page
+  const perPage = 6
+
+  const contacts = await getContacts(perPage, page)
+  console.log("total pages: ",contacts.items_count)
+  const totalPages = Math.ceil(contacts.items_count / perPage)
+  console.log(totalPages)
+
+  
+  
 
   return (
     <>
-
-      
-     
       <Heading>Contacts</Heading>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-sm:w-full sm:flex-1">
@@ -105,21 +108,11 @@ export default async function Events() {
           </>
         ))}
       </ul>
-      <Pagination className="mt-10">
-      <PaginationPrevious href="?page=2" />
-      <PaginationList>
-        <PaginationPage href="?page=1">1</PaginationPage>
-        <PaginationPage href="?page=2">2</PaginationPage>
-        <PaginationPage href="?page=3" current>
-          3
-        </PaginationPage>
-        <PaginationPage href="?page=4">4</PaginationPage>
-        <PaginationGap />
-        <PaginationPage href="?page=65">65</PaginationPage>
-        <PaginationPage href="?page=66">66</PaginationPage>
-      </PaginationList>
-      <PaginationNext href="?page=4" />
-    </Pagination>
+      
+      {totalPages > 1 ? (
+        <Workable_Pagination totalPagesArray={createArrayFromConstant(totalPages)}/>
+      ) : (<></>)}
+      
     </>
   )
 }

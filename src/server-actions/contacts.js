@@ -6,14 +6,24 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 
-export async function getContacts(){
+export async function getContacts(perPage, page){
   try {
     await connectDB()
-    const data = JSON.parse(JSON.stringify(await ContactModel.find()))
+    const data = JSON.parse(
+      JSON.stringify(
+        await ContactModel
+        .find()
+        .skip(perPage * (page - 1))
+        .limit(perPage)
+      )
+    )
 
+    const items_count = await ContactModel
+      .countDocuments()
+   
     // throw new Error('Error!')
 
-    return { data }
+    return { data, items_count }
   } catch (error) {
     return { errMsg: error.message }
   }
