@@ -6,28 +6,32 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 
-export async function getContacts(perPage, page){
+export async function getContacts(perPage, page, searchQuery){
   try {
     await connectDB()
+        
+    let regex = new RegExp(searchQuery)
+    const rawData = await ContactModel
+    .find({name: regex})
+  
+
     const data = JSON.parse(
       JSON.stringify(
         await ContactModel
-        .find()
+        .find({name: regex})
         .skip(perPage * (page - 1))
         .limit(perPage)
-      )
+        )
     )
 
-    const items_count = await ContactModel
-      .countDocuments()
-   
-    // throw new Error('Error!')
-
-    return { data, items_count }
+    const items_count = rawData.length
+  
+    return { data, items_count  }
   } catch (error) {
-    return { errMsg: error.message }
+   console.log(error)
   }
 }
+
 
 export async function updateContact(contactId, newName, newEmail) {
   try {

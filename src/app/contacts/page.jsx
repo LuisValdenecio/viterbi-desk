@@ -1,21 +1,19 @@
-//'use client';
-
 import { Badge } from '@/components/badge'
-import { Button } from '@/components/button'
+
 import { Divider } from '@/components/divider'
 import { Dropdown, DropdownButton, DropdownItem, DropdownMenu } from '@/components/dropdown'
 import { Heading } from '@/components/heading'
-import { Input, InputGroup } from '@/components/input'
-import { Link } from '@/components/link'
-import { Select } from '@/components/select'
-import { getEvents } from '@/data'
-import { getContacts } from '@/server-actions/contacts'
-import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 
-import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
+import { Link } from '@/components/link'
+
+import { getContacts } from '@/server-actions/contacts'
+import { EllipsisVerticalIcon } from '@heroicons/react/16/solid'
+
 import { Remove_Contact_Dialog } from '@/components/remove-contact-dialog'
 import { Alter_Contact_Dialog } from '@/components/alter-contact-dialog'
 import { Workable_Pagination } from '@/components/workable-pagination'
+import {Search_and_filter} from '@/components/search-and-filter'
+
 export const metadata = {
   title: 'Events',
 }
@@ -30,45 +28,22 @@ function createArrayFromConstant(number) {
 
 export default async function Page({searchParams}) {
 
+  const searchQuery = searchParams.search
+
   let page = parseInt(searchParams.page, 10)
   page = !page || page < 1 ? 1 : page
   const perPage = 6
 
-  const contacts = await getContacts(perPage, page)
-  console.log("total pages: ",contacts.items_count)
+  const contacts = await getContacts(perPage, page, searchQuery)
+  
   const totalPages = Math.ceil(contacts.items_count / perPage)
   console.log(totalPages)
-
-  
-  
 
   return (
     <>
       <Heading>Contacts</Heading>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="max-sm:w-full sm:flex-1">
-          
-          <div className="mt-4 flex max-w-xl gap-4">
-            <div className="flex-1">
-              <InputGroup>
-                <MagnifyingGlassIcon />
-                <Input name="search" placeholder="Search events&hellip;" />
-              </InputGroup>
-            </div>
-            <div>
-              <Select name="sort_by">
-                <option value="name">Sort by name</option>
-                <option value="date">Sort by date</option>
-                <option value="status">Sort by status</option>
-              </Select>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 flex max-w-xl gap-4">
-          <New_Contact_Dialog button_title={"New Contact"}/>
-        </div>
-        
+      <div>
+        <Search_and_filter></Search_and_filter>
       </div>
       <ul className="mt-10">
         {contacts.data.map((contact, index) => (
@@ -110,7 +85,7 @@ export default async function Page({searchParams}) {
       </ul>
       
       {totalPages > 1 ? (
-        <Workable_Pagination totalPagesArray={createArrayFromConstant(totalPages)}/>
+        <Workable_Pagination resourceURL={'/contacts'} totalPagesArray={createArrayFromConstant(totalPages)}/>
       ) : (<></>)}
       
     </>
