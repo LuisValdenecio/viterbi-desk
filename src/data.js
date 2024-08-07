@@ -6,6 +6,29 @@ export async function getRecentOrders() {
   return (await getOrders()).slice(0, 10)
 }
 
+const users = [
+  {
+    email: "ls04af@gmail.com",
+    name : "Luís Tchitue",
+    password: "password"
+  },
+  {
+    email: "isaiasfernando2020@gmail.com",
+    name : "Isaías Chitue",
+    password: "password123#"
+  },
+  {
+    email: "benvindamariatchitue@gmail.com",
+    name : "Benvinda Maria",
+    password: "password456#"
+  }
+]
+
+export const getUserByEmail = email => {
+  const found = users.find(user => user.email === email)
+  return found
+}
+
 export async function getOrders() {
   return [
     {

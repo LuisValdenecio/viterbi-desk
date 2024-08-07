@@ -1,20 +1,31 @@
-import { doSocialLogin } from "@/server-actions/authentication";
+'use client'
 
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
+import { doSocialLogin } from "@/server-actions/authentication";
+import { doCredentialLogin } from "@/server-actions/authentication";
+import { useRouter } from "next/navigation";
+
 export default function Example() {
+
+  const router = useRouter()
+
+  async function handleFormSubmit(event) {
+    event.preventDefault()
+    try {
+      const formData = new FormData(event.currentTarget)
+      const response = await doCredentialLogin(formData)
+
+      console.log("response is ",response)
+      if (!!response) {
+
+      } else {
+        router.push("/dashboard")
+      }
+      
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
   return (
     <>
       <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -31,7 +42,7 @@ export default function Example() {
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
           <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
-            <form action="#" method="POST" className="space-y-6">
+            <form onSubmit={handleFormSubmit} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
                   Email address
