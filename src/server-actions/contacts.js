@@ -41,7 +41,7 @@ export async function updateContact(contactId, newName, newEmail) {
     contact.name = newName
     contact.email = newEmail
     contact.save()
-    revalidatePath('/contacts')
+    revalidatePath('/dashboard/contacts')
   } catch(error) {
     console.log(error)
     return {errMsg : 'error updating contact'}
@@ -51,7 +51,7 @@ export async function updateContact(contactId, newName, newEmail) {
 export async function deleteContact(contactId) {
   try {
     await ContactModel.deleteOne({_id : contactId})
-    revalidatePath('/contacts')
+    revalidatePath('/dashboard/contacts')
     return ('todo deleted')
   } catch(error) {
     return {errMsg : 'error deleting contact'}
@@ -74,8 +74,8 @@ export async function postContact(formData) {
     const newContact = await ContactModel.create({name, email})
     newContact.save()
 
-    revalidatePath('/contacts')
-    redirect('/')
+    revalidatePath('/dashboard/contacts')
+    redirect('/dashboard/contacts')
 
     return true
 

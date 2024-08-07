@@ -17,9 +17,9 @@ export function Search_and_filter() {
 
     useEffect(() => {
         if (!query) {
-            router.push('/contacts')
+            router.push('/dashboard/contacts')
         } else {
-            router.push(`/contacts?search=${query}`)
+            router.push(`/dashboard/contacts?search=${query}`)
         }
     }, [query, router])
 
