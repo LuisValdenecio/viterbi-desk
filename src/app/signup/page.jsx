@@ -5,7 +5,7 @@ import { doCredentialLogin } from "@/server-actions/authentication";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function Example() {
+export default function Page() {
 
   const router = useRouter()
 
@@ -13,14 +13,26 @@ export default function Example() {
     event.preventDefault()
     try {
       const formData = new FormData(event.currentTarget)
-      const response = await doCredentialLogin(formData)
 
-      console.log("response is ",response)
-      if (!!response) {
+      const name = formData.get('name')
+      const email = formData.get('email')
+      const password = formData.get('password')
 
-      } else {
-        router.push("/dashboard")
-      }
+      const response = await fetch(`/api/register`, {
+        method : "POST",
+        headers: {
+            "content-type": "application/json",
+        },
+        body : JSON.stringify({
+            name, 
+            email,
+            password
+        })
+      })
+
+      response.status === 201 && router.push('/signin')
+
+
       
     } catch(e) {
       console.log(e)
@@ -37,7 +49,7 @@ export default function Example() {
             className="mx-auto h-10 w-auto"
           />
           <h2 className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-            Sign in to your account
+            Sign up for a new account
           </h2>
         </div>
 
@@ -61,6 +73,22 @@ export default function Example() {
               </div>
 
               <div>
+                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                  Name
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  />
+                </div>
+              </div>
+
+              <div>
                 <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
                   Password
                 </label>
@@ -76,32 +104,14 @@ export default function Example() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                  />
-                  <label htmlFor="remember-me" className="ml-3 block text-sm leading-6 text-gray-900">
-                    Remember me
-                  </label>
-                </div>
-
-                <div className="text-sm leading-6">
-                  <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                    Forgot password?
-                  </a>
-                </div>
-              </div>
+             
 
               <div>
                 <button
                   type="submit"
                   className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                  Sign in
+                  create account
                 </button>
               </div>
             </form>
@@ -166,9 +176,9 @@ export default function Example() {
           </div>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Not a member?{' '}
-            <Link href={"/signup"} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
-              Sign up for a free account
+            already a member?{' '}
+            <Link href={"/signin"} className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">
+              sign in
             </Link>
           </p>
         </div>

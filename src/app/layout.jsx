@@ -1,4 +1,5 @@
 import '@/styles/tailwind.css'
+import connectDB from "@/lib/mongo";
 
 export const metadata = {
   title: {
@@ -10,6 +11,8 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   
+  await connectDB();
+
   return (
     <html
       lang="en"

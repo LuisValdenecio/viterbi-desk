@@ -1,14 +1,13 @@
 'use server'
 
 import ContactModel from "@/lib/mongo/contacts";
-import connectDB from "@/lib/mongo";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 
 export async function getContacts(perPage, page, searchQuery){
   try {
-    await connectDB()
+   
         
     let regex = new RegExp(searchQuery)
     const rawData = await ContactModel
@@ -36,7 +35,7 @@ export async function getContacts(perPage, page, searchQuery){
 export async function updateContact(contactId, newName, newEmail) {
   try {
     console.log("id equals to",contactId)
-    await connectDB()
+    
     const contact = await ContactModel.findOne({_id : contactId})
     contact.name = newName
     contact.email = newEmail
@@ -60,7 +59,7 @@ export async function deleteContact(contactId) {
 
 export async function postContact(formData) {
  
-  await connectDB()
+  
 
   const {name, email} = formData
   console.log(email, name)

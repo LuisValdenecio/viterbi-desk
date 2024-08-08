@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
+import UserModel from "./lib/mongo/users";
+import bcrypt from "bcrypt"
 
 import {getUserByEmail} from "@/data"
 
@@ -25,10 +27,15 @@ export const {
                 if (credentials === null) return null;
                 
                 try {
-                    const user = getUserByEmail(credentials?.email);
+                    const user = await UserModel.findOne({
+                        email : credentials?.email
+                    });
                     
                     if (user) {
-                        const isMatch = user?.password === credentials.password;
+                        const isMatch = await bcrypt.compare(
+                            credentials?.password,
+                            user.password
+                        )
 
                         if (isMatch) {
                             return user;
