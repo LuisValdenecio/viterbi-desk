@@ -16,8 +16,8 @@ export default function Example() {
       const response = await doCredentialLogin(formData)
 
       console.log("response is ",response)
-      if (!!response) {
-
+      if (!response) {
+        
       } else {
         router.push("/dashboard")
       }

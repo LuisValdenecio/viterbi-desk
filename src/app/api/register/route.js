@@ -24,7 +24,6 @@ export const POST = async (request) => {
         })
     }
     
-
     return new NextResponse("User has been created", {
         status : 201
     })

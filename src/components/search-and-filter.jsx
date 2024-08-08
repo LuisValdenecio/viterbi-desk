@@ -4,6 +4,7 @@ import { Input, InputGroup } from '@/components/input'
 import { useEffect, useState } from 'react'
 import { Select } from '@/components/select'
 import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
+import { Upload_csv_dialog } from '@/components/upload-csv-dialog'
 import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
@@ -48,8 +49,9 @@ export function Search_and_filter() {
           </div>
         </div>
 
-        <div className="mt-4 flex max-w-xl gap-4">
+        <div className="mt-4 flex max-w-xl gap-2">
           <New_Contact_Dialog button_title={"New Contact"}/>
+          <Upload_csv_dialog button_title={"Add .csv"}/>
         </div>
         
       </div>

@@ -57,6 +57,16 @@ export async function deleteContact(contactId) {
   }
 }
 
+export async function postManyContacts(data) {
+  try {
+    const options = {ordered : true}
+    await ContactModel.insertMany(data, options)
+  } catch(e) {
+    console.log(e)
+    return {errMsg : 'error inserting contacts'}
+  }
+}
+
 export async function postContact(formData) {
  
   
