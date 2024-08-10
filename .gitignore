@@ -29,9 +29,13 @@ yarn-error.log*
 .env*.local
 .env
 
+#secret
+google_credentials.json
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+

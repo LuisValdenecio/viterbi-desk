@@ -58,6 +58,12 @@ export const {
                 params: {
                     prompt: "consent",
                     access_type: "offline",
+                    scope: [
+                        "openid",
+                        "https://www.googleapis.com/auth/userinfo.email",
+                        "https://www.googleapis.com/auth/userinfo.profile",
+                        "https://www.googleapis.com/auth/gmail.readonly"
+                    ].join(" "),
                     response_type: "code",
                 },
             },
@@ -74,4 +80,14 @@ export const {
             },
         }),
     ],
+    callbacks: {
+         async jwt({ token, user, account }) {
+            console.log(account)
+            if (account?.['access_token']) {
+                token['access_token'] = account?.['access_token']
+                token['refresh_token'] = account?.['refresh_token']
+              }
+            return token;
+        },
+    },
 })

@@ -40,6 +40,8 @@ import {
   Cog6ToothIcon,
   HomeIcon,
   QuestionMarkCircleIcon,
+  InboxIcon,
+  MagnifyingGlassIcon,
   SparklesIcon,
   Square2StackIcon,
   TicketIcon,
@@ -158,7 +160,8 @@ function AccountDropdownMenu({ anchor }) {
 export default async function ApplicationLayout({ children }) {
   
   const session = await auth()
-
+  //console.log("session: ", session)
+  
   if (!session?.user) redirect("/signin")
 
   return (
@@ -167,6 +170,12 @@ export default async function ApplicationLayout({ children }) {
         <Navbar>
           <NavbarSpacer />
           <NavbarSection>
+              <NavbarItem href="/search" aria-label="Search">
+                <MagnifyingGlassIcon />
+              </NavbarItem>
+              <NavbarItem href="/inbox" aria-label="Inbox">
+                <InboxIcon />
+              </NavbarItem>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
                 <Avatar src={session?.user?.image} square />
@@ -180,7 +189,7 @@ export default async function ApplicationLayout({ children }) {
         <Sidebar>
           <SidebarHeader>
             <Dropdown>
-              <DropdownButton as={SidebarItem}>
+              <DropdownButton as={SidebarItem} className="lg:mb-2.5">
                 <Avatar src="/teams/catalyst.svg" />
                 <SidebarLabel>Catalyst</SidebarLabel>
                 <ChevronDownIcon />
@@ -206,6 +215,16 @@ export default async function ApplicationLayout({ children }) {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
+            <SidebarSection className="max-lg:hidden">
+              <SidebarItem href="/search">
+                <MagnifyingGlassIcon />
+                <SidebarLabel>Search</SidebarLabel>
+              </SidebarItem>
+              <SidebarItem href="/inbox">
+                <InboxIcon />
+                <SidebarLabel>Inbox</SidebarLabel>
+              </SidebarItem>
+            </SidebarSection>
           </SidebarHeader>
 
           <SidebarBody>
