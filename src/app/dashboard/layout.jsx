@@ -30,6 +30,7 @@ import {
   CircleStackIcon,
   Cog8ToothIcon,
   DocumentTextIcon,
+  EyeIcon,
   LightBulbIcon,
   PlusIcon,
   ShieldCheckIcon,
@@ -50,6 +51,7 @@ import Sidebar_item from "@/components/sidebar-item";
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { doLogout } from '@/server-actions/authentication'
+import { getChannles } from '@/server-actions/channels'
 //import { usePathname } from 'next/navigation'
 //import { useEffect, useState } from 'react'
 
@@ -160,6 +162,7 @@ function AccountDropdownMenu({ anchor }) {
 export default async function ApplicationLayout({ children }) {
   
   const session = await auth()
+  const channels = await getChannles()
   //console.log("session: ", session)
   
   if (!session?.user) redirect("/signin")
@@ -195,23 +198,44 @@ export default async function ApplicationLayout({ children }) {
                 <ChevronDownIcon />
               </DropdownButton>
               <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
-                <DropdownItem href="/dashboard/settings">
-                  <Cog8ToothIcon />
-                  <DropdownLabel>Settings</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="#">
-                  <Avatar slot="icon" src="/teams/catalyst.svg" />
-                  <DropdownLabel>Catalyst</DropdownLabel>
-                </DropdownItem>
-                <DropdownItem href="#">
-                  <Avatar slot="icon" initials="BE" className="bg-purple-500 text-white" />
-                  <DropdownLabel>Big Events</DropdownLabel>
-                </DropdownItem>
-                <DropdownDivider />
-                <DropdownItem href="#">
+                {channels?.length >= 4 ? (
+                  <>
+                    <DropdownItem href="/dashboard/settings">
+                      <EyeIcon />
+                      <DropdownLabel>See all channels</DropdownLabel>
+                    </DropdownItem>
+                    <DropdownDivider />
+                  </>
+                 
+                ) : (<></>)}
+                
+                
+                
+                {channels.map((channel) => (
+                  <DropdownItem href="#">
+                    {channel.provider === 'Gmail' ? (
+                      <Avatar slot="icon" src="/teams/Gmail.svg" />
+                    ) : (
+                      channel.provider === 'Discord' ? (
+                        <Avatar slot="icon" src="/teams/Discord.svg" />
+                      ) : (
+                        channel.provider === 'LinkedIn' ? (
+                          <Avatar slot="icon" src="/teams/LinkedIn.svg" />
+                        ) : (
+                          <Avatar slot="icon" src="/teams/OtherSource.svg" />
+                        )
+                      )
+                    )}
+                   
+                   
+                    
+                    <DropdownLabel>{channel.name}</DropdownLabel>
+                  </DropdownItem>
+                ))}
+                
+                <DropdownItem href="/dashboard/channels">
                   <PlusIcon />
-                  <DropdownLabel>New team&hellip;</DropdownLabel>
+                  <DropdownLabel>New Channel</DropdownLabel>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>

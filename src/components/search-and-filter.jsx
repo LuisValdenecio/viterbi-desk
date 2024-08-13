@@ -3,14 +3,13 @@
 import { Input, InputGroup } from '@/components/input'
 import { useEffect, useState } from 'react'
 import { Select } from '@/components/select'
-import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
 import { Upload_csv_dialog } from '@/components/upload-csv-dialog'
 import { EllipsisVerticalIcon, MagnifyingGlassIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/navigation'
 import { useDebounce } from 'use-debounce'
 
 
-export function Search_and_filter() {
+export function Search_and_filter({path, searchParam, csvBtn, children}) {
 
     const router = useRouter()
     const [text, setText] = useState('')
@@ -18,9 +17,9 @@ export function Search_and_filter() {
 
     useEffect(() => {
         if (!query) {
-            router.push('/dashboard/contacts')
+            router.push(path)
         } else {
-            router.push(`/dashboard/contacts?search=${query}`)
+            router.push(`${path}?${searchParam}=${query}`)
         }
     }, [query, router])
 
@@ -50,8 +49,8 @@ export function Search_and_filter() {
         </div>
 
         <div className="mt-4 flex max-w-xl gap-2">
-          <New_Contact_Dialog button_title={"New Contact"}/>
-          <Upload_csv_dialog button_title={"Add .csv"}/>
+          {children}
+          {csvBtn ? (<Upload_csv_dialog button_title={"Add .csv"}/>) : (<></>)}
         </div>
         
       </div>

@@ -8,7 +8,7 @@ import { TouchTarget } from './button'
 import { Link } from './link'
 
 export function Navbar({ className, ...props }) {
-  return <nav {...props} className={clsx(className, 'flex flex-1 items-center gap-4 py-2.5')} />
+  return <nav {...props} className={clsx(className, 'flex flex-1 items-start gap-4 py-2.5')} />
 }
 
 export function NavbarDivider({ className, ...props }) {
@@ -20,7 +20,7 @@ export function NavbarSection({ className, ...props }) {
 
   return (
     <LayoutGroup id={id}>
-      <div {...props} className={clsx(className, 'flex items-center gap-3')} />
+      <div {...props} className={clsx(className, 'flex items-start gap-3')} />
     </LayoutGroup>
   )
 }
@@ -36,7 +36,7 @@ export const NavbarItem = forwardRef(function NavbarItem(
 ) {
   let classes = clsx(
     // Base
-    'relative flex min-w-0 items-center gap-3 rounded-lg p-2 text-left text-base/6 font-medium text-zinc-950 sm:text-sm/5',
+    'relative flex min-w-0 items-start gap-3 rounded-lg pr-2 pt-2 pb-2 text-left text-base/6 font-medium text-zinc-950 sm:text-sm/5',
     // Leading icon/icon-only
     'data-[slot=icon]:*:size-6 data-[slot=icon]:*:shrink-0 data-[slot=icon]:*:fill-zinc-500 sm:data-[slot=icon]:*:size-5',
     // Trailing icon (down chevron or similar)
@@ -44,13 +44,13 @@ export const NavbarItem = forwardRef(function NavbarItem(
     // Avatar
     'data-[slot=avatar]:*:-m-0.5 data-[slot=avatar]:*:size-7 data-[slot=avatar]:*:[--avatar-radius:theme(borderRadius.DEFAULT)] data-[slot=avatar]:*:[--ring-opacity:10%] sm:data-[slot=avatar]:*:size-6',
     // Hover
-    'data-[hover]:bg-zinc-950/5 data-[slot=icon]:*:data-[hover]:fill-zinc-950',
+    //'data-[hover]:bg-zinc-950/5 data-[slot=icon]:*:data-[hover]:fill-zinc-950',
     // Active
-    'data-[active]:bg-zinc-950/5 data-[slot=icon]:*:data-[active]:fill-zinc-950',
+    //'data-[active]:bg-zinc-950/5 data-[slot=icon]:*:data-[active]:fill-zinc-950',
     // Dark mode
     'dark:text-white dark:data-[slot=icon]:*:fill-zinc-400',
-    'dark:data-[hover]:bg-white/5 dark:data-[slot=icon]:*:data-[hover]:fill-white',
-    'dark:data-[active]:bg-white/5 dark:data-[slot=icon]:*:data-[active]:fill-white'
+    //'dark:data-[hover]:bg-white/5 dark:data-[slot=icon]:*:data-[hover]:fill-white',
+    //'dark:data-[active]:bg-white/5 dark:data-[slot=icon]:*:data-[active]:fill-white'
   )
 
   return (
@@ -58,7 +58,7 @@ export const NavbarItem = forwardRef(function NavbarItem(
       {current && (
         <motion.span
           layoutId="current-indicator"
-          className="absolute inset-x-2 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white"
+          className="absolute inset-x-1 -bottom-2.5 h-0.5 rounded-full bg-zinc-950 dark:bg-white"
         />
       )}
       {'href' in props ? (

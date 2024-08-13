@@ -13,6 +13,8 @@ import { Remove_Contact_Dialog } from '@/components/remove-contact-dialog'
 import { Alter_Contact_Dialog } from '@/components/alter-contact-dialog'
 import { Workable_Pagination } from '@/components/workable-pagination'
 import {Search_and_filter} from '@/components/search-and-filter'
+import { New_Contact_Dialog } from '@/components/add-new-contact-dialog'
+
 
 export const metadata = {
   title: 'Events',
@@ -43,7 +45,11 @@ export default async function Page({searchParams}) {
     <>
       <Heading>Contacts</Heading>
       <div>
-        <Search_and_filter></Search_and_filter>
+        <Search_and_filter 
+          path={'/dashboard/contacts'} 
+          searchParam={'search'}
+          csvBtn={true}
+          ><New_Contact_Dialog button_title={"New Contact"}/></Search_and_filter>
       </div>
       <ul className="mt-10">
         {contacts.data.map((contact, index) => (
