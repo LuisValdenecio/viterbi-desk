@@ -13,6 +13,10 @@ import { New_channel_dialog } from '@/components/new-channel-dialog'
 import { postChannel } from '@/server-actions/channels'
 import { useState } from 'react'
 
+import { Description } from '@/components/fieldset'
+import { Switch, SwitchField, SwitchGroup } from '@/components/switch'
+
+
 /*
 export const metadata = {
   title: 'Settings',
@@ -60,37 +64,27 @@ export default function Settings() {
 
       <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
         <div className="space-y-1">
-          <Subheading>Organization Email</Subheading>
+          <Subheading>Reports</Subheading>
           <Text>This is how customers can contact you for support.</Text>
         </div>
         <div className="space-y-4">
-          <Input type="text" value={provider} onChange={(event) => setProvider(event.target.value)} aria-label="Organization Email" name="provider" defaultValue="Gmail" />
-          <CheckboxField>
-            <Checkbox name="email_is_public" defaultChecked />
-            <Label>Show email on public profile</Label>
-          </CheckboxField>
+          <SwitchGroup>
+            <SwitchField>
+              <Label>Show daily reports on the dashboard </Label>
+              <Description>Get fresh to your dashboard</Description>
+              <Switch name="show_on_events_page" />
+            </SwitchField>
+            <SwitchField>
+              <Label>Allow embedding</Label>
+              <Description>Allow others to embed your event details on their own site.</Description>
+              <Switch name="allow_embedding" />
+            </SwitchField>
+          </SwitchGroup>
         </div>
       </section>
 
-      <Divider className="my-10" soft />
-
+     
       
-
-      <Divider className="my-10" soft />
-
-      <section className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
-        <div className="space-y-1">
-          <Subheading>Currency</Subheading>
-          <Text>The currency that your organization will be collecting.</Text>
-        </div>
-        <div>
-          <Select aria-label="Currency" name="currency" defaultValue="cad">
-            <option value="cad">CAD - Canadian Dollar</option>
-            <option value="usd">USD - United States Dollar</option>
-          </Select>
-        </div>
-      </section>
-
       <Divider className="my-10" soft />
 
       <div className="flex justify-end gap-4">

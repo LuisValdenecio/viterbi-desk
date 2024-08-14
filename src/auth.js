@@ -5,8 +5,6 @@ import Credentials from "next-auth/providers/credentials";
 import UserModel from "./lib/mongo/users";
 import bcrypt from "bcrypt"
 
-import {getUserByEmail} from "@/data"
-
 export const {
     handlers: { GET, POST },
     auth,
@@ -41,7 +39,7 @@ export const {
                             return user;
                         } else {
                             console.log("error")
-                            throw new Error("Email or Password is not correct");
+                            throw new Error("Password is not correct");
                         }
                     } else {
                         throw new Error("User not found");

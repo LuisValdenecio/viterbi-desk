@@ -11,6 +11,11 @@ const config = {
       },
     },
   },
+  variants : {
+    extend : {
+      animation: ['animate-spin']
+    }
+  },
   plugins: [],
 }
 /** @type {import('tailwindcss').Config} */
