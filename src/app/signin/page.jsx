@@ -7,7 +7,7 @@ export default function Example() {
 
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="flex min-h-full dark:bg-zinc-900 flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
             alt="Your Company"
@@ -20,7 +20,7 @@ export default function Example() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
-          <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+          <div className="bg-white dark:bg-zinc-900 px-6 py-12 shadow sm:rounded-lg sm:px-12">
             
             <LoginForm />
 
@@ -30,7 +30,7 @@ export default function Example() {
                   <div className="w-full border-t border-gray-200" />
                 </div>
                 <div className="relative flex justify-center text-sm font-medium leading-6">
-                  <span className="bg-white px-6 text-gray-900">Or continue with</span>
+                  <span className="bg-white dark:bg-gray-900 px-6 text-gray-900 dark:text-white">Or continue with</span>
                 </div>
               </div>
 

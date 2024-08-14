@@ -7,19 +7,20 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { useFormStatus } from 'react-dom';
+import { LoadingButton } from '@/components/loading-button';
 
 export function SubmitBtn() {
     const { pending } = useFormStatus();
     return (
-        <button
-            type="submit" 
-            disabled={pending} 
-            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-             {pending ? 'Signing in...' : 'Signin'}
-        </button>
+        <LoadingButton variant='default_full_width' loading={pending}>
+            {pending ? '' : 'Sign in'}
+        </LoadingButton>
     )
 }
+
+export function LoadingButtonDemo () {
+    return <LoadingButton variant='default_full_width' loading>Sign In</LoadingButton>;
+};
 
 export  function LoginForm() {
 
@@ -99,7 +100,7 @@ export  function LoginForm() {
                 </div>
 
                 <div>
-                   <SubmitBtn />
+                   <SubmitBtn/>
                 </div>
             </form>
         </>
