@@ -39,10 +39,16 @@ export  function LoginForm() {
             router.push('/dashboard')
        } else if (state.message === ' User not found') {
             setUserDoesNotExist(true)
+            setOtherSignError(false)
+            setIncorrectPassword(false)
        } else if (state.message === ' Password is not correct') {
             setIncorrectPassword(true)
+            setUserDoesNotExist(false)
+            setOtherSignError(false)
        } else if ( state.message ) {
-        setOtherSignError(true)
+            setOtherSignError(true)
+            setIncorrectPassword(false)
+            setUserDoesNotExist(false)
        }
     }, [state])
 
@@ -67,7 +73,8 @@ export  function LoginForm() {
                         <Input name="password" type="password" invalid={(state.errors?.password || incorrectPassword) ? true : false} required />
                         {state.errors?.password && <ErrorMessage>{state.errors?.password[0]}</ErrorMessage>}
                         {incorrectPassword && <ErrorMessage>Incorrect password</ErrorMessage>}
-                        {otherSignError && <ErrorMessage>Something went wrong, try again.</ErrorMessage>}
+                        
+                        { (otherSignError && !state.errors?.password && !state.errors?.email) && <ErrorMessage>Something went wrong, try again.</ErrorMessage>}
                     </Field>
                 </div>
 
