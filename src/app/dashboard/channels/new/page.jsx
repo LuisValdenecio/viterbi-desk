@@ -15,7 +15,9 @@ import { useState } from 'react'
 
 import { Description } from '@/components/fieldset'
 import { Switch, SwitchField, SwitchGroup } from '@/components/switch'
-
+import { CardHeader_ } from '@/components/cardHeader'
+import { CardContent_ } from '@/components/cardContent'
+import { RegisterNewChannel } from '../(components)/registerChannel'
 
 /*
 export const metadata = {
@@ -33,8 +35,21 @@ export default function Settings() {
     await postChannel({name, provider})
   }
 
+  const description = `
+    Please, fill in all the fields to create a new Channel
+  `
+
+
 
   return (
+    <>
+      <CardHeader_ main_title={'New Channel'} description={description} />  
+      <CardContent_>
+          <RegisterNewChannel />
+      </CardContent_>
+    
+    </>
+    /*
     <form onSubmit={handleSubmit} >
       <Subheading className="my-10 mt-6" >New Channel</Subheading>
 
@@ -95,4 +110,5 @@ export default function Settings() {
       </div>
     </form>
   )
-}
+    */
+)}

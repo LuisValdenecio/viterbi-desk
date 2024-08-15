@@ -1,12 +1,32 @@
-import {Search_and_filter} from '@/components/search-and-filter'
+
 import { Button } from '@/components/button'
 import { getContactsSearch } from '@/server-actions/channels'
-import { Dropdown, DropdownButton, DropdownItem, DropdownMenu, DropdownLabel } from '@/components/dropdown'
-import { ArrowUpRightIcon, EllipsisVerticalIcon, PencilSquareIcon, PlusIcon, StarIcon, TrashIcon } from '@heroicons/react/16/solid'
-import { Workable_Pagination } from '@/components/workable-pagination'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
-import { Avatar } from '@/components/avatar'
+import { CardHeader_ } from '@/components/cardHeader'
+import { CardFooter_ } from '@/components/cardFooter'
+import { CardContent_ } from '@/components/cardContent'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import Image from "next/image"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  MoreHorizontal,
+} from "lucide-react"
+
+
 
 export const metadata = {
   title: 'Channels',
@@ -15,12 +35,12 @@ export const metadata = {
 function createArrayFromConstant(number) {
   let arr = []
   for (let i = 0; i < number; i++) {
-    arr.push(i+1)
+    arr.push(i + 1)
   }
   return arr
 }
 
-export default async function Page({searchParams}) {
+export default async function Page({ searchParams }) {
 
   const searchQuery = searchParams.search
   let page = parseInt(searchParams.page, 10)
@@ -31,77 +51,88 @@ export default async function Page({searchParams}) {
   console.log(channels)
   const totalPages = Math.ceil(channels.items_count / perPage)
 
+  const description = `
+  This page shows all your channels regardless of their status
+  `
+
   return (
     <>
-      <div>
-      <Search_and_filter 
-          path={'/dashboard/channels'} 
-          searchParam={'search'}
-          csvBtn={false}
-          >
-            <Button href="/dashboard/channels/new">
-              <PlusIcon/>
-              New Channel
-            </Button>
-           
-          </Search_and_filter>
-      </div>
-      <Table className="mt-6 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
-        <TableHead>
-          <TableRow>
-            <TableHeader>Provider</TableHeader>
-            <TableHeader>Date</TableHeader>
-            <TableHeader>Name</TableHeader>
-            <TableHeader className="text-right"></TableHeader>
-            
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {channels.data.map((channel, index) => (
-            <TableRow key={index} href={`/dashboard/channels/${channel._id}`} title={`Order #${channel.id}`}>
-             
-              <TableCell >{channel.provider}</TableCell>
-              <TableCell>{channel.createdAt}</TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Avatar src="/teams/catalyst.svg" className="size-6" />
-                  <span>{channel.name}</span>
-                </div>
-              </TableCell>
-              <TableCell className="text-right">
-              <Dropdown>
-                    <DropdownButton plain aria-label="More options">
-                      <EllipsisVerticalIcon />
-                    </DropdownButton>
-                    <DropdownMenu anchor="bottom end">
-                      <DropdownItem href={"#"} >
-                        <StarIcon />
-                        <DropdownLabel >Favorite</DropdownLabel>
-                      </DropdownItem>
-                      <DropdownItem href={"#"} >
-                        <TrashIcon/>
-                        <DropdownLabel >Delete</DropdownLabel>
-                      </DropdownItem>
-                      <DropdownItem href={"#"} >
-                        <PencilSquareIcon />
-                        <DropdownLabel >Edit </DropdownLabel>
-                      </DropdownItem>
-                      
-                    </DropdownMenu>
-                  </Dropdown>
-              </TableCell>
+      <CardHeader_ main_title={'Channels'} description={description} />
+      <CardContent_>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="hidden w-[100px] sm:table-cell">
+                <span className="sr-only">Image</span>
+              </TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Provider</TableHead>
               
-              
+              <TableHead className="hidden md:table-cell">
+                Date
+              </TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>
+                <span className="sr-only">Actions</span>
+              </TableHead>
             </TableRow>
-            
+          </TableHeader>
+          <TableBody>
+          {channels.data.map((channel, index) => (
+             <TableRow key={index}>
+            <TableCell className="hidden sm:table-cell">
+              <Image
+                alt="Product image"
+                className="aspect-square rounded-md object-cover"
+                height="32"
+                src="/teams/catalyst.svg"
+                width="32"
+              />
+            </TableCell>
+            <TableCell className="font-medium">
+            {channel.name}
+            </TableCell>
+            <TableCell>
+                {channel.provider}
+            </TableCell>
+            <TableCell className="hidden md:table-cell">
+              {channel.createdAt}
+            </TableCell>
+            <TableCell className="hidden md:table-cell">
+              <Badge variant="outline">Active</Badge>
+            </TableCell>
+           
+            <TableCell>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    aria-haspopup="true"
+                    plain
+                    size="icon"
+                    variant="ghost"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem>Edit</DropdownMenuItem>
+                  <DropdownMenuItem>Delete</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </TableCell>
+          </TableRow>
+
           ))}
-        </TableBody>
-      </Table>
+            
 
-      {totalPages > 1 ? (
-        <Workable_Pagination resourceURL={'/dashboard/channels'} totalPagesArray={createArrayFromConstant(totalPages)}/>
-      ) : (<></>)}
-
+          </TableBody>
+        </Table>
+      </CardContent_>
+      <CardFooter_ />
     </>
   )
+
+
 }

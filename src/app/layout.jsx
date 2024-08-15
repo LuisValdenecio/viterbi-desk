@@ -1,5 +1,6 @@
 import '@/styles/tailwind.css'
 import connectDB from "@/lib/mongo";
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata = {
   title: {
@@ -23,7 +24,8 @@ export default async function RootLayout({ children }) {
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
       </head>
       <body className='h-full mx-auto'>
-        {children}
+        <TooltipProvider>{children}</TooltipProvider>
+        
       </body>
     </html>
   )

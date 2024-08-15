@@ -22,6 +22,7 @@ import {
   SidebarSpacer,
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
+import { SiderBarBody } from './(components)/sidebar-body'
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -37,6 +38,9 @@ import {
   UserCircleIcon,
   UsersIcon,
 } from '@heroicons/react/16/solid'
+
+import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye } from 'lucide-react'
+
 import {
   Cog6ToothIcon,
   HomeIcon,
@@ -47,7 +51,7 @@ import {
   Square2StackIcon,
   TicketIcon,
 } from '@heroicons/react/20/solid'
-import Sidebar_item from "@/components/sidebar-item";
+
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import { doLogout } from '@/server-actions/authentication'
@@ -134,22 +138,22 @@ function AccountDropdownMenu({ anchor }) {
   return (
     <DropdownMenu className="min-w-64" anchor={anchor}>
       <DropdownItem href="/dashboard/account">
-        <UserCircleIcon />
-        <DropdownLabel>My account</DropdownLabel>
+        <CircleUser size={20} strokeWidth={1.25} />
+        <DropdownLabel className="ml-2"> My account</DropdownLabel>
       </DropdownItem>
       <DropdownDivider />
       <DropdownItem href="#">
-        <ShieldCheckIcon />
-        <DropdownLabel>Privacy policy</DropdownLabel>
+        <ShieldCheck size={20} strokeWidth={1.25} />
+        <DropdownLabel className="ml-2">Privacy policy</DropdownLabel>
       </DropdownItem>
       <DropdownItem href="#">
-        <LightBulbIcon />
-        <DropdownLabel>Share feedback</DropdownLabel>
+        <Lightbulb size={20} strokeWidth={1.25} />
+        <DropdownLabel className="ml-2">Share feedback</DropdownLabel>
       </DropdownItem>
       <DropdownDivider />
       <DropdownItem>
-        <ArrowRightStartOnRectangleIcon />
-        <DropdownLabel>
+        <LogOut size={20} strokeWidth={1.25} />
+        <DropdownLabel className="ml-2">
           <form action={doLogout}>
             <button type='submit'>Sign out</button>
           </form>  
@@ -177,7 +181,7 @@ export default async function ApplicationLayout({ children }) {
                 <MagnifyingGlassIcon />
               </NavbarItem>
               <NavbarItem href="/inbox" aria-label="Inbox">
-                <InboxIcon />
+                <Inbox strokeWidth={1} size={20} />
               </NavbarItem>
             <Dropdown>
               <DropdownButton as={NavbarItem}>
@@ -201,8 +205,8 @@ export default async function ApplicationLayout({ children }) {
                 {channels?.length >= 4 ? (
                   <>
                     <DropdownItem href="/dashboard/settings">
-                      <EyeIcon />
-                      <DropdownLabel>See all channels</DropdownLabel>
+                      <Eye size={20} strokeWidth={1.25} />
+                      <DropdownLabel className="ml-1">See all channels</DropdownLabel>
                     </DropdownItem>
                     <DropdownDivider />
                   </>
@@ -241,67 +245,17 @@ export default async function ApplicationLayout({ children }) {
             </Dropdown>
             <SidebarSection className="max-lg:hidden">
               <SidebarItem href="/search">
-                <MagnifyingGlassIcon />
+                <Search strokeWidth={1.25} size={20} />
                 <SidebarLabel>Search</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/inbox">
-                <InboxIcon />
+                <Inbox size={20} strokeWidth={1.25} />
                 <SidebarLabel>Inbox</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarHeader>
 
-          <SidebarBody>
-            <SidebarSection>
-              <Sidebar_item href={"/dashboard"} path={"/dashboard"}>
-                <HomeIcon />
-                <SidebarLabel>Home</SidebarLabel>
-              </Sidebar_item>
-              
-              <Sidebar_item href={"/dashboard/contacts"} path={"/dashboard/contacts"}>
-                <UsersIcon/>
-                <SidebarLabel>Contacts</SidebarLabel>
-              </Sidebar_item>
-
-              <Sidebar_item href={"/dashboard/drafts"} path={"/dashboard/drafts"}>
-                <DocumentTextIcon />
-                <SidebarLabel>Drafts</SidebarLabel>
-              </Sidebar_item>
-
-              <Sidebar_item href={"/dashboard/knowledge-base"} path={"/dashboard/knowledge-base"}>
-                <CircleStackIcon />
-                <SidebarLabel>Knowledge base</SidebarLabel>
-              </Sidebar_item>
-
-              <Sidebar_item href={"/dashboard/settings"} path={"/dashboard/settings"}>
-                <Cog6ToothIcon />
-                <SidebarLabel>Settings</SidebarLabel>
-              </Sidebar_item>
-                  
-            </SidebarSection>
-
-            <SidebarSection className="max-lg:hidden">
-              <SidebarHeading>Upcoming Events</SidebarHeading>
-              {events.map((event) => (
-                <SidebarItem key={event.id} href={event.url}>
-                  {event.name}
-                </SidebarItem>
-              ))}
-            </SidebarSection>
-
-            <SidebarSpacer />
-
-            <SidebarSection>
-              <SidebarItem href="#">
-                <QuestionMarkCircleIcon />
-                <SidebarLabel>Support</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="#">
-                <SparklesIcon />
-                <SidebarLabel>Changelog</SidebarLabel>
-              </SidebarItem>
-            </SidebarSection>
-          </SidebarBody>
+          <SiderBarBody events={events} />
 
           <SidebarFooter className="max-lg:hidden">
             <Dropdown>

@@ -5,6 +5,7 @@ import { Heading, Subheading } from '@/components/heading'
 import { Select } from '@/components/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 import { getRecentOrders } from '@/data'
+import { LineChart_ } from '@/components/linechart'
 
 export function Stat({ title, value, change }) {
   return (
@@ -26,6 +27,9 @@ export default async function Home() {
   return (
     <>
       <Heading>Good afternoon, Erica</Heading>
+      <div className="mt-2 mb-2">
+        <LineChart_ />
+      </div>
       <div className="mt-8 flex items-end justify-between">
         <Subheading>Overview</Subheading>
         <div>
