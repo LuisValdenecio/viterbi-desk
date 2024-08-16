@@ -26,7 +26,7 @@ const SignupFormSchema = z.object({
         password : formData.get("password"),
     })
 
-    console.log(formData)
+    console.log("form data: ", formData.get("name"))
 
     if (!validateFields.success) {
         return {

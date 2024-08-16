@@ -14,7 +14,6 @@ const LoginFormSchema = z.object({
 })
 
 const SignInValidateSession = LoginFormSchema.omit({})
-//const CheckEmailValidadeSession = CheckUserEmailSchema.omit({})
 
 export async function doSocialLogin(formData) {
     const action = formData.get('action')
@@ -32,6 +31,10 @@ export async function doCredentialLogin(_prevstate, formData) {
       password : formData.get("password"),
     })
 
+
+
+    console.log(validateFields.success)
+
     //const validateUserEmail = CheckEmailValidadeSession.safeParse({false})
 
     if (!validateFields.success) {
@@ -42,8 +45,14 @@ export async function doCredentialLogin(_prevstate, formData) {
     }
 
     const { email, password } = validateFields.data
+
+    setTimeout(() => {
+      // Your form processing logic here
+     
+    }, 3000); // 3-second delay
   
     try {
+      
       const response = await signIn("credentials", {
         email: email,
         password: password,
@@ -53,11 +62,15 @@ export async function doCredentialLogin(_prevstate, formData) {
       return {
         message : 'Success',
       }
-
+      
     } catch (err) {
       if (err instanceof AuthError) {
         console.log(err.cause.err.message.split("Error:")[1])
-        return { message: err.cause.err.message.split("Error:")[1] };
+        return {
+          errors: {},
+          message: err.cause.err.message.split("Error:")[1]
+        }
+       
       }
       throw err;
     }
