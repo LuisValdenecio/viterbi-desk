@@ -43,14 +43,15 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
   import { LoadingButton } from '@/components/loading-button';
+  import { AgentCapabilies } from './agentCapabilities'
   
-  export function RegisterNewChannel() {
+  export function RegisterNewAgent() {
     return (
       <div className="grid">
        
         <div className="flex flex-col">
          
-          <main className="grid flex-1 gap-4 overflow-auto  ">
+          <main className="grid flex-1 gap-4 overflow-auto  md:grid-cols-2 lg:grid-cols-2">
             <div
               className="relative  flex-col items-start gap-8 md:flex" x-chunk="dashboard-03-chunk-0"
             >
@@ -164,6 +165,20 @@ import {
                 <fieldset>
                     <LoadingButton variant='default_full_width' loading>Register channel</LoadingButton>
                 </fieldset>
+              </form>
+            </div>
+            <div
+              className="" x-chunk="dashboard-03-chunk-0"
+            >
+              <form className="grid w-full items-start gap-6">
+                <fieldset className="grid gap-6 rounded-lg border p-4">
+                  <legend className="-ml-1 px-1 text-sm font-medium">
+                    Capabilitiess
+                  </legend>
+                  <AgentCapabilies />
+                </fieldset>
+                
+               
               </form>
             </div>
            

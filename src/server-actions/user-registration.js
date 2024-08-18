@@ -27,13 +27,15 @@ const SignupFormSchema = z.object({
     })
 
     console.log("form data: ", formData.get("name"))
-
+    
     if (!validateFields.success) {
         return {
           errors: validateFields.error.flatten().fieldErrors,
           message: 'Missing Fields',
         };
       }
+
+     
 
       console.log("SUCESS", validateFields.success)
   

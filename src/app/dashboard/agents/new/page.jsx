@@ -1,5 +1,6 @@
 import { CardHeader_ } from '@/components/cardHeader'
 import { CardContent_ } from '@/components/cardContent'
+import { RegisterNewAgent } from '../(components)/registerAgent'
 
 export default async function Page() {
 
@@ -11,7 +12,7 @@ export default async function Page() {
         <>
             <CardHeader_ main_title={'New Agent'} description={description} />  
             <CardContent_>
-                <h1>Content goes here</h1>
+                <RegisterNewAgent />
             </CardContent_>
         </>
     )

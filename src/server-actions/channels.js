@@ -3,6 +3,24 @@
 import ChannelModel from "@/lib/mongo/channels"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { z } from "zod"
+
+// for testing loading, suspense and skeletons
+export async function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+
+const ChannelFormSchema = z.object({
+  channelName : z.string().min(1,{
+    message : 'Please enter a valid name for the channel.'
+  }),
+  provider : z.string().min(1,{
+    message : 'Please select a valid provider.'
+  }),
+})
+
+const ChannelCreationSession = ChannelFormSchema.omit({})
 
 export async function getContactsSearch(perPage, page, searchQuery){
   try {
@@ -47,24 +65,32 @@ export async function getChannles(){
 }
 
 
-export async function postChannel(formData) {
- 
-    const {name, provider} = formData
-    console.log(name, provider)
-    // validate here
-    if (!name || !provider) {
-      throw new Error('Missing name or email')
+export async function postChannel(_prevstate, formData) {
+
+    const validateFields = ChannelCreationSession.safeParse({
+      channelName : formData.get('channelName'),
+      provider : formData.get('provider')
+    })
+
+    if (!validateFields.success) {
+      return {
+        errors: validateFields.error.flatten().fieldErrors,
+        message: 'Missing Fields',
+      };
     }
-  
+ 
+    const {channelName, provider} = validateFields.data
+   
     try {
-      
+      console.log("data", {channelName, provider})
+      const name = channelName
       const newChannel = await ChannelModel.create({name, provider})
       newChannel.save()
   
-      revalidatePath('/dashboard/channel')
-      redirect('/dashboard/channel')
-  
-      return true
+      return {
+        message : 'Success',
+        channelId : newChannel._id
+      }
   
     } catch(error) {
       console.log(error)

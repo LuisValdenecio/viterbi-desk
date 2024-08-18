@@ -1,5 +1,7 @@
+import { CardContent_ } from '@/components/cardContent'
 import { CardHeader_ } from '@/components/cardHeader'
- 
+import { NoData } from '@/components/no-data'
+import { Skeleton_ } from './(components)/skeletons'
 
 export default async function Page() {
 
@@ -8,6 +10,12 @@ export default async function Page() {
     `
 
     return (
-        <CardHeader_ main_title={'Agents'} description={description} />  
+        <>
+            <CardHeader_ main_title={'Agents'} description={description} />  
+            <CardContent_ >
+                <Skeleton_ />
+                {false && <NoData />}
+            </CardContent_>
+        </>        
     )
 }
