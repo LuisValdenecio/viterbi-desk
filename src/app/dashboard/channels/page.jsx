@@ -7,6 +7,7 @@ import {Loading} from './loading'
 import { CardHeader_ } from '@/components/cardHeader'
 import { CardFooter_ } from '@/components/cardFooter'
 import { CardContent_ } from '@/components/cardContent'
+/*
 import {
   Table,
   TableBody,
@@ -15,6 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+ */
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
+
+
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -62,28 +67,26 @@ export default async function Page({ searchParams }) {
       <CardHeader_ main_title={'Channels'} description={description} />
       <CardContent_>
         <Suspense fallback={<Loading />}>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell">
-                  <span className="sr-only">Image</span>
-                </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Provider</TableHead>
-                
-                <TableHead className="hidden md:table-cell">
-                  Date
-                </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+          <Table className="mt-4 [--gutter:theme(spacing.6)] lg:[--gutter:theme(spacing.10)]">
+              <TableHead>
+                <TableRow>
+                  <TableHeader className="hidden w-[100px] sm:table-cell">
+                    <span className="sr-only">Image</span>
+                  </TableHeader>
+                  <TableHeader>Name</TableHeader>
+                  <TableHeader>Provider</TableHeader>
+                  <TableHeader>Date</TableHeader>
+                  <TableHeader>Status</TableHeader>
+                  <TableHeader>
+                    <span>Actions</span>
+                  </TableHeader>
+                </TableRow>
+                  
+              </TableHead>
+            
             <TableBody>
             {channels.data.map((channel, index) => (
-
-              <TableRow key={index} href={`/dashboard/channels/${channel._id}`}>
+              <TableRow key={index} href={`/dashboard/channels/${channel._id}`} title={`Order #${channel._id}`}>
                 <TableCell className="hidden sm:table-cell">
                   <Image
                     alt="Product image"

@@ -64,6 +64,17 @@ export async function getChannles(){
   }
 }
 
+export async function getChannel(channelId) {
+  try {
+    const data = JSON.parse(
+      JSON.stringify(await ChannelModel.findOne({_id : channelId})))
+      console.log("data ", data)
+    return data
+  } catch(err) {
+    console.log(err)
+  }
+}
+
 
 export async function postChannel(_prevstate, formData) {
 
