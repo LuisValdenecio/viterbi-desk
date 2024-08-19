@@ -9,7 +9,7 @@ import {
     SidebarSpacer,
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
-  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye } from 'lucide-react'
+  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss } from 'lucide-react'
 import { usePathname } from 'next/navigation';
 
 
@@ -25,31 +25,20 @@ export function SiderBarBody({events}) {
                 <SidebarLabel>Home</SidebarLabel>
               </Sidebar_item>
               
-              <Sidebar_item href={"/dashboard/contacts"} path={"/dashboard/contacts"}>
-                <ContactRound strokeWidth={path === '/dashboard/contacts' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Contacts</SidebarLabel>
-              </Sidebar_item>
-
-              <Sidebar_item href={"/dashboard/drafts"} path={"/dashboard/drafts"}>
-                <PencilRuler strokeWidth={path === '/dashboard/drafts' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Drafts</SidebarLabel>
-              </Sidebar_item>
-
               <Sidebar_item href={"/dashboard/agents"} path={"/dashboard/agents"}>
                 <Bot strokeWidth={path === '/dashboard/agents' ? 1.75 : 1.25} size={20} />
                 <SidebarLabel>Agents</SidebarLabel>
               </Sidebar_item>
 
+              <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/channels"}>
+                <Rss strokeWidth={path === '/dashboard/channels' ? 1.75 : 1.25} size={20} />
+                <SidebarLabel>Channels</SidebarLabel>
+              </Sidebar_item>
+
               <Sidebar_item href={"/dashboard/knowledge-base"} path={"/dashboard/knowledge-base"}>
                 <DatabaseZap strokeWidth={path === '/dashboard/knowledge-base' ? 1.75 : 1.25} size={20} />
                 <SidebarLabel>Knowledge base</SidebarLabel>
-              </Sidebar_item>
-
-              <Sidebar_item href={"/dashboard/settings"} path={"/dashboard/settings"}>
-                <Settings strokeWidth={path === '/dashboard/settings' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Settings</SidebarLabel>
-              </Sidebar_item>
-                  
+              </Sidebar_item>  
             </SidebarSection>
 
             <SidebarSection className="max-lg:hidden">
