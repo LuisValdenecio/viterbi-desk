@@ -79,12 +79,18 @@ export const {
         }),
     ],
     callbacks: {
-         async jwt({ token, user, account }) {
-            console.log(account)
+        
+
+        async jwt({ token, user, account }) {
+            console.log("ACCOUNT :", account)
+            console.log("PROVIDER : ", account?.provider)
             if (account?.['access_token']) {
-                token['access_token'] = account?.['access_token']
-                token['refresh_token'] = account?.['refresh_token']
-              }
+                token['access_token'] = account?.['access_token'] || 'luis token' 
+                token['refresh_token'] = account?.['refresh_token'] || 'luis refresh token'
+                } else {
+                    token['access_token'] = account?.['access_token'] || 'luis token' 
+                token['refresh_token'] = account?.['refresh_token'] || 'luis refresh token'
+                }
             return token;
         },
     },

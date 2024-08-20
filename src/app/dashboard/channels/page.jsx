@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table"
  */
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
-
+import { getURL } from '@/server-actions/gmail-api-utility'
 
 import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
@@ -33,7 +33,6 @@ import {
   MoreHorizontal,
 } from "lucide-react"
 
-import Link from 'next/link'
 
 export const metadata = {
   title: 'Channels',
@@ -48,6 +47,9 @@ function createArrayFromConstant(number) {
 }
 
 export default async function Page({ searchParams }) {
+
+  const authURL = await getURL()
+  console.log("URL URL:", authURL)
 
   const searchQuery = searchParams.search
   let page = parseInt(searchParams.page, 10)

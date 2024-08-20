@@ -167,7 +167,7 @@ export default async function ApplicationLayout({ children }) {
   
   const session = await auth()
   const channels = await getChannles()
-  //console.log("session: ", session)
+  console.log("SESSION: ", session)
   
   if (!session?.user) redirect("/signin")
 

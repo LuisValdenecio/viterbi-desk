@@ -11,6 +11,8 @@ export const GET = async (req, res) => {
         
         const access_token = token?.['access_token']
         const refresh_token = token?.['refresh_token']
+
+        console.log("TOKENS: ", access_token, refresh_token)
         
         const oauth2Client = new google.auth.OAuth2(
           process.env.GOOGLE_CLIENT_ID,
