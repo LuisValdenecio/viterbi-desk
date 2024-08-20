@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import {google} from 'googleapis';
 import crypto from 'crypto'
+import ChannelModel from "@/lib/mongo/channels";
+import connect from "@/lib/mongo";
 import url from 'url'
 
 const auth = new google.auth.OAuth2(
@@ -20,6 +22,16 @@ export const GET = async (req, res) => {
     }  else { // Get access and refresh tokens (if access_type is offline)
         let { tokens } = await auth.getToken(q.code);
         auth.setCredentials(tokens);
-        return Response.json(tokens)
+       
+        await connect()
+        const channel = await ChannelModel.findOne({_id : q.state})
+        channel.refreshToken = tokens.refresh_token
+        channel.save()
+
+        return new NextResponse("success", {
+            status : 201,
+            tokens : tokens
+        })
+            
     }
 }

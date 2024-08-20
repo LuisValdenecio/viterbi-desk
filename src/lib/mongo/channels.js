@@ -5,6 +5,9 @@ const channelSchema = new Schema({
         type:String,
         required:true
     },
+    refreshToken :{
+        type:String,
+    },
     provider: {
         type:String,
         required:true
