@@ -14,9 +14,8 @@ import { Dashboard } from '@/components/data-template'
 export default async function layout({ children }) {
 
     const links = [
-        {name : 'All', href : '/dashboard/channels'},
-        {name : 'Active', href : '/dashboard/channels/new'},
-      
+        {name : 'Profile', href : '/dashboard/account/'},
+        {name : 'Billing & Plans', href : '/dashboard/account/billing'}, 
     ]
 
     const cta_button = {
@@ -26,7 +25,7 @@ export default async function layout({ children }) {
 
     return <>
     
-        <Dashboard cta_button={cta_button} links={links} showButtons={false} showSearch={false}>
+        <Dashboard cta_button={cta_button} links={links}>
             {children}
         </Dashboard>
         
