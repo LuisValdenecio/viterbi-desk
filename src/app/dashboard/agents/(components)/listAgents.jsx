@@ -25,10 +25,9 @@ import { Select } from '@/components/select'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
-export function ListAgents({ channelId }) {
+export function ListAgents() {
 
-    const { data : agents, error : fetchAgentsError, isLoading } = useSWR(`/api/agents/${channelId}`, fetcher)
-    console.log("AGENTS: ", agents?.agents)
+    const { data : agents, error : fetchAgentsError, isLoading } = useSWR('/api/allAgents', fetcher)
     return (
         <>
 

@@ -26,7 +26,7 @@ export default async function layout({ children }) {
 
     return <>
     
-        <Dashboard cta_button={cta_button} links={links} showButtons={false} showSearch={false}>
+        <Dashboard cta_button={cta_button} links={links} showButtons={true} showSearch={false}>
             {children}
         </Dashboard>
         

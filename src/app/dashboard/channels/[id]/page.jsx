@@ -1,41 +1,45 @@
 'use client'
 
 import { CardHeader_ } from '@/components/cardHeader'
-import { CardFooter_ } from '@/components/cardFooter'
 import { CardContent_ } from '@/components/cardContent'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { getChannel } from '@/server-actions/channels'
 import { ChannelDashboard } from '../(components)/channelDashboard'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { Skeleton } from "@/components/ui/skeleton"
+import useSWR from 'swr'
+
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+
+export function fetchChannelData(url) {
+  const { data, error, isLoading } = useSWR(url, fetcher)
+ 
+  return {
+    channel: data,
+    isLoadingFromChannelFetch : isLoading,
+    isErrorFromChannelFetch: error
+  }
+}
 
 export default function Page() {
 
   const path = usePathname()
-  const [channelData, setChannelData] = useState([])
   const channelId = path.split("/")[path.split("/").length - 1]
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await getChannel(channelId)
-        setChannelData(response)
-      } catch(error) {
-        console.log(error)
-      }
-    }
-    fetchData()  
-  }, [])
-
+  const { channel, isLoadingFromChannelFetch, isErrorFromChannelFetch } = fetchChannelData(`/api/channel/${channelId}`)
 
   return (
     <>
-      <CardHeader_ main_title={channelData?.name} description={channelData?.provider} />
+      {!isLoadingFromChannelFetch && (
+        <CardHeader_ main_title={channel?.channel?.name} description={channel?.channel?.provider} />
+      )}
+
+      {isLoadingFromChannelFetch && (
+        <div className="flex items-center space-x-4">
+          <div className="space-y-2 p-6">
+            <Skeleton className="h-6 w-[300px]" />
+            <Skeleton className="h-4 w-[200px]" />
+          </div>
+        </div>
+      )}
+      
       <CardContent_>
         <ChannelDashboard />
       </CardContent_>
