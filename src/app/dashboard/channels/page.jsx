@@ -54,7 +54,7 @@ export default async function Page({ searchParams }) {
   const searchQuery = searchParams.search
   let page = parseInt(searchParams.page, 10)
   page = !page || page < 1 ? 1 : page
-  const perPage = 8
+  const perPage = 11
 
   const channels = await getContactsSearch(perPage, page, searchQuery)
   console.log(channels)

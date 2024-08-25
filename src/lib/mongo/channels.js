@@ -9,7 +9,8 @@ const channelSchema = new Schema({
         type:String,
         required:true
     },
-    token :  { type: Schema.Types.ObjectId, ref: 'GoogleTokenModel' },
+    googleToken :  { type: Schema.Types.ObjectId, ref: 'GoogleTokenModel' },
+    discordToken :  { type: Schema.Types.ObjectId, ref: 'DiscordTokenModel' },
 }, {timestamps : true})
 
 const ChannelModel = models.Channel || model("Channel",channelSchema)

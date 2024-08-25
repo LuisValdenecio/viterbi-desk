@@ -1,6 +1,6 @@
 import { CardHeader_ } from '@/components/cardHeader'
 import { CardContent_ } from '@/components/cardContent'
-import { RegisterNewAgent } from '../(components)/registerAgent'
+import { RegisterNewAgent } from '../../(components)/registerAgent'
 
 export default async function Page() {
 

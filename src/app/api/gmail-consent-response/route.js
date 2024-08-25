@@ -33,7 +33,7 @@ export const GET = async (req, res) => {
 
         await connect()
         const channel = await ChannelModel.findOne({_id : q.state})
-        channel.token = googleToken._id
+        channel.googleToken = googleToken._id
         channel.save()
 
         return new NextResponse("success", {

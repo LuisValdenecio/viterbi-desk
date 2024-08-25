@@ -2,12 +2,18 @@ import { NextResponse } from "next/server"
 import {google} from 'googleapis';
 import crypto from 'crypto'
 import ChannelModel from "@/lib/mongo/channels";
+import DiscordTokenModel from "@/lib/mongo/discordTokens"
 import connect from "@/lib/mongo";
 import url from 'url'
 import axios from 'axios'
+import { cookies } from "next/headers";
 
 export const GET = async (req, res) => {
+    
+    const cookieStore = cookies()
+    const channelId = cookieStore.get('channel-id')
     let code = url.parse(req.url, true).query.code;
+
     const params = new URLSearchParams();
     let user;
     params.append('client_id', process.env.DISCORD_CLIENT_ID);
@@ -20,12 +26,21 @@ export const GET = async (req, res) => {
         const { access_token,token_type}=response.data;
 
         // find the discord channel and add access token
+        console.log("TOKENS: ", access_token, token_type)
         await connect()
-        const channel = await ChannelModel.findOne({provider : 'Discord'})
-        channel.refreshToken = access_token
+
+        const discordToken = await DiscordTokenModel({
+            access_token : access_token,
+            token_type : token_type
+        })
+
+        discordToken.save()
+
+        const channel = await ChannelModel.findOne({_id : channelId.value})
+        channel.discordToken = discordToken._id
         channel.save()
 
-        await axios.get("http://localhost:3000/dashboard/channels")
+        //await axios.get("http://localhost:3000/dashboard/channels")
 
         return new NextResponse("success", {
             status : 201

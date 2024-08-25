@@ -215,7 +215,7 @@ export default async function ApplicationLayout({ children }) {
                 
                 
                 
-                {channels.map((channel) => (
+                {channels?.map((channel) => (
                   <DropdownItem href="#">
                     {channel.provider === 'Gmail' ? (
                       <Avatar slot="icon" src="/teams/Gmail.svg" />
