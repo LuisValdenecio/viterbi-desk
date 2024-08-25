@@ -28,7 +28,7 @@ export default async function Home() {
     <>
       <Heading>Good afternoon, Erica</Heading>
       <div className="mt-2 mb-2">
-        <LineChart_ />
+       
       </div>
       <div className="mt-8 flex items-end justify-between">
         <Subheading>Overview</Subheading>

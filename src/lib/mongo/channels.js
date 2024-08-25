@@ -5,13 +5,11 @@ const channelSchema = new Schema({
         type:String,
         required:true
     },
-    refreshToken :{
-        type:String,
-    },
     provider: {
         type:String,
         required:true
     },
+    token :  { type: Schema.Types.ObjectId, ref: 'GoogleTokenModel' },
 }, {timestamps : true})
 
 const ChannelModel = models.Channel || model("Channel",channelSchema)

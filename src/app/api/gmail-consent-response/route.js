@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import {google} from 'googleapis';
 import crypto from 'crypto'
 import ChannelModel from "@/lib/mongo/channels";
+import GoogleTokenModel from "@/lib/mongo/googleTokens"
 import connect from "@/lib/mongo";
 import url from 'url'
 
@@ -21,11 +22,18 @@ export const GET = async (req, res) => {
         })
     }  else { // Get access and refresh tokens (if access_type is offline)
         let { tokens } = await auth.getToken(q.code);
-        auth.setCredentials(tokens);
-       
+    
+        const googleToken = await GoogleTokenModel({
+            access_token : tokens?.access_token,
+            refresh_token : tokens?.refresh_token,
+            scope : tokens?.scope
+        })
+
+        googleToken.save()
+
         await connect()
         const channel = await ChannelModel.findOne({_id : q.state})
-        channel.refreshToken = tokens.refresh_token
+        channel.token = googleToken._id
         channel.save()
 
         return new NextResponse("success", {

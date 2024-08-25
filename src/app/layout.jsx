@@ -1,6 +1,7 @@
 import '@/styles/tailwind.css'
 import connectDB from "@/lib/mongo";
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/toaster';
 
 export const metadata = {
   title: {
@@ -25,7 +26,7 @@ export default async function RootLayout({ children }) {
       </head>
       <body className='h-full mx-auto'>
         <TooltipProvider>{children}</TooltipProvider>
-        
+        <Toaster/>
       </body>
     </html>
   )
