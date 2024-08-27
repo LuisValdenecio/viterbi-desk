@@ -5,8 +5,7 @@ import connect from "@/lib/mongo";
 export const GET = async (req, { params }) => {
     try {
         await connect()
-        const agents = await AgentModel.find({channelId : params.id})
-        
+        const agents = await AgentModel.find({channel : params.id})
         return Response.json({ agents })
 
     } catch (error) {

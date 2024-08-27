@@ -5,14 +5,21 @@ const agentSchema = new Schema({
         type:String,
         required:true
     },
-    channelId:{
-        type:String,
+    channel :  { 
+        type: Schema.Types.ObjectId, 
+        ref: 'ChannelModel',
         required:true
     },
-    action:{
+    description: {
         type:String,
-        required:true,
     },
+    status : {
+        type:String,
+    },
+    priority : {
+        type:String,
+        required:true
+    }
 }, {timestamps : true})
 
 const AgentModel = models.Agent || model("Agent",agentSchema)

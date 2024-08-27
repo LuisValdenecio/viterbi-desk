@@ -43,7 +43,7 @@ import {
     TooltipTrigger,
   } from "@/components/ui/tooltip"
   import { LoadingButton } from '@/components/loading-button';
-  import { AgentCapabilies } from './agentCapabilities'
+  //import { AgentCapabilies } from './agentCapabilities'
   
   export function RegisterNewAgent() {
     return (

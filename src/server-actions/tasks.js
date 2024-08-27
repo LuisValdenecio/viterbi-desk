@@ -20,6 +20,12 @@ const TaskFormSchema = z.object({
     agentId : z.string().min(1, {
         message : ''
     }),
+    status : z.string().min(1,{
+        message : 'Please select a valid status.',
+    }).optional(),
+    id : z.string().min(1, {
+        message : ''
+    }),
     timezone : z.string().min(1, {
         message : 'Select a time zone'
     }),
@@ -41,12 +47,16 @@ const TaskCreationSession = TaskFormSchema.omit({})
 
 export async function executeTask(formData) {
 
+    console.log("FORM DATA: ", formData)
+
     const agentId = formData.get('task-agent')
 
     try {
         // execute task code based on the provider
         const agent = await AgentModel.find({_id : agentId})
-        const channel = await ChannelModel.find({_id : agent[0]?.channelId})
+        console.log(agent)
+        const channel = await ChannelModel.find({_id : agent[0]?.channel})
+        console.log(channel)
 
         switch(channel[0]?.provider) {
             case 'Gmail' :
@@ -74,8 +84,10 @@ export async function postTask(_prevstate, formData) {
     const validatedFields = TaskCreationSession.safeParse({
         taskName : formData.get('taskName'),
         agentId : formData.get('agentId'),
+        status : 'functioning',
         timezone : formData.get('timezone'),
         day : formData.get('day'),
+        id : 'TASK-1B',
         day_period : formData.get('day_period'),
         hour_minute : formData.get('hour_minute'),
         template : formData.get('template'),
@@ -91,8 +103,10 @@ export async function postTask(_prevstate, formData) {
     const { 
         taskName,
         agentId,
+        status,
         timezone,
         day,
+        id,
         day_period,
         hour_minute,
         template 
@@ -119,6 +133,8 @@ export async function postTask(_prevstate, formData) {
     
     const task = await TaskModel.create({
         taskName : taskName, 
+        status : status,
+        id : id,
         agent : agentId,
         schedule : taskSchedule._id, 
         template : taskTemplate._id

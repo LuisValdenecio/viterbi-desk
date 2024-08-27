@@ -1,13 +1,17 @@
 import { Schema, model, models } from "mongoose"
-import AgentModel from "./agents"
-import TaskTemplateModel from './taskTemplate'
-import TaskScheduleModel from './taskSchedule'
 
 const taskSchema = new Schema({
     taskName:{
         type:String,
         required:true,
         unique: true
+    },
+    status : {
+        type:String,
+    },
+    id: {
+        type:String,
+        required:true
     },
     agent : { type: Schema.Types.ObjectId, ref: 'AgentModel', required: true },
     schedule : [{ type: Schema.Types.ObjectId, ref: 'TaskScheduleModel', required: true }],

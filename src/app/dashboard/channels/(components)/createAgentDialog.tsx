@@ -25,8 +25,9 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { PlusCircle, Loader2, Eye, PencilRuler, Zap } from "lucide-react"
+import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -71,10 +72,13 @@ const formSchema = z.object({
   agentName: z.string().min(1, {
     message: 'Please enter a valid name for the Agent.'
   }),
-  channelId: z.string().min(1, {
+  channel: z.string().min(1, {
     message: 'Add a valid channel id'
   }),
-  action: z.string().min(1, {
+  priority: z.string().min(1, {
+    message: 'Please select a valid action.'
+  }),
+  description: z.string().min(1, {
     message: 'Please select a valid action.'
   }),
 })
@@ -87,16 +91,18 @@ export function CreateAgentDialog() {
   const initialState = {
     errors: {
       agentName: undefined,
-      channelId: undefined,
-      action: undefined
+      channel: undefined,
+      action: undefined,
+      description : undefined
     },
     message: undefined
   };
 
-  const initialValues: { agentName: string, channelId: string, action: string } = {
+  const initialValues: { agentName: string, channel: string, priority: string, description: string } = {
     agentName: "",
-    channelId: channelId,
-    action: "",
+    channel: channelId,
+    priority: "",
+    description: ""
   };
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -132,15 +138,15 @@ export function CreateAgentDialog() {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button size="sm" className="h-8 gap-1">
-
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Agent
-            </span>
-
-
-          </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto hidden h-8 lg:flex"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          New
+        </Button>
+          
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -168,7 +174,7 @@ export function CreateAgentDialog() {
 
               <FormField
                 control={form.control}
-                name="channelId"
+                name="channel"
                 render={({ field }) => (
                   <FormItem className="hidden">
                     <FormLabel>Channel id</FormLabel>
@@ -180,24 +186,23 @@ export function CreateAgentDialog() {
               />
 
               <div className="grid gap-3 mb-4">
-                <Label htmlFor="model">Actions</Label>
-                <Select name="action">
+                <Label htmlFor="model">Tasks Priority</Label>
+                <Select name="priority">
                   <SelectTrigger
                     id="model"
-                    name="action"
                     className="items-start [&_[data-description]]:hidden"
                   >
-                    <SelectValue placeholder="Select what your agent can do" />
+                    <SelectValue placeholder="Select a priority for this agent" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Read">
+                    <SelectItem value="low">
                       <div className="flex items-start gap-3 text-muted-foreground">
-                        <Eye className="size-5" />
+                        <MoveDown className="size-5" />
                         <div className="grid gap-0.5">
                           <p>
 
                             <span className="font-medium text-foreground">
-                              Read
+                              Low
                             </span>
                           </p>
                           <p className="text-xs" data-description>
@@ -206,40 +211,54 @@ export function CreateAgentDialog() {
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Write">
+                    <SelectItem value="medium">
                       <div className="flex items-start gap-3 text-muted-foreground">
-                        <PencilRuler className="size-5" />
+                        <MoveRight className="size-5" />
                         <div className="grid gap-0.5">
                           <p>
                             <span className="font-medium text-foreground">
-                              Write
+                              Medium
                             </span>
                           </p>
                           <p className="text-xs" data-description>
-                            Can act on the channel, like sending messages
+                           Tasks run once stack is free
                           </p>
                         </div>
                       </div>
                     </SelectItem>
-                    <SelectItem value="Read/Write">
+                    <SelectItem value="high">
                       <div className="flex items-start gap-3 text-muted-foreground">
-                        <Zap className="size-5" />
+                        <MoveUp className="size-5" />
                         <div className="grid gap-0.5">
                           <p>
                             <span className="font-medium text-foreground">
-                              Read/Write
+                              High
                             </span>
                           </p>
                           <p className="text-xs" data-description>
-                            The most powerful model for complex
-                            computations.
+                           The tasks run ASAP
                           </p>
                         </div>
                       </div>
                     </SelectItem>
                   </SelectContent>
-                  <FormMessage>{state?.errors?.action}</FormMessage>
+                  <FormMessage>{state?.errors?.priority}</FormMessage>
                 </Select>
+
+                <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="mb-4">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." />
+                    </FormControl>
+                    <FormMessage>{state?.errors?.description}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
               </div>
               <SubmitBtn />
             </form>

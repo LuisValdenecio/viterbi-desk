@@ -15,7 +15,7 @@ export default async function layout({ children }) {
 
     const links = [
         {name : 'All', href : '/dashboard/channels'},
-        {name : 'Active', href : '/dashboard/channels/new'},
+        {name : 'Active', href : '#'},
       
     ]
 

@@ -75,10 +75,9 @@ export function Dashboard({ children, cta_button, links, showSearch, showButtons
 
   return (
     <div className="flex flex-col">
-
       <div className="flex flex-col ">
         <header className="sticky mb-2 top-0 z-30 flex h-14 items-center gap-4 border-b bg-background  sm:static sm:h-auto sm:border-0 sm:bg-transparent ">
-
+        
         <BreadCrumpComponent />
 
         {showSearch && (
@@ -109,33 +108,7 @@ export function Dashboard({ children, cta_button, links, showSearch, showButtons
               </TabsList>
               {showButtons && (
                 <div className="ml-auto flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm" className="h-8 gap-1">
-                        <ListFilter className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                          Filter
-                        </span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuCheckboxItem checked>
-                        Active
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem>
-                        Archived
-                      </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <Button size="sm" variant="outline" className="h-8 gap-1">
-                    <File className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Export
-                    </span>
-                  </Button>
+                  
                   <Button size="sm" className="h-8 gap-1" asChild>
                     <Link href={cta_button.href}>
                       <PlusCircle className="h-3.5 w-3.5" />

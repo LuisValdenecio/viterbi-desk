@@ -40,6 +40,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { Textarea } from "@/components/ui/textarea";
 
   export function SubmitBtn() {
     const { pending } = useFormStatus();
@@ -54,9 +55,12 @@ import {
     channelName : z.string().min(1, {
       message : 'Please enter a valid name.'
     }),
-    provider : z.string().min(1,{
-      message : 'Please enter a provider'
+    provider :  z.string().min(1, {
+      message : 'Please enter a valid name.'
     }),
+    description : z.string().min(1,{
+      message : 'Please enter a provider'
+    })
   })
 
   export function RegisterNewChannel() {
@@ -65,15 +69,17 @@ import {
 
     const initialState = {
       errors: {
-        email: undefined,
-        password: undefined
+        channelName: undefined,
+        provider: undefined,
+        description : undefined
       },
       message: undefined
     };
 
-    const initialValues: {channelName : string, provider : string} = {
+    const initialValues: {channelName : string, provider : string, description : string} = {
       channelName: "",
       provider: "",
+      description : ""
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -125,6 +131,7 @@ import {
                           </FormItem>
                         )}
                       />
+
                       <div className="grid gap-3">
                         <Label htmlFor="model">Provider</Label>
                         <Select name="provider">
@@ -203,7 +210,19 @@ import {
                         </Select>
                       </div>
                       
-                  
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem className="mb-4">
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                              <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." {...field}/>
+                            </FormControl>
+                            <FormMessage>{state?.errors?.description}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
                   
                     
                       <SubmitBtn />

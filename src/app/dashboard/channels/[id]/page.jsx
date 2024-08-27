@@ -1,11 +1,16 @@
 'use client'
 
-import { CardHeader_ } from '@/components/cardHeader'
-import { CardContent_ } from '@/components/cardContent'
 import { usePathname } from 'next/navigation'
-import { ChannelDashboard } from '../(components)/channelDashboard'
-import { Skeleton } from "@/components/ui/skeleton"
 import useSWR from 'swr'
+import { ListItemTable } from "../(components)/agents-list/tableOfItems"
+import { CreateAgentDialog } from "../(components)/createAgentDialog"
+
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -23,27 +28,40 @@ export default function Page() {
 
   const path = usePathname()
   const channelId = path.split("/")[path.split("/").length - 1]
-  const { channel, isLoadingFromChannelFetch, isErrorFromChannelFetch } = fetchChannelData(`/api/channel/${channelId}`)
+  const { data, isLoading,  error } = useSWR(`/api/agents/${channelId}`, fetcher)
+  
 
+  if (error) return <div>falhou em carregar</div>
+  if (isLoading) return <div>carregando...</div>
   return (
-    <>
-      {!isLoadingFromChannelFetch && (
-        <CardHeader_ main_title={channel?.channel?.name} description={channel?.channel?.provider} />
-      )}
+  <>
 
-      {isLoadingFromChannelFetch && (
-        <div className="flex items-center space-x-4">
-          <div className="space-y-2 p-6">
-            <Skeleton className="h-6 w-[300px]" />
-            <Skeleton className="h-4 w-[200px]" />
-          </div>
-        </div>
-      )}
-      
-      <CardContent_>
-        <ChannelDashboard />
-      </CardContent_>
-      
-    </>
+<div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
+
+<Tabs defaultValue="overview">
+  <div className="flex justify-between items-center pl-2 pr-2 pt-2">
+    <TabsList>
+      <TabsTrigger value="overview">Overview</TabsTrigger>
+      <TabsTrigger value="agents">Agents</TabsTrigger>
+    </TabsList>
+    <CreateAgentDialog />
+  </div>
+  <TabsContent value="overview" >
+    
+  </TabsContent>
+  <TabsContent value="agents">
+  <div className="p-2">
+      <ListItemTable agents={data.agents} />
+    </div>
+  </TabsContent>
+
+</Tabs>
+</div>
+    
+
+    
+  </>
+  
   )
+  
 }

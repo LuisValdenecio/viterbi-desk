@@ -4,7 +4,7 @@ export default async function layout({ children }) {
 
     const links = [
         {name : 'All', href: '/dashboard/agents'},
-        {name : 'Active', href: '/dashboard/agents/active'},
+        {name : 'Active', href: '#'},
     ]
 
     const cta_button = {
@@ -13,7 +13,7 @@ export default async function layout({ children }) {
     }
 
     return <> 
-       <Dashboard cta_button={cta_button} links={links}>
+       <Dashboard cta_button={cta_button} links={links} >
             {children}
        </Dashboard>
     </>

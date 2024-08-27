@@ -7,12 +7,18 @@ const AgentFormSchema = z.object({
     agentName : z.string().min(1,{
       message : 'Please enter a valid name for the Agent.'
     }),
-    channelId : z.string().min(1,{
+    channel : z.string().min(1,{
       message : 'Add a valid channel id'
     }),
-    action : z.string().min(1,{
-      message : 'Please select a valid action.'
+    priority : z.string().min(1,{
+      message : 'Please select a valid priority.'
     }),
+    description : z.string().min(1,{
+      message : 'Please select a valid description.',
+    }).optional(),
+    status : z.string().min(1,{
+      message : 'Please select a valid status.',
+    }).optional(),
 })
 
 const UpdateAgentFormSchema = z.object({
@@ -40,6 +46,21 @@ const DeleteAgentSchema = z.object({
 const AgentCreationSession = AgentFormSchema.omit({})
 const AgentDeletionSession = DeleteAgentSchema.omit({})
 const UpdateAgentSession = UpdateAgentFormSchema.omit({})
+
+export async function getAllAgents() {
+  try {
+    const data = JSON.parse(
+      JSON.stringify(
+        await AgentModel
+        .find()
+        )
+    )
+
+    return data
+  } catch(error) {
+    console.log(error)
+  }
+}
 
 export async function getAgentsByChannel(channelId) {
   try {
@@ -96,8 +117,10 @@ export async function postAgent(_prevstate, formData) {
     console.log(formData)
     const validateFields = AgentCreationSession.safeParse({
         agentName : formData.get('agentName'),
-        channelId : formData.get('channelId'),
-        action : formData.get('action')
+        channel : formData.get('channel'),
+        priority : formData.get('priority'),
+        status : 'functioning',
+        description : formData.get('description')
     })
 
     console.log("VALIDATED FIELDS", validateFields)
@@ -109,13 +132,10 @@ export async function postAgent(_prevstate, formData) {
         };
     }
 
-    
-
-    const { agentName, channelId, action } = validateFields.data
+    const { agentName, channel, priority, status, description } = validateFields.data
 
     try {
-        console.log("data", {agentName, action})
-        const newAgent = await AgentModel.create({agentName, channelId, action})
+        const newAgent = await AgentModel.create({agentName, channel, description, status, priority,  })
         newAgent.save()
     
         return {

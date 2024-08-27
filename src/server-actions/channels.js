@@ -15,9 +15,15 @@ const ChannelFormSchema = z.object({
   channelName : z.string().min(1,{
     message : 'Please enter a valid name for the channel.'
   }),
+  id : z.string().min(1,{
+    message : 'Please enter a valid name for the channel.'
+  }),
   provider : z.string().min(1,{
     message : 'Please select a valid provider.'
   }),
+  description : z.string().min(1, {
+    message : 'Please type in a valid description'
+  })
 })
 
 const ChannelCreationSession = ChannelFormSchema.omit({})
@@ -44,6 +50,21 @@ export async function getContactsSearch(perPage, page, searchQuery){
     return { data, items_count  }
   } catch (error) {
    console.log(error)
+  }
+}
+
+export async function getAllChannels() {
+  try {
+    const data = JSON.parse(
+      JSON.stringify(
+        await ChannelModel
+        .find()
+        )
+    )
+
+    return data
+  } catch (error) {
+    console.log(error)
   }
 }
 
@@ -78,9 +99,13 @@ export async function getChannel(channelId) {
 
 export async function postChannel(_prevstate, formData) {
 
+    console.log(formData)
+
     const validateFields = ChannelCreationSession.safeParse({
       channelName : formData.get('channelName'),
-      provider : formData.get('provider')
+      id : "CH-3450",
+      provider : formData.get('provider'),
+      description : formData.get('description')
     })
 
     if (!validateFields.success) {
@@ -90,17 +115,16 @@ export async function postChannel(_prevstate, formData) {
       };
     }
  
-    const {channelName, provider} = validateFields.data
+    const {channelName, id, provider, description} = validateFields.data
    
     try {
       console.log("data", {channelName, provider})
       const name = channelName
-      const newChannel = await ChannelModel.create({name, provider})
+      const newChannel = await ChannelModel.create({name, id, description, provider})
       newChannel.save()
   
       return {
         message : 'Success',
-        channelId : newChannel._id
       }
   
     } catch(error) {
