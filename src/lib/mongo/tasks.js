@@ -6,6 +6,10 @@ const taskSchema = new Schema({
         required:true,
         unique: true
     },
+    priority : {
+        type:String,
+        required:true
+    },
     status : {
         type:String,
     },

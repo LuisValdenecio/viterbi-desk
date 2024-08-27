@@ -89,6 +89,7 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id))
     },
   },
+  /*
   {
     accessorKey: "priority",
     header: ({ column }) => (
@@ -116,6 +117,7 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id))
     },
   },
+  */
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,

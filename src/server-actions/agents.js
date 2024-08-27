@@ -10,9 +10,6 @@ const AgentFormSchema = z.object({
     channel : z.string().min(1,{
       message : 'Add a valid channel id'
     }),
-    priority : z.string().min(1,{
-      message : 'Please select a valid priority.'
-    }),
     description : z.string().min(1,{
       message : 'Please select a valid description.',
     }).optional(),
@@ -118,7 +115,6 @@ export async function postAgent(_prevstate, formData) {
     const validateFields = AgentCreationSession.safeParse({
         agentName : formData.get('agentName'),
         channel : formData.get('channel'),
-        priority : formData.get('priority'),
         status : 'functioning',
         description : formData.get('description')
     })
@@ -132,10 +128,10 @@ export async function postAgent(_prevstate, formData) {
         };
     }
 
-    const { agentName, channel, priority, status, description } = validateFields.data
+    const { agentName, channel, status, description } = validateFields.data
 
     try {
-        const newAgent = await AgentModel.create({agentName, channel, description, status, priority,  })
+        const newAgent = await AgentModel.create({agentName, channel, description, status })
         newAgent.save()
     
         return {

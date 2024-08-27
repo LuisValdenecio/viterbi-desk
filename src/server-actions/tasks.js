@@ -17,6 +17,9 @@ const TaskFormSchema = z.object({
     taskName : z.string().min(1, {
         message : 'Please type in a valid name for the task'
     }),
+    priority : z.string().min(1,{
+        message : 'Please select a valid priority.'
+    }),
     agentId : z.string().min(1, {
         message : ''
     }),
@@ -83,6 +86,7 @@ export async function postTask(_prevstate, formData) {
     
     const validatedFields = TaskCreationSession.safeParse({
         taskName : formData.get('taskName'),
+        priority : formData.get('priority'),
         agentId : formData.get('agentId'),
         status : 'functioning',
         timezone : formData.get('timezone'),
@@ -102,6 +106,7 @@ export async function postTask(_prevstate, formData) {
 
     const { 
         taskName,
+        priority,
         agentId,
         status,
         timezone,
@@ -133,6 +138,7 @@ export async function postTask(_prevstate, formData) {
     
     const task = await TaskModel.create({
         taskName : taskName, 
+        priority :  priority,
         status : status,
         id : id,
         agent : agentId,

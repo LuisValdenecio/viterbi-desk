@@ -15,10 +15,6 @@ const agentSchema = new Schema({
     },
     status : {
         type:String,
-    },
-    priority : {
-        type:String,
-        required:true
     }
 }, {timestamps : true})
 

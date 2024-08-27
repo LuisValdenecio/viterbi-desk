@@ -117,6 +117,7 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id))
     },
   },
+  
   {
     accessorKey: "priority",
     header: ({ column }) => (

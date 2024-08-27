@@ -26,7 +26,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { PlusCircle, Loader2, Eye, PencilRuler, Zap, ClockIcon } from "lucide-react"
+import { PlusCircle, Loader2, Eye, PencilRuler, Zap, ClockIcon, MoveDown, MoveRight, MoveUp } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -73,6 +73,9 @@ export function SubmitBtn() {
 const formSchema = z.object({
   taskName: z.string().min(1, {
     message: 'Please enter a valid name for the Agent.'
+  }),
+  priority: z.string().min(1, {
+    message: 'Please select a valid action.'
   }),
   agentId: z.string().min(1, {
     message: 'Add a valid channel id'
@@ -161,12 +164,73 @@ export function CreateTaskDialog() {
                   <FormItem className="mb-4">
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="type in the name of the Agent" {...field} />
+                      <Input placeholder="type in the name of the Task" {...field} />
                     </FormControl>
                     <FormMessage>{state?.errors?.taskName}</FormMessage>
                   </FormItem>
                 )}
               />
+
+              <div className="grid gap-3 mb-4">
+              <Label htmlFor="model">Tasks Priority</Label>
+                <Select name="priority">
+                  <SelectTrigger
+                    id="model"
+                    className="items-start [&_[data-description]]:hidden"
+                  >
+                    <SelectValue placeholder="Select a priority for this task" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">
+                      <div className="flex items-start gap-3 text-muted-foreground">
+                        <MoveDown className="size-5" />
+                        <div className="grid gap-0.5">
+                          <p>
+
+                            <span className="font-medium text-foreground">
+                              Low
+                            </span>
+                          </p>
+                          <p className="text-xs" data-description>
+                            Reads all the data and makes reports
+                          </p>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="medium">
+                      <div className="flex items-start gap-3 text-muted-foreground">
+                        <MoveRight className="size-5" />
+                        <div className="grid gap-0.5">
+                          <p>
+                            <span className="font-medium text-foreground">
+                              Medium
+                            </span>
+                          </p>
+                          <p className="text-xs" data-description>
+                           Tasks run once stack is free
+                          </p>
+                        </div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="high">
+                      <div className="flex items-start gap-3 text-muted-foreground">
+                        <MoveUp className="size-5" />
+                        <div className="grid gap-0.5">
+                          <p>
+                            <span className="font-medium text-foreground">
+                              High
+                            </span>
+                          </p>
+                          <p className="text-xs" data-description>
+                           The tasks run ASAP
+                          </p>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                  <FormMessage>{state?.errors?.priority}</FormMessage>
+                </Select>
+              </div>
 
               <FormField
                 control={form.control}

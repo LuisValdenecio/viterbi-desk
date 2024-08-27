@@ -75,9 +75,6 @@ const formSchema = z.object({
   channel: z.string().min(1, {
     message: 'Add a valid channel id'
   }),
-  priority: z.string().min(1, {
-    message: 'Please select a valid action.'
-  }),
   description: z.string().min(1, {
     message: 'Please select a valid action.'
   }),
@@ -98,10 +95,9 @@ export function CreateAgentDialog() {
     message: undefined
   };
 
-  const initialValues: { agentName: string, channel: string, priority: string, description: string } = {
+  const initialValues: { agentName: string, channel: string, description: string } = {
     agentName: "",
     channel: channelId,
-    priority: "",
     description: ""
   };
 
@@ -186,65 +182,7 @@ export function CreateAgentDialog() {
               />
 
               <div className="grid gap-3 mb-4">
-                <Label htmlFor="model">Tasks Priority</Label>
-                <Select name="priority">
-                  <SelectTrigger
-                    id="model"
-                    className="items-start [&_[data-description]]:hidden"
-                  >
-                    <SelectValue placeholder="Select a priority for this agent" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="low">
-                      <div className="flex items-start gap-3 text-muted-foreground">
-                        <MoveDown className="size-5" />
-                        <div className="grid gap-0.5">
-                          <p>
-
-                            <span className="font-medium text-foreground">
-                              Low
-                            </span>
-                          </p>
-                          <p className="text-xs" data-description>
-                            Reads all the data and makes reports
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="medium">
-                      <div className="flex items-start gap-3 text-muted-foreground">
-                        <MoveRight className="size-5" />
-                        <div className="grid gap-0.5">
-                          <p>
-                            <span className="font-medium text-foreground">
-                              Medium
-                            </span>
-                          </p>
-                          <p className="text-xs" data-description>
-                           Tasks run once stack is free
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="high">
-                      <div className="flex items-start gap-3 text-muted-foreground">
-                        <MoveUp className="size-5" />
-                        <div className="grid gap-0.5">
-                          <p>
-                            <span className="font-medium text-foreground">
-                              High
-                            </span>
-                          </p>
-                          <p className="text-xs" data-description>
-                           The tasks run ASAP
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                  <FormMessage>{state?.errors?.priority}</FormMessage>
-                </Select>
-
+                
                 <FormField
                 control={form.control}
                 name="description"

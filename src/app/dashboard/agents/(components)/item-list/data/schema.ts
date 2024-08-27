@@ -8,7 +8,6 @@ export const taskSchema = z.object({
   channel: z.string(),
   description: z.string(),
   status: z.string(),
-  priority: z.string(),
 })
 
 export type Task = z.infer<typeof taskSchema>
