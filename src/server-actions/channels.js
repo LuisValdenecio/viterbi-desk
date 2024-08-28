@@ -1,6 +1,7 @@
 'use server'
 
 import ChannelModel from "@/lib/mongo/channels"
+import GoogleTokenModel from "@/lib/mongo/googleTokens";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod"
@@ -17,6 +18,9 @@ const ChannelFormSchema = z.object({
   }),
   id : z.string().min(1,{
     message : 'Please enter a valid name for the channel.'
+  }),
+  token : z.string().min(1,{
+    message : 'The authorization is missing for this provider'
   }),
   provider : z.string().min(1,{
     message : 'Please select a valid provider.'
@@ -101,9 +105,11 @@ export async function postChannel(_prevstate, formData) {
 
     console.log(formData)
 
+    
     const validateFields = ChannelCreationSession.safeParse({
       channelName : formData.get('channelName'),
       id : "CH-3450",
+      token : formData.get('token'),
       provider : formData.get('provider'),
       description : formData.get('description')
     })
@@ -114,15 +120,32 @@ export async function postChannel(_prevstate, formData) {
         message: 'Missing Fields',
       };
     }
- 
-    const {channelName, id, provider, description} = validateFields.data
+    
+    const {channelName, id, token, provider, description} = validateFields.data
    
     try {
-      console.log("data", {channelName, provider})
-      const name = channelName
-      const newChannel = await ChannelModel.create({name, id, description, provider})
-      newChannel.save()
-  
+
+      const token_provider = token.split('-')[0]
+      const token_id = token.split('-')[token.split('-').length - 1]
+
+      switch(token_provider) {
+        case 'Gmail' : 
+          const find_google_token = await GoogleTokenModel.find({_id : token_id})
+          if (!find_google_token) {
+            return {
+              message : 'Invalid token'
+            }
+          }
+
+          const name = channelName
+          const newChannel = await ChannelModel.create({name, id, description, provider})
+          newChannel.googleToken = token_id
+          newChannel.save()
+              
+        default :
+          break
+      }
+
       return {
         message : 'Success',
       }
@@ -131,4 +154,5 @@ export async function postChannel(_prevstate, formData) {
       console.log(error)
       return {errMsg : error.message}
     }
+      
   }

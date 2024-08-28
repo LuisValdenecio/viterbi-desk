@@ -49,7 +49,7 @@ export async function executeGmailTask(formData) {
     try {
         const agent = await AgentModel.find({_id : agentId})
         console.log(agent)
-        const channel = await ChannelModel.find({_id : agent[0]?.channelId})
+        const channel = await ChannelModel.find({_id : agent[0]?.channel})
         console.log(channel)
         const googleToken = await GoogleTokenModel.find({_id : channel[0]?.googleToken})
         console.log(googleToken)

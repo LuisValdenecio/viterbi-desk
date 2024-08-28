@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import {google} from 'googleapis';
 import crypto from 'crypto'
-import ChannelModel from "@/lib/mongo/channels";
+//import ChannelModel from "@/lib/mongo/channels";
 import GoogleTokenModel from "@/lib/mongo/googleTokens"
 import connect from "@/lib/mongo";
 import url from 'url'
@@ -22,6 +22,8 @@ export const GET = async (req, res) => {
         })
     }  else { // Get access and refresh tokens (if access_type is offline)
         let { tokens } = await auth.getToken(q.code);
+
+        await connect()
     
         const googleToken = await GoogleTokenModel({
             access_token : tokens?.access_token,
@@ -31,7 +33,11 @@ export const GET = async (req, res) => {
 
         googleToken.save()
 
-        await connect()
+        const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-${googleToken._id}`)
+       
+        return response
+
+        /* 
         const channel = await ChannelModel.findOne({_id : q.state})
         channel.googleToken = googleToken._id
         channel.save()
@@ -40,6 +46,7 @@ export const GET = async (req, res) => {
             status : 201,
             tokens : tokens
         })
+        */
             
     }
 }

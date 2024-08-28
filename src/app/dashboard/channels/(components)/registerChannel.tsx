@@ -9,8 +9,8 @@ import {
 
   import { Button } from "@/components/ui/button"
   import { postChannel } from "@/server-actions/channels"
-  import { useRouter } from "next/navigation";
-  import { useEffect } from "react"
+  import { usePathname, useRouter } from "next/navigation";
+  import { useEffect, useState } from "react"
 
   import { Input } from "@/components/ui/input"
   import { Label } from "@/components/ui/label"
@@ -30,6 +30,7 @@ import {
 import { useFormStatus } from "react-dom";
 import { useFormState } from 'react-dom'
 import { z } from "zod"
+import { useSearchParams } from "next/navigation";
 
 import {
   Form,
@@ -41,6 +42,9 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea";
+import { GmailProviderDialog } from "../(components)/gmail-provider-dialog/provider"
+import { ToastAction } from "@/components/ui/toast"
+import { useToast } from "@/components/ui/use-toast"
 
   export function SubmitBtn() {
     const { pending } = useFormStatus();
@@ -58,6 +62,9 @@ import { Textarea } from "@/components/ui/textarea";
     provider :  z.string().min(1, {
       message : 'Please enter a valid name.'
     }),
+    token :  z.string().min(1, {
+      message : 'Please enter a valid name.'
+    }),
     description : z.string().min(1,{
       message : 'Please enter a provider'
     })
@@ -65,20 +72,29 @@ import { Textarea } from "@/components/ui/textarea";
 
   export function RegisterNewChannel() {
 
-    const router = useRouter()
 
+    const router = useRouter()
+    const pathname = usePathname()
+    const [gmailProvider, setGmailProvider] = useState(false)
+    const searchParams = useSearchParams();
+    const [selectedProvider, setSelectedProvider] = useState(null)
+    const { toast } = useToast()
+
+    /* ----- FORM STUFF ------- */
     const initialState = {
       errors: {
         channelName: undefined,
         provider: undefined,
+        token: undefined,
         description : undefined
       },
       message: undefined
     };
 
-    const initialValues: {channelName : string, provider : string, description : string} = {
+    const initialValues: {channelName : string, provider : string, token : string, description : string} = {
       channelName: "",
-      provider: "",
+      provider: searchParams.get("provider")?.split("-")[0],
+      token: searchParams.get("provider"),
       description : ""
     };
 
@@ -88,15 +104,30 @@ import { Textarea } from "@/components/ui/textarea";
     })
 
     const [state, formAction] = useFormState(postChannel, initialState);
+    /* ----- */
+
+    const setProvider = (value : any) => {
+      if (value === 'Gmail') {
+        setGmailProvider(true)
+      }
+    }
+
+    if (searchParams.get("provider")?.split("-")[0] === 'Gmail') {
+        if (selectedProvider !== 'Gmail') {
+          setSelectedProvider('Gmail')
+          toast({
+            title: "Gmail Authorization status ",
+            description: "Success",
+          })
+        }
+    }
 
     useEffect(() => {
 
       if (state?.message) {
-
         if (state?.message === 'Success') {
           router.push(`/dashboard/channels/${state?.channelId}`)
-        }
-        
+        }        
       }
       
       if (Array.isArray(state?.errors)) {
@@ -108,6 +139,8 @@ import { Textarea } from "@/components/ui/textarea";
     
     return (
       <div className="grid">
+
+        <GmailProviderDialog open={gmailProvider} close={setGmailProvider} />
        
         <div className="flex flex-col">
          
@@ -132,21 +165,36 @@ import { Textarea } from "@/components/ui/textarea";
                         )}
                       />
 
+                      <FormField
+                        control={form.control}
+                        name="token"
+                        render={({ field }) => (
+                          <FormItem className="hidden">
+                            <FormControl>
+                              <Input defaultValue={searchParams.get("provider")} {...field} />
+                            </FormControl>
+                            <FormMessage>{state?.errors?.channelName}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
                       <div className="grid gap-3">
                         <Label htmlFor="model">Provider</Label>
-                        <Select name="provider">
+                        <Select name="provider" onValueChange={setProvider} defaultValue={searchParams.get("provider")?.split("-")[0]}>
                           <SelectTrigger
                             id="model"
                             name="provider"
                             className="items-start [&_[data-description]]:hidden"
+                            
                           >
                             <SelectValue placeholder="Select a model" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Gmail">
-                              <div className="flex items-start gap-3 text-muted-foreground">        
+                              <div className="flex items-start gap-3 text-muted-foreground">      
                                 <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 48 48" width="24px" height="24px"><path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/><path fill="#1e88e5" d="M3,16.2l3.614,1.71L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/><polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"/><path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/><path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0 C43.076,8,45,9.924,45,12.298z"/></svg>
                                 <div className="grid gap-0.5">
+                                  
                                   <p>
                                     
                                     <span className="font-medium text-foreground">
