@@ -32,7 +32,7 @@ export function ListItemTable({agents}) {
 
   return (
     <>
-      <div className="p-2">
+      <div>
         <DataTable data={agents} columns={columns} />
       </div>
     </>

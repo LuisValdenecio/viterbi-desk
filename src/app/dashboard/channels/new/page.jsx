@@ -18,6 +18,14 @@ import { Switch, SwitchField, SwitchGroup } from '@/components/switch'
 import { CardHeader_ } from '@/components/cardHeader'
 import { CardContent_ } from '@/components/cardContent'
 import { RegisterNewChannel } from '../(components)/registerChannel'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 /*
 export const metadata = {
@@ -41,10 +49,16 @@ export default function Settings() {
   
   return (
     <>
-      <CardHeader_ main_title={'New Channel'} description={description} />  
-      <CardContent_>
-          <RegisterNewChannel />
-      </CardContent_>
+      <div className="mb-4">
+
+      <CardTitle className='mb-2'>{"New Channel"}</CardTitle>
+            <CardDescription>
+                {description}
+            </CardDescription>
+      </div>
+      
+      <RegisterNewChannel />
+      
     
     </>
 )}

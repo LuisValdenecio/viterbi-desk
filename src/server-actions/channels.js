@@ -141,14 +141,17 @@ export async function postChannel(_prevstate, formData) {
           const newChannel = await ChannelModel.create({name, id, description, provider})
           newChannel.googleToken = token_id
           newChannel.save()
+
+          return {
+            message : 'Success',
+            channelId : newChannel._id
+          }
               
         default :
           break
       }
 
-      return {
-        message : 'Success',
-      }
+      
   
     } catch(error) {
       console.log(error)

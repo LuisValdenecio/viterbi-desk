@@ -49,7 +49,7 @@ import {
         
         <div className="flex flex-col">
          
-          <main className="grid flex-1 gap-4 overflow-auto p-2 md:grid-cols-2 lg:grid-cols-2">
+          <main className="grid flex-1 gap-4 overflow-auto md:grid-cols-2 lg:grid-cols-2">
             <div
               className="relative hidden flex-col items-start gap-8 md:flex" x-chunk="dashboard-03-chunk-0"
             >

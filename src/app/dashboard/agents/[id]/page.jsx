@@ -28,7 +28,7 @@ export default function Page() {
             <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
 
                 <Tabs defaultValue="overview">
-                    <div className="flex justify-between items-center pl-2 pr-2 pt-2">
+                    <div className="flex justify-between items-center">
                         <TabsList>
                             <TabsTrigger value="overview">Overview</TabsTrigger>
                             <TabsTrigger value="agents">Tasks</TabsTrigger>

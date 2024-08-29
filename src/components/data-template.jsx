@@ -123,9 +123,9 @@ export function Dashboard({ children, cta_button, links, showSearch, showButtons
               
             </div>
 
-            <Card x-chunk="dashboard-06-chunk-0">
+            
               {children}
-            </Card>
+            
 
           </Tabs>
         </main>

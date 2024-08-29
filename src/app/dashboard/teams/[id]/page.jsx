@@ -2,8 +2,10 @@
 
 import { usePathname } from 'next/navigation'
 import useSWR from 'swr'
-import { ListItemTable } from "../(components)/agents-list/tableOfItems"
-import { CreateAgentDialog } from "../(components)/createAgentDialog"
+//import { ListItemTable } from "../(components)/agents-list/tableOfItems"
+import { ListItemTable } from "../(components)/people-list/tableOfItems"
+//import { CreateAgentDialog } from "../(components)/createAgentDialog"
+import { CreatePersonDialog } from "../(components)/createPersonDialog"
 
 import {
   Tabs,
@@ -11,11 +13,11 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { Overview } from '../(components)/overview/overview'
+//import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
-export function fetchChannelData(url) {
+export function fetchTeamData(url) {
   const { data, error, isLoading } = useSWR(url, fetcher)
 
   return {
@@ -28,12 +30,12 @@ export function fetchChannelData(url) {
 export default function Page() {
 
   const path = usePathname()
-  const channelId = path.split("/")[path.split("/").length - 1]
-  const { data, isLoading, error } = useSWR(`/api/agents/${channelId}`, fetcher)
-
+  const teamId = path.split("/")[path.split("/").length - 1]
+  const { data, isLoading, error } = useSWR(`/api/people/${teamId}`, fetcher)
 
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
+  console.log(data)
   return (
     <>
 
@@ -43,16 +45,16 @@ export default function Page() {
           <div className="flex justify-between items-center">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="agents">Agents</TabsTrigger>
+              <TabsTrigger value="people">People</TabsTrigger>
             </TabsList>
-            <CreateAgentDialog />
+            <CreatePersonDialog />
           </div>
           <TabsContent value="overview" >
-            <Overview />
+            
           </TabsContent>
-          <TabsContent value="agents">
+          <TabsContent value="people">
             <div className="">
-              <ListItemTable agents={data.agents} />
+              <ListItemTable people={data.people} />
             </div>
           </TabsContent>
 

@@ -150,33 +150,6 @@ import { useToast } from "@/components/ui/use-toast"
             >
                <Form {...form}>
                   <form action={formAction} className="grid w-full items-start gap-6">
-                    
-                      <FormField
-                        control={form.control}
-                        name="channelName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                              <Input placeholder="type in the name of the channel" {...field} />
-                            </FormControl>
-                            <FormMessage>{state?.errors?.channelName}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="token"
-                        render={({ field }) => (
-                          <FormItem className="hidden">
-                            <FormControl>
-                              <Input defaultValue={searchParams.get("provider")} {...field} />
-                            </FormControl>
-                            <FormMessage>{state?.errors?.channelName}</FormMessage>
-                          </FormItem>
-                        )}
-                      />
 
                       <div className="grid gap-3">
                         <Label htmlFor="model">Provider</Label>
@@ -257,7 +230,34 @@ import { useToast } from "@/components/ui/use-toast"
                           <FormMessage>{state?.errors?.provider}</FormMessage>
                         </Select>
                       </div>
-                      
+                    
+                      <FormField
+                        control={form.control}
+                        name="channelName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="type in the name of the channel" {...field} />
+                            </FormControl>
+                            <FormMessage>{state?.errors?.channelName}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="token"
+                        render={({ field }) => (
+                          <FormItem className="hidden">
+                            <FormControl>
+                              <Input defaultValue={searchParams.get("provider")} {...field} />
+                            </FormControl>
+                            <FormMessage>{state?.errors?.channelName}</FormMessage>
+                          </FormItem>
+                        )}
+                      />
+ 
                       <FormField
                         control={form.control}
                         name="description"

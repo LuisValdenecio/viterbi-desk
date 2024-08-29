@@ -9,7 +9,7 @@ import {
     SidebarSpacer,
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
-  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss } from 'lucide-react'
+  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users } from 'lucide-react'
 import { usePathname } from 'next/navigation';
 
 
@@ -28,6 +28,11 @@ export function SiderBarBody({events}) {
               <Sidebar_item href={"/dashboard/agents"} path={"/dashboard/agents"}>
                 <Bot strokeWidth={path === '/dashboard/agents' ? 1.75 : 1.25} size={20} />
                 <SidebarLabel>Agents</SidebarLabel>
+              </Sidebar_item>
+
+              <Sidebar_item href={"/dashboard/teams"} path={"/dashboard/teams"}>
+                <Users strokeWidth={path === '/dashboard/teams' ? 1.75 : 1.25} size={20} />
+                <SidebarLabel>Teams</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/channels"}>

@@ -26,14 +26,14 @@ async function getTasks() {
 }
 */
 
-export function ListItemTable({channels}) {
+export function ListItemTable({people}) {
  
   //const tasks = await getTasks()
 
   return (
     <>
-      <div>
-        <DataTable data={channels} columns={columns} />
+      <div className="">
+        <DataTable data={people} columns={columns} />
       </div>
     </>
   )
