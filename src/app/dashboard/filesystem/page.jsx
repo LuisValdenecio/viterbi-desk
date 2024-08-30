@@ -5,6 +5,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { getOrders } from '@/data'
 
 import { getContacts } from '@/server-actions/contacts'
+import { ListItemTable } from "./(components)/item-list/tableOfItems"
+//import { CreateDataStorageDialog } from "./(components)/addFileDialog"
 
 export const metadata = {
   title: 'Orders',
@@ -14,9 +16,12 @@ export default async function Orders() {
   //let contacts = await getContacts()
   //console.log(contacts)
 
+  const data = []
+
   return (
     <>
-      <h1>hi there</h1>
+      <ListItemTable files={data} />
+      {/*<CreateDataStorageDialog />*/}
     </>
   )
 }

@@ -4,6 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Avatar } from '@/components/avatar'
+
 
 import { labels, priorities, statuses } from "../data/data"
 import { Task } from "../data/schema"
@@ -40,7 +42,10 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[150px] truncate">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="w-[150px] flex items-center gap-2">
+      <Avatar src={'/events/bear-hug-thumb.jpg'} className="size-6" />
+      <span className="truncate">{row.getValue("name")}</span>
+    </div>,
     enableSorting: true,
     enableHiding: true,
   },

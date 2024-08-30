@@ -40,9 +40,9 @@ export function SiderBarBody({events}) {
                 <SidebarLabel>Channels</SidebarLabel>
               </Sidebar_item>
 
-              <Sidebar_item href={"/dashboard/knowledge-base"} path={"/dashboard/knowledge-base"}>
-                <DatabaseZap strokeWidth={path === '/dashboard/knowledge-base' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Knowledge base</SidebarLabel>
+              <Sidebar_item href={"/dashboard/filesystem"} path={"/dashboard/filesystem"}>
+                <DatabaseZap strokeWidth={path === '/dashboard/filesystem' ? 1.75 : 1.25} size={20} />
+                <SidebarLabel>Filesystem</SidebarLabel>
               </Sidebar_item>  
             </SidebarSection>
 
