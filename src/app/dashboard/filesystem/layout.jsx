@@ -13,7 +13,7 @@ export default async function layout({ children }) {
     }
 
     return <> 
-       <Dashboard cta_button={cta_button} links={links} >
+       <Dashboard cta_button={cta_button} links={links} addDataStorage={true}>
             {children}
        </Dashboard>
     </>

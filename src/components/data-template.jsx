@@ -69,8 +69,9 @@ import {
 } from "@/components/ui/tooltip"
 import { usePathname } from "next/navigation"
 import { BreadCrumpComponent } from '@/components/breadcrump'
+import { CreateDataStorageDialog } from '../app/dashboard/filesystem/(components)/addFileDialog'
 
-export function Dashboard({ children, cta_button, links, showSearch, showButtons }) {
+export function Dashboard({ children, cta_button, links, showSearch, showButtons, addDataStorage }) {
 
 
   return (
@@ -118,6 +119,12 @@ export function Dashboard({ children, cta_button, links, showSearch, showButtons
                     </Link>
 
                   </Button>
+                </div>
+              )}
+
+              {addDataStorage && (
+                <div className="ml-auto flex items-center gap-2">
+                  <CreateDataStorageDialog />
                 </div>
               )}
               

@@ -62,9 +62,9 @@ export function SiderBarBody({events}) {
                 <CircleHelp size={20} strokeWidth={1.25} />
                 <SidebarLabel>Support</SidebarLabel>
               </SidebarItem>
-              <SidebarItem href="#">
+              <SidebarItem href="/dashboard/playground">
                 <Sparkles size={20} strokeWidth={1.25} />
-                <SidebarLabel>Changelog</SidebarLabel>
+                <SidebarLabel>playground</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>
