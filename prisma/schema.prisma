@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  team_id String @id @default(cuid())
+  name String @db.VarChar(255)
+  description String @db.VarChar(500)
+  person User @relation(fields: [user_id], references: [user_id])
+  user_id String
+}
+
+model User_privilege {
+  id String @id @default(cuid())
+  privilege String?
+  user User @relation(fields: [user_id], references: [user_id])
+  chhanel Channel @relation(fields: [channel_id], references: [channel_id])
+  user_id String @unique
+  channel_id String @unique
+}
+
+model User {
+  user_id String @id @default(cuid())
+  name String @db.VarChar(255)
+  img String? @db.VarChar(255)
+  email String @unique
+  password String 
+  teams Team[]
+  channels Channel[]
+  user_privilege User_privilege?
+  Stripe_sub Stripe_sub?
+}
+
+model Stripe_sub {
+  sub_id String @id @default(cuid())
+  user User @relation(fields: [user_id], references: [user_id])
+  user_id String @unique
+}
+
+model Agent {
+  agent_id String @id @default(cuid())
+  name String @db.VarChar(255)
+  tasks Task[]
+  channel Channel @relation(fields: [channel_id], references: [channel_id])
+  channel_id String @unique 
+}
+
+model Channel {
+  channel_id String @id @default(cuid())
+  name String @db.VarChar(255)
+  description String @db.VarChar(500)
+  owner User @relation(fields: [user_id], references: [user_id])
+  user_privilege User_privilege?
+  agents Agent[]
+  user_id String @unique
+}
+
+model Task {
+  task_id String @id @default(cuid())
+  name String @db.VarChar(255)
+  description String @db.VarChar(500)
+  agent Agent @relation(fields: [agent_id], references: [agent_id])
+  recurrent Boolean?
+  schedule String
+  agent_id String @unique
+}
+

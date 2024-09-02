@@ -4,7 +4,22 @@ import GitHubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import UserModel from "./lib/mongo/users";
 import bcrypt from "bcrypt"
+import prisma from "./lib/prisma";
 
+async function getUser(email) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+        return user
+    } catch (error) {
+      console.error('Failed to fetch user:', error);
+      throw new Error('Failed to fetch user.');
+    }
+}
+  
 export const {
     handlers: { GET, POST },
     auth,
@@ -25,9 +40,7 @@ export const {
                 if (credentials === null) return null;
                 
                 try {
-                    const user = await UserModel.findOne({
-                        email : credentials?.email
-                    });
+                    const user = await getUser(credentials?.email);
                     
                     if (user) {
                         const isMatch = await bcrypt.compare(

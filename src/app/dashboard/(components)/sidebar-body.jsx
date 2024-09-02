@@ -10,10 +10,14 @@ import {
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
   import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users } from 'lucide-react'
+import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
 
 export function SiderBarBody({events}) {
+
+    const {data:session} = useSession()
+    console.log(session)
 
     const path = usePathname()
     console.log(path)
