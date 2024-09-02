@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
-import UserModel from "./lib/mongo/users";
 import bcrypt from "bcrypt"
 import prisma from "./lib/prisma";
 
@@ -49,7 +48,7 @@ export const {
                         )
 
                         if (isMatch) {
-                            return user;
+                            return user
                         } else {
                             console.log("error")
                             throw new Error("Password is not correct");
@@ -92,19 +91,27 @@ export const {
         }),
     ],
     callbacks: {
-        
-
-        async jwt({ token, user, account }) {
-            console.log("ACCOUNT :", account)
-            console.log("PROVIDER : ", account?.provider)
-            if (account?.['access_token']) {
-                token['access_token'] = account?.['access_token'] || 'luis token' 
-                token['refresh_token'] = account?.['refresh_token'] || 'luis refresh token'
-                } else {
-                    token['access_token'] = account?.['access_token'] || 'luis token' 
-                token['refresh_token'] = account?.['refresh_token'] || 'luis refresh token'
+        session: ({session, token}) => {
+            return {
+                ...session,
+                user : {
+                    ...session.user,
+                    id : token.id,
+                    img : token.img
                 }
-            return token;
+            }
         },
+
+        jwt: ({token, user}) => {
+            if (user) {
+                return {
+                    ...token, 
+                    id : user.user_id,
+                    email : user.email,
+                    img : user.img
+                }
+            }
+            return token
+        }
     },
 })

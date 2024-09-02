@@ -166,11 +166,8 @@ function AccountDropdownMenu({ anchor }) {
 export default async function ApplicationLayout({ children }) {
   
   const session = await auth()
-  const channels = await getChannles()
-  console.log("SESSION: ", session)
-  
-  if (!session?.user) redirect("/signin")
-
+  const channels = []
+    
   return (
     <SidebarLayout
       navbar={

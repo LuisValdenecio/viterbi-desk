@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server"
 import {google} from 'googleapis';
-import crypto from 'crypto'
-//import ChannelModel from "@/lib/mongo/channels";
-import GoogleTokenModel from "@/lib/mongo/googleTokens"
-import connect from "@/lib/mongo";
+import prisma from "@/lib/prisma";
 import url from 'url'
 
 const auth = new google.auth.OAuth2(
@@ -23,30 +20,16 @@ export const GET = async (req, res) => {
     }  else { // Get access and refresh tokens (if access_type is offline)
         let { tokens } = await auth.getToken(q.code);
 
-        await connect()
-    
-        const googleToken = await GoogleTokenModel({
-            access_token : tokens?.access_token,
-            refresh_token : tokens?.refresh_token,
-            scope : tokens?.scope
+        const new_google_token = await prisma.google_token.create({
+            data : {
+                access_token : tokens?.access_token,
+                refresh_token : tokens?.refresh_token,
+                scope : tokens?.scope
+            }
         })
 
-        googleToken.save()
-
-        const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-${googleToken._id}`)
+        const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-${new_google_token.id}`)
        
-        return response
-
-        /* 
-        const channel = await ChannelModel.findOne({_id : q.state})
-        channel.googleToken = googleToken._id
-        channel.save()
-
-        return new NextResponse("success", {
-            status : 201,
-            tokens : tokens
-        })
-        */
-            
+        return response            
     }
 }

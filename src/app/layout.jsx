@@ -1,5 +1,4 @@
 import '@/styles/tailwind.css'
-import connectDB from "@/lib/mongo";
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { Providers } from './providers'
@@ -14,8 +13,6 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   
-  await connectDB();
-
   return (
     <html
       lang="en"

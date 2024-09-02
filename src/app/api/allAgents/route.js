@@ -1,14 +1,10 @@
 import { NextResponse } from "next/server"
-import  AgentModel  from "@/lib/mongo/agents"
-import connect from "@/lib/mongo";
+import  prisma  from "@prisma/client";
 
 export const GET = async (req, res) => {
     try {
-        await connect()
-        const agents = await AgentModel.find()
-        
+        const agents = await prisma.agent.findMany()        
         return Response.json({ agents })
-
     } catch (error) {
         console.log(error)
         return new NextResponse("something bad happened", {

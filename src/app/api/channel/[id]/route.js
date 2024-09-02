@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server"
-import ChannelModel from "@/lib/mongo/channels";
-import connect from "@/lib/mongo";
+import prisma from "@/lib/prisma";
 
 export const GET = async (req, { params }) => {
     try {
-        await connect()
-        const channel = await ChannelModel.findOne({_id : params.id})
+
+        const channel = await prisma.channel.findFirst({
+            where : {
+                channel_id : params.id
+            }
+        })
         
         return Response.json({ channel })
 

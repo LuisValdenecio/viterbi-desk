@@ -375,39 +375,7 @@ export function CreateTaskDialog() {
                
               </fieldset>
 
-              <div className="grid gap-3 mb-4">
-                <Label htmlFor="model">Templates</Label>
-                <Select name="template">
-                  <SelectTrigger
-                    id="model"
-                    className="items-start [&_[data-description]]:hidden"
-                  >
-                    <SelectValue placeholder="Select what your agent can do" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Inbox Summarizer">
-                      <div className="flex items-start gap-3 text-muted-foreground">
-                        <Eye className="size-5" />
-                        <div className="grid gap-0.5">
-                          <p>
-
-                            <span className="font-medium text-foreground">
-                              Inbox Summarizer
-                            </span>
-                          </p>
-                          <p className="text-xs" data-description>
-                            Reads all the data and makes reports
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-
-
-
-                  </SelectContent>
-                  <FormMessage>{state?.errors?.template}</FormMessage>
-                </Select>
-              </div>
+             
               <SubmitBtn />
             </form>
           </Form>

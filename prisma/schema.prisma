@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -16,18 +17,25 @@ datasource db {
 model Team {
   team_id String @id @default(cuid())
   name String @db.VarChar(255)
+  channel Channel[]
   description String @db.VarChar(500)
-  person User @relation(fields: [user_id], references: [user_id])
+  person User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
   user_id String
+  user_previlege User_privilege[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model User_privilege {
   id String @id @default(cuid())
-  privilege String?
-  user User @relation(fields: [user_id], references: [user_id])
-  chhanel Channel @relation(fields: [channel_id], references: [channel_id])
-  user_id String @unique
-  channel_id String @unique
+  privilege String
+  status String
+  user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
+  team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
+  user_id String 
+  team_id String 
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model User {
@@ -38,41 +46,89 @@ model User {
   password String 
   teams Team[]
   channels Channel[]
-  user_privilege User_privilege?
+  user_privilege User_privilege[]
   Stripe_sub Stripe_sub?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Stripe_sub {
   sub_id String @id @default(cuid())
-  user User @relation(fields: [user_id], references: [user_id])
+  user User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
   user_id String @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Agent {
   agent_id String @id @default(cuid())
   name String @db.VarChar(255)
+  description String @db.VarChar(500)
+  status String @default("functioning")
   tasks Task[]
-  channel Channel @relation(fields: [channel_id], references: [channel_id])
-  channel_id String @unique 
+  channel Channel? @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate : Cascade)
+  channel_id String 
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Channel {
   channel_id String @id @default(cuid())
   name String @db.VarChar(255)
+  provider String
+  provider_connected Boolean @default(false)
   description String @db.VarChar(500)
-  owner User @relation(fields: [user_id], references: [user_id])
-  user_privilege User_privilege?
+  owner User? @relation(fields: [owner_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
+  google_token Google_token? @relation(fields: [google_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
+  discord_token Discord_token? @relation(fields: [discord_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
+  team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
   agents Agent[]
-  user_id String @unique
+  owner_id String?
+  team_id String?
+  google_token_id String? @unique
+  discord_token_id String? @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Google_token {
+  id String @id @default(cuid())
+  access_token String @db.VarChar(255)
+  refresh_token String @db.VarChar(255)
+  channel Channel?
+  scope String @db.VarChar(255)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+model Discord_token {
+  id String @id @default(cuid())
+  access_token String @db.VarChar(255)
+  token_type String @db.VarChar(255)
+  channel Channel?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Task {
   task_id String @id @default(cuid())
   name String @db.VarChar(255)
-  description String @db.VarChar(500)
-  agent Agent @relation(fields: [agent_id], references: [agent_id])
+  priority String @db.VarChar(500)
+  status String @default("functioning")
+  agent Agent? @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade, onUpdate : Cascade)
   recurrent Boolean?
-  schedule String
-  agent_id String @unique
+  task_schedule Task_Schedule? @relation(fields : [schedule], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  agent_id String
+  schedule String @unique
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
+model Task_Schedule {
+  id String @id @default(cuid())
+  task Task?
+  timezone String
+  day String 
+  dayPeriod String
+  hourAndMinute String
+}

@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server"
-import {google} from 'googleapis';
 import crypto from 'crypto'
-import ChannelModel from "@/lib/mongo/channels";
-import DiscordTokenModel from "@/lib/mongo/discordTokens"
 import connect from "@/lib/mongo";
 import url from 'url'
 import axios from 'axios'
@@ -29,6 +26,7 @@ export const GET = async (req, res) => {
         console.log("TOKENS: ", access_token, token_type)
         await connect()
 
+        /*
         const discordToken = await DiscordTokenModel({
             access_token : access_token,
             token_type : token_type
@@ -41,6 +39,7 @@ export const GET = async (req, res) => {
         channel.save()
 
         //await axios.get("http://localhost:3000/dashboard/channels")
+        */
 
         return new NextResponse("success", {
             status : 201

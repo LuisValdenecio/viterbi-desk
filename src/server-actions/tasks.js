@@ -1,17 +1,12 @@
 'use server'
 
-import TaskModel from '@/lib/mongo/tasks'
-import TaskScheduleModel from '@/lib/mongo/taskSchedule'
-import TaskTemplateModel from '@/lib/mongo/taskTemplate'
-import AgentModel from '@/lib/mongo/agents'
-import ChannelModel from '@/lib/mongo/channels'
-import GoogleTokenModel from '@/lib/mongo/googleTokens'
-import { google } from "googleapis"
 
 import {executeGmailTask} from '../server-actions/provider-based-task'
 import { executeDiscordTask } from '../server-actions/provider-based-task'
 
 import { z } from 'zod'
+import prisma from '@/lib/prisma'
+
 
 const TaskFormSchema = z.object({
     taskName : z.string().min(1, {
@@ -26,9 +21,7 @@ const TaskFormSchema = z.object({
     status : z.string().min(1,{
         message : 'Please select a valid status.',
     }).optional(),
-    id : z.string().min(1, {
-        message : ''
-    }),
+
     timezone : z.string().min(1, {
         message : 'Select a time zone'
     }),
@@ -41,29 +34,37 @@ const TaskFormSchema = z.object({
     hour_minute : z.string().min(1, {
         message : 'Please select a valid time point'
     }),
-    template : z.string().min(1, {
-        message : 'Select a template'
-    }),
 })
 
 const TaskCreationSession = TaskFormSchema.omit({})
 
 export async function executeTask(formData) {
 
-    console.log("FORM DATA: ", formData)
-
-    const agentId = formData.get('task-agent')
+    const taskId = formData.get('task-id')
 
     try {
         // execute task code based on the provider
-        const agent = await AgentModel.find({_id : agentId})
-        console.log(agent)
-        const channel = await ChannelModel.find({_id : agent[0]?.channel})
-        console.log(channel)
+        const task = await prisma.task.findFirst({
+            where : {
+                task_id : taskId
+            }
+        })
+        
+        const agent = await prisma.agent.findFirst({
+            where : {
+                agent_id : task.agent_id
+            }
+        })
 
-        switch(channel[0]?.provider) {
+        const channel = await prisma.channel.findFirst({
+            where : {
+                channel_id : agent.channel_id
+            }
+        })
+       
+        switch(channel?.provider) {
             case 'Gmail' :
-                await executeGmailTask(formData)
+                await executeGmailTask(channel)
                 break
             case 'Discord' : 
                 await executeDiscordTask(formData)
@@ -94,7 +95,6 @@ export async function postTask(_prevstate, formData) {
         id : 'TASK-1B',
         day_period : formData.get('day_period'),
         hour_minute : formData.get('hour_minute'),
-        template : formData.get('template'),
     })
 
     if (!validatedFields.success) {
@@ -114,42 +114,25 @@ export async function postTask(_prevstate, formData) {
         id,
         day_period,
         hour_minute,
-        template 
     } = validatedFields.data
 
-    const template_description = 'some description'
-
-    const taskSchedule = await TaskScheduleModel.create({
-        timezone : timezone, 
-        day : day, 
-        dayPeriod : day_period, 
-        hourAndMinute : hour_minute
+    const taskSchedule = await prisma.task_Schedule.create({
+        data : {
+            timezone : timezone, 
+            day : day, 
+            dayPeriod : day_period, 
+            hourAndMinute : hour_minute
+        }
     })
-    taskSchedule.save()
 
-    const taskTemplate = await TaskTemplateModel.create({
-        templateName : template, 
-        templateDescription : template_description
+    const newTask = await prisma.task.create({
+        data : {
+            name : taskName,
+            priority : priority,
+            status : status,
+            agent_id : agentId,
+            schedule : taskSchedule.id
+        }
     })
-    
-    taskTemplate.save()
-
-    const agent = await AgentModel.find({_id : agentId})
-    
-    const task = await TaskModel.create({
-        taskName : taskName, 
-        priority :  priority,
-        status : status,
-        id : id,
-        agent : agentId,
-        schedule : taskSchedule._id, 
-        template : taskTemplate._id
-    })   
-    task.save()
-    
-    console.log(task)
-
-    //console.log(validatedFields.data)
-
 
 }

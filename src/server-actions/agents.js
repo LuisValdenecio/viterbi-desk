@@ -1,6 +1,6 @@
 'use server'
 
-import AgentModel from '@/lib/mongo/agents'
+import prisma from '@/lib/prisma'
 import { z } from "zod"
 
 const AgentFormSchema = z.object({
@@ -12,9 +12,6 @@ const AgentFormSchema = z.object({
     }),
     description : z.string().min(1,{
       message : 'Please select a valid description.',
-    }).optional(),
-    status : z.string().min(1,{
-      message : 'Please select a valid status.',
     }).optional(),
 })
 
@@ -46,19 +43,13 @@ const UpdateAgentSession = UpdateAgentFormSchema.omit({})
 
 export async function getAllAgents() {
   try {
-    const data = JSON.parse(
-      JSON.stringify(
-        await AgentModel
-        .find()
-        )
-    )
-
+    const data = await prisma.agent.findMany()
     return data
   } catch(error) {
     console.log(error)
   }
 }
-
+/*
 export async function getAgentsByChannel(channelId) {
   try {
     const data = JSON.parse(
@@ -109,13 +100,12 @@ export async function deleteAgent(_prevstate, formData) {
       console.log(err)
     }
 }
+*/
 
 export async function postAgent(_prevstate, formData) {
-    console.log(formData)
     const validateFields = AgentCreationSession.safeParse({
         agentName : formData.get('agentName'),
         channel : formData.get('channel'),
-        status : 'functioning',
         description : formData.get('description')
     })
 
@@ -128,24 +118,29 @@ export async function postAgent(_prevstate, formData) {
         };
     }
 
-    const { agentName, channel, status, description } = validateFields.data
+    const { agentName, channel, description } = validateFields.data
 
     try {
-        const newAgent = await AgentModel.create({agentName, channel, description, status })
-        newAgent.save()
-    
-        return {
-          message : 'Success',
-          agentID : ""+newAgent._id
+      const newAgent = await prisma.agent.create({
+        data : {
+          name : agentName,
+          description : description,
+          channel_id : channel
         }
+      })
+
+      return {
+        message : 'Success',
+        agentID : ""+newAgent.agent_id
+      }
 
     } catch(error) {
         console.log(error)
         return {errMsg : error.message}
     }
-
 }
 
+/*
 export async function updateAgent(_prevstate, formData) {
     console.log("FORM DATA : ", formData)
     const validateFields = UpdateAgentSession.safeParse({
@@ -180,3 +175,4 @@ export async function updateAgent(_prevstate, formData) {
         return {errMsg : error.message}
     }
 }
+*/

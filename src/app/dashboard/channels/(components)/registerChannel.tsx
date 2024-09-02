@@ -124,6 +124,8 @@ import { useToast } from "@/components/ui/use-toast"
 
     useEffect(() => {
 
+      console.log(state?.message)
+
       if (state?.message) {
         if (state?.message === 'Success') {
           router.push(`/dashboard/channels/${state?.channelId}`)

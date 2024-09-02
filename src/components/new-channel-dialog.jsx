@@ -4,7 +4,6 @@ import { Button } from '@/components/button'
 import { Dialog, DialogActions, DialogBody, DialogDescription, DialogTitle } from '@/components/dialog'
 import { Field, Label } from '@/components/fieldset'
 import { Input } from '@/components/input'
-import { postContact } from '@/server-actions/contacts';
 import { useState } from 'react'
 
 export function New_channel_dialog() {

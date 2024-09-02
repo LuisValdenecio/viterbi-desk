@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server"
-import TaskModel from "@/lib/mongo/tasks"
-import connect from "@/lib/mongo";
+import prisma from "@/lib/prisma";
 
 export const GET = async (req, { params }) => {
     try {
-        await connect()
-        const tasks = await TaskModel.find({agent : params.id})
+        const tasks = await prisma.task.findMany({
+            where : {
+                agent_id : params.id
+            }
+        })
         
         return Response.json({ tasks })
 

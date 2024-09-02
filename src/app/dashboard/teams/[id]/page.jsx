@@ -35,7 +35,7 @@ export default function Page() {
 
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>
-  console.log(data)
+  console.log("DATA: ", data)
   return (
     <>
 
@@ -47,7 +47,7 @@ export default function Page() {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="people">People</TabsTrigger>
             </TabsList>
-            <CreatePersonDialog />
+           {/* <CreatePersonDialog />*/}
           </div>
           <TabsContent value="overview" >
             

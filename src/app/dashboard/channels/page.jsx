@@ -9,7 +9,7 @@ export const metadata = {
 export default async function Page({ searchParams }) {
 
   const channels = await getAllChannels()
-
+  console.log("ALL CHANNELS: ", channels)
   return (
     <>
      <ListItemTable channels={channels} />

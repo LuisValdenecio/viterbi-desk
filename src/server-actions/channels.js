@@ -1,22 +1,12 @@
 'use server'
 
-import ChannelModel from "@/lib/mongo/channels"
-import GoogleTokenModel from "@/lib/mongo/googleTokens";
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod"
-
-// for testing loading, suspense and skeletons
-export async function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
+import prisma from "@/lib/prisma";
+import { auth } from '@/auth'
 
 
 const ChannelFormSchema = z.object({
   channelName : z.string().min(1,{
-    message : 'Please enter a valid name for the channel.'
-  }),
-  id : z.string().min(1,{
     message : 'Please enter a valid name for the channel.'
   }),
   token : z.string().min(1,{
@@ -31,7 +21,7 @@ const ChannelFormSchema = z.object({
 })
 
 const ChannelCreationSession = ChannelFormSchema.omit({})
-
+/*
 export async function getContactsSearch(perPage, page, searchQuery){
   try {
            
@@ -56,22 +46,16 @@ export async function getContactsSearch(perPage, page, searchQuery){
    console.log(error)
   }
 }
-
+*/
 export async function getAllChannels() {
   try {
-    const data = JSON.parse(
-      JSON.stringify(
-        await ChannelModel
-        .find()
-        )
-    )
-
-    return data
+    const channels = prisma.channel.findMany()
+    return channels
   } catch (error) {
     console.log(error)
   }
 }
-
+/*
 export async function getChannles(){
   try {
      
@@ -99,16 +83,14 @@ export async function getChannel(channelId) {
     console.log(err)
   }
 }
-
+*/
 
 export async function postChannel(_prevstate, formData) {
 
-    console.log(formData)
-
+    const session = await auth()
     
     const validateFields = ChannelCreationSession.safeParse({
       channelName : formData.get('channelName'),
-      id : "CH-3450",
       token : formData.get('token'),
       provider : formData.get('provider'),
       description : formData.get('description')
@@ -120,8 +102,10 @@ export async function postChannel(_prevstate, formData) {
         message: 'Missing Fields',
       };
     }
+
+    console.log("VALIDATED FIELDS: ", validateFields)
     
-    const {channelName, id, token, provider, description} = validateFields.data
+    const {channelName, token, provider, description} = validateFields.data
    
     try {
 
@@ -130,21 +114,52 @@ export async function postChannel(_prevstate, formData) {
 
       switch(token_provider) {
         case 'Gmail' : 
-          const find_google_token = await GoogleTokenModel.find({_id : token_id})
-          if (!find_google_token) {
+          const google_token = await prisma.google_token.findFirst({
+            where : {
+              id : token_id
+            }
+          })
+
+          console.log("GOOGLE TOKEN", google_token)
+
+          if (!google_token) {
             return {
               message : 'Invalid token'
             }
           }
 
-          const name = channelName
-          const newChannel = await ChannelModel.create({name, id, description, provider})
-          newChannel.googleToken = token_id
-          newChannel.save()
+          console.log("CREATE CHANNEL")
+
+          const userOwner = await prisma.user.findFirst({
+            where : {
+              user_id : session?.user?.id
+            }
+          })
+
+          if (!userOwner) {
+            return {
+              message : 'The user attempting to create this channel does not exist'
+            }
+          }
+
+          const newChannel = await prisma.channel.create({
+            data : {
+              name : channelName,
+              provider : provider,
+              description : description,
+              owner_id : session?.user?.id,
+              google_token_id : token_id,
+            }
+          })
+
+
+          //const newChannel = await ChannelModel.create({name, id, description, provider})
+          //newChannel.googleToken = token_id
+          //newChannel.save()
 
           return {
             message : 'Success',
-            channelId : newChannel._id
+            channelId : newChannel.channel_id
           }
               
         default :

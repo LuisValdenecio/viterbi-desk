@@ -30,7 +30,7 @@ export default function Page() {
   const path = usePathname()
   const channelId = path.split("/")[path.split("/").length - 1]
   const { data, isLoading, error } = useSWR(`/api/agents/${channelId}`, fetcher)
-
+  console.log("DATA: ", data)
 
   if (error) return <div>falhou em carregar</div>
   if (isLoading) return <div>carregando...</div>

@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server"
-import  PersonModel  from "@/lib/mongo/person"
-import connect from "@/lib/mongo";
+
+import prisma from "@/lib/prisma";
 
 export const GET = async (req, { params }) => {
     try {
-        await connect()
-        const people = await PersonModel.find({team : {$all : [params.id]}})
+
+        const people = await prisma.user.findMany({
+            relationLoadStrategy: 'join',
+            
+            include: {
+                user_privilege: {
+                   
+                },
+            },
+        })
+
+        //const people = await prisma.user_privilege.findMany()
         return Response.json({ people })
 
     } catch (error) {

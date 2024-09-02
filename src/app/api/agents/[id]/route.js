@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server"
-import  AgentModel  from "@/lib/mongo/agents"
-import connect from "@/lib/mongo";
+import prisma from "@/lib/prisma";
 
 export const GET = async (req, { params }) => {
     try {
-        await connect()
-        const agents = await AgentModel.find({channel : params.id})
+        const agents = await prisma.agent.findMany({
+            where : {
+                channel_id : params.id
+            }
+        })
+        
         return Response.json({ agents })
 
     } catch (error) {

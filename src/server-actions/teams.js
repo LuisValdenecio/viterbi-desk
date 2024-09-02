@@ -1,76 +1,72 @@
 'use server'
 
-import TeamModel from "../lib/mongo/teams"
+import prisma from "@/lib/prisma"
 import { z } from "zod"
+import { auth } from '@/auth'
 
 const TeamFormSchema = z.object({
     teamName : z.string().min(1,{
       message : 'Please enter a valid name for the team.'
     }),
-    id : z.string().min(1,{
-      message : 'Id assignment failed.'
-    }),
-    channel : z.string().min(1,{
-      message : 'Invalid id for the channel'
-    }),
+   
     description : z.string().min(1,{
       message : 'Please type in a description.'
     }),
-    status : z.string().min(1, {
-      message : 'Status assignment failed'
-    })
 })
 
 const TeamCreationSession = TeamFormSchema.omit({})
 
 export async function postTeam(_prevstate, formData) {
-    console.log(formData)
+    const session = await auth()
 
     const validateFields = TeamCreationSession.safeParse({
         teamName : formData.get('teamName'),
-        id : "CH-3450",
-        channel : '66ccd24550ccba4cb471d5fe',
         description : formData.get('description'),
-        status : 'functioning'
-      })
-  
-      if (!validateFields.success) {
-        return {
-          errors: validateFields.error.flatten().fieldErrors,
-          message: 'Missing Fields',
-        };
-      }
+    })
 
-      const {teamName, id, channel, description, status} = validateFields.data
+    if (!validateFields.success) {
+      return {
+        errors: validateFields.error.flatten().fieldErrors,
+        message: 'Missing Fields',
+      };
+    }
 
-      console.log(validateFields.data)
-      console.log(validateFields.success)
+    const {teamName, description} = validateFields.data
 
-      try {
-        const newTeam = await TeamModel.create({teamName, id, channel, description, status})
-        newTeam.save()
+    try {
 
-        return {
-            message : 'Success',
-            teamId : ""+newTeam._id
+      const newTeam = await prisma.team.create({
+        data : {
+          name : teamName,
+          description : description,
+          user_id : session?.user?.id
         }
+      })
 
-      } catch (error) {
-        console.log(error)
-        return {errMsg : error.message}
+      const user_privelege = await prisma.user_privilege.create({
+        data : {
+          privilege : 'Owner',
+          status : 'active',
+          user_id : session?.user?.id,
+          team_id : newTeam.team_id
+        }
+      })
+
+      return {
+          message : 'Success',
+          teamId : ""+newTeam.team_id
       }
+
+    } catch (error) {
+      console.log(error)
+      return {errMsg : error.message}
+    }
 
 }
 
 export async function getAllTeams() {
   try {
-    const data = JSON.parse(
-      JSON.stringify(
-        await TeamModel
-        .find()
-        )
-    )
-
+    const data = await prisma.team.findMany()
     return data
   } catch(error) {
     console.log(error)

@@ -73,7 +73,7 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "taskName",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -84,7 +84,7 @@ export const columns: ColumnDef<Task>[] = [
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("taskName")}
+            {row.getValue("name")}
           </span>
         </div>
       )
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex items-center">
           <form action={executeTask}>
-            <input type="text" name="task-agent" className="hidden" value={row?.original?.agent} />
+            <input type="text" name="task-id" className="hidden" value={row?.original?.task_id} />
             <SubmitBtn/>
           </form>
         </div>

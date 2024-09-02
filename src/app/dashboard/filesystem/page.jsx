@@ -4,7 +4,6 @@ import { Heading } from '@/components/heading'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
 import { getOrders } from '@/data'
 
-import { getContacts } from '@/server-actions/contacts'
 import { ListItemTable } from "./(components)/item-list/tableOfItems"
 import { CreateDataStorageDialog } from "./(components)/addFileDialog"
 
