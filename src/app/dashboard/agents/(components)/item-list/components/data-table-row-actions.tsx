@@ -57,7 +57,7 @@ export function DataTableRowActions<TData>({
           */
         }
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?._id}`}>
+          <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
              Go to
             <DropdownMenuShortcut>
               <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />

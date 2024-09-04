@@ -92,7 +92,6 @@ export async function postTask(_prevstate, formData) {
         status : 'functioning',
         timezone : formData.get('timezone'),
         day : formData.get('day'),
-        id : 'TASK-1B',
         day_period : formData.get('day_period'),
         hour_minute : formData.get('hour_minute'),
     })
@@ -115,6 +114,8 @@ export async function postTask(_prevstate, formData) {
         day_period,
         hour_minute,
     } = validatedFields.data
+
+    console.log("DATA: ", validatedFields.data)
 
     const taskSchedule = await prisma.task_Schedule.create({
         data : {
