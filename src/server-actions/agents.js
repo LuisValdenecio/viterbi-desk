@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma'
 import { z } from "zod"
+import { auth } from '@/auth'
 
 const AgentFormSchema = z.object({
     agentName : z.string().min(1,{
@@ -41,10 +42,79 @@ const AgentCreationSession = AgentFormSchema.omit({})
 const AgentDeletionSession = DeleteAgentSchema.omit({})
 const UpdateAgentSession = UpdateAgentFormSchema.omit({})
 
-export async function getAllAgents() {
+export async function getMyAgents() {
+  const session = await auth()
+
   try {
-    const data = await prisma.agent.findMany()
-    return data
+
+    const channels = await prisma.channel.findMany({
+      where : {
+        owner_id : session?.user?.id
+      }
+    })
+
+    const channels_id = channels.map(channel => channel.channel_id)
+
+    const agents = await prisma.agent.findMany({
+      where : {
+        channel_id : {
+          in : channels_id
+        }
+      }
+    })
+
+    return agents
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
+export async function getAllAgents() {
+
+  const session = await auth()
+  
+  try {
+
+    const teams = await prisma.team.findMany({
+      where : {
+        user_id : session?.user?.id
+      }
+    })
+
+    console.log("TEAMS: ", teams)
+
+    const teams_id = teams.map(team => team.team_id)
+
+    console.log("TEAMS IDS: ", teams_id)
+
+    const channels_teams = await prisma.team_channel.findMany({
+      where : {
+        teamId : {
+          in : teams_id
+        }
+      }
+    })
+
+    console.log("CHANNELS: ", channels_teams)
+
+    const channels = channels_teams.map(channel => channel.channelId)
+
+    console.log("CHANNELS IDS: ", channels)
+
+    const agents = await prisma.agent.findMany({
+      where : {
+        channel_id : {
+          in : channels
+        }
+      }
+    })
+
+    console.log("AGENTS: ", agents)
+
+    return agents
   } catch(error) {
     console.log(error)
   }

@@ -17,7 +17,7 @@ datasource db {
 model Team {
   team_id String @id @default(cuid())
   name String @db.VarChar(255)
-  channel Channel[]
+  channel_connection Team_channel[]
   description String @db.VarChar(500)
   person User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
   user_id String
@@ -52,6 +52,14 @@ model User {
   updatedAt  DateTime   @updatedAt
 }
 
+model Team_channel {
+  id String @id @default(cuid())
+  team Team @relation(fields: [teamId], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
+  channel Channel @relation(fields: [channelId], references: [channel_id], onDelete: Cascade, onUpdate: Cascade)
+  teamId String
+  channelId String
+}
+
 model Stripe_sub {
   sub_id String @id @default(cuid())
   user User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
@@ -78,13 +86,12 @@ model Channel {
   provider String
   provider_connected Boolean @default(false)
   description String @db.VarChar(500)
+  Team_channel Team_channel[]
   owner User? @relation(fields: [owner_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
   google_token Google_token? @relation(fields: [google_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
   discord_token Discord_token? @relation(fields: [discord_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
-  team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
   agents Agent[]
   owner_id String?
-  team_id String?
   google_token_id String? @unique
   discord_token_id String? @unique
   createdAt  DateTime   @default(now())

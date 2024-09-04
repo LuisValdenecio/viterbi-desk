@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server"
-import  prisma  from "@prisma/client";
+import  prisma  from "@/lib/prisma";
+import { auth } from '@/auth'
+
 
 export const GET = async (req, res) => {
+    const session = await auth()
+
     try {
-        await connect()
-        const channels = await prisma.channel.findMany()
+        const channels = await prisma.channel.findMany({
+            where : {
+                owner_id : session?.user?.id
+            },
+        })
         return Response.json({ channels })
 
     } catch (error) {

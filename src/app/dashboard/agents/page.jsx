@@ -1,9 +1,9 @@
 import { ListItemTable } from './(components)/item-list/tableOfItems'
-import { getAllAgents } from '@/server-actions/agents'
+import { getMyAgents } from '@/server-actions/agents'
 
 export default async function Page() {
 
-   const agents = await getAllAgents()
+   const agents = await getMyAgents()
 
     return (
         <>

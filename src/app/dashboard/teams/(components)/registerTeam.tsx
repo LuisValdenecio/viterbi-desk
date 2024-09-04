@@ -6,11 +6,22 @@ import {
     Loader2
   } from "lucide-react"
   
-
+  import useSWR from 'swr'
   import { Button } from "@/components/ui/button"
   import { postTeam } from "@/server-actions/teams"
   import { usePathname, useRouter } from "next/navigation";
-  import { useEffect, useState } from "react"
+  import { use, useEffect, useState } from "react"
+  import { MultiSelect } from "@/components/multi-select"
+
+  const fetcher = (...args) => fetch(...args).then(res => res.json())
+
+  const frameworksList = [
+    { value: "react framework ", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue"},
+    { value: "svelte", label: "Svelte"},
+    { value: "ember", label: "Ember" },
+  ];
 
   import { Input } from "@/components/ui/input"
   import { Label } from "@/components/ui/label"
@@ -44,6 +55,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import { NoChannelDialog } from "./noChannelDialog"
 
   export function SubmitBtn() {
     const { pending } = useFormStatus();
@@ -54,8 +66,20 @@ import { useToast } from "@/components/ui/use-toast"
     )
   }
 
+  function transformResultData (results : Array<any>) {
+    console.log("RESULTS", results)
+    const channels = results.map((channel) => {
+      return {value : channel.channel_id, label : channel.name}
+    })
+    return channels 
+  }
+
   const formSchema = z.object({
     teamName : z.string().min(1,{
+      message : 'Please enter a valid name for the team.'
+    }),
+    
+    channels :  z.string().min(1,{
       message : 'Please enter a valid name for the team.'
     }),
    
@@ -66,6 +90,16 @@ import { useToast } from "@/components/ui/use-toast"
 
   export function RegisterNewTeam() {
 
+    const [noChannels, setNoChannels] = useState(false)
+    const [selectedFrameworks, setSelectedFrameworks] = useState([]);
+    const { data, isLoading, error } = useSWR(`/api/channels`, fetcher)
+    console.log("DATA : ", data)
+    let channels 
+    if (!isLoading) {
+      channels = transformResultData(data.channels)
+    }
+      
+    console.log(selectedFrameworks)
 
     const router = useRouter()
     const pathname = usePathname()
@@ -77,14 +111,16 @@ import { useToast } from "@/components/ui/use-toast"
     const initialState = {
       errors: {
         teamName: undefined,
-        description : undefined
+        description : undefined,
+        channels : undefined
       },
       message: undefined
     };
 
-    const initialValues: {teamName : string, description : string} = {
+    const initialValues: {teamName : string, description : string, channels : string} = {
         teamName: "",
-        description : ""
+        description : "",
+        channels : "",
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -111,10 +147,14 @@ import { useToast } from "@/components/ui/use-toast"
       }
     }, [state?.errors]);
     
+
+
+    if (error) return <div>falhou em carregar</div>
+    if (isLoading) return <div>carregando...</div>
     return (
       <div className="grid">
 
-        
+        <NoChannelDialog isItOpen={data?.channels?.length === 0}/>
        
         <div className="flex flex-col">
          
@@ -141,11 +181,12 @@ import { useToast } from "@/components/ui/use-toast"
                         )}
                       />
 
+
                       <FormField
                         control={form.control}
                         name="description"
                         render={({ field }) => (
-                          <FormItem className="mb-4">
+                          <FormItem className="">
                             <FormLabel>Description</FormLabel>
                             <FormControl>
                               <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." {...field}/>
@@ -154,6 +195,32 @@ import { useToast } from "@/components/ui/use-toast"
                           </FormItem>
                         )}
                       />
+
+                    <FormField
+                      control={form.control}
+                      
+                      name="channels"
+                      render={({ field }) => (
+                        <FormItem >
+                          <FormLabel>Channels</FormLabel>
+                          <FormControl>
+                              <div className="w-full">
+                                <Input className="hidden" {...field} />
+                                <MultiSelect
+                                  options={channels}
+                                  onValueChange={field.onChange}
+                                  defaultValue={""}
+                                  placeholder="Select the channels this team will have acess to"
+                                  variant="inverted"
+                                  animation={2}
+                                  maxCount={3}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage>{state?.errors?.channels}</FormMessage>
+                        </FormItem>
+                      )}
+                    />
                   
                     
                       <SubmitBtn />

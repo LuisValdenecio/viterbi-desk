@@ -3,8 +3,8 @@ import { Dashboard } from '@/components/data-template'
 export default async function layout({ children }) {
 
     const links = [
-        {name : 'All', href: '/dashboard/agents'},
-        {name : 'Active', href: '#'},
+        {name : 'My agents', href: '/dashboard/agents'},
+        {name : 'Other agents', href: '/dashboard/agents/'},
     ]
 
     const cta_button = {

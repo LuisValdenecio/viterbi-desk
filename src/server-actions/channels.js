@@ -48,8 +48,13 @@ export async function getContactsSearch(perPage, page, searchQuery){
 }
 */
 export async function getAllChannels() {
+  const session = await auth()
   try {
-    const channels = prisma.channel.findMany()
+    const channels = await prisma.channel.findMany({
+      where : {
+        owner_id : session?.user?.id
+      },
+    })
     return channels
   } catch (error) {
     console.log(error)
