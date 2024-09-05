@@ -4,8 +4,7 @@ import { usePathname } from 'next/navigation'
 import useSWR from 'swr'
 //import { ListItemTable } from "../(components)/agents-list/tableOfItems"
 import { ListItemTable } from "../(components)/people-list/tableOfItems"
-//import { CreateAgentDialog } from "../(components)/createAgentDialog"
-import { CreatePersonDialog } from "../(components)/createPersonDialog"
+import { AddMemberDialog } from "../(components)/createPersonDialog"
 
 import {
   Tabs,
@@ -13,6 +12,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { Button } from '@/components/ui/button'
 //import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -45,14 +45,15 @@ export default function Page() {
           <div className="flex justify-between items-center">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="people">People</TabsTrigger>
+              <TabsTrigger value="active">Members</TabsTrigger>
+              <TabsTrigger value="Invitations">Invitations</TabsTrigger>
             </TabsList>
-           {/* <CreatePersonDialog />*/}
+            <AddMemberDialog />
           </div>
           <TabsContent value="overview" >
             
           </TabsContent>
-          <TabsContent value="people">
+          <TabsContent value="active">
             <div className="">
               <ListItemTable people={data.people} />
             </div>

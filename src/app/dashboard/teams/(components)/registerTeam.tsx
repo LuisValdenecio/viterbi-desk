@@ -55,7 +55,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
-import { NoChannelDialog } from "./noChannelDialog"
 
   export function SubmitBtn() {
     const { pending } = useFormStatus();
@@ -90,7 +89,6 @@ import { NoChannelDialog } from "./noChannelDialog"
 
   export function RegisterNewTeam() {
 
-    const [noChannels, setNoChannels] = useState(false)
     const [selectedFrameworks, setSelectedFrameworks] = useState([]);
     const { data, isLoading, error } = useSWR(`/api/channels`, fetcher)
     console.log("DATA : ", data)
@@ -154,8 +152,6 @@ import { NoChannelDialog } from "./noChannelDialog"
     return (
       <div className="grid">
 
-        <NoChannelDialog isItOpen={data?.channels?.length === 0}/>
-       
         <div className="flex flex-col">
          
           <main className="grid flex-1 gap-4 overflow-auto  ">
