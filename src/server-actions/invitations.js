@@ -3,10 +3,14 @@
 import prisma from '@/lib/prisma'
 import { z } from "zod"
 import { auth } from '@/auth'
+import { randomUUID } from 'crypto'
 
 const InvitationFormSchema = z.object({
     email: z.string().email({
       message: 'Please enter a valid email address.'
+    }),
+    role: z.string().min(1, {
+      message: 'Please select a valid role'
     }),
     teamId: z.string().min(1, {
         message: 'The given Id is not allowed'
@@ -19,10 +23,9 @@ export async function sendInvitation(_prevstate, formData) {
 
     const session = await auth()
 
-    console.log("FORM DATA: ", formData)
-
     const validatedFields = InvitationSession.safeParse({
         email : formData.get('email'),
+        role : formData.get('role'),
         teamId : formData.get('teamId')
     })
 
@@ -33,13 +36,16 @@ export async function sendInvitation(_prevstate, formData) {
         };
     }
 
-    const { email, teamId } = validatedFields.data
+    const { email, role, teamId } = validatedFields.data
     
     try {   
+        // make the queries below a transation, if one fails, all fail:
+        const invitation_token = `${randomUUID()}${randomUUID()}`.replace(/-/g, '')
 
         const member_invitation = await prisma.member_invitation.create({
             data : {
                 guest_email : email, 
+                role : role,
                 team_id : teamId,
             }
         })
@@ -48,6 +54,14 @@ export async function sendInvitation(_prevstate, formData) {
             data : {
                 invitation_info : member_invitation.id,
                 inviter_id : session?.user?.id
+            }
+        })
+
+        const invitation_link = await prisma.invitation_link.create({
+            data : {
+                token : invitation_token,
+                link : `http://localhost:3000/api/team-invitation/${invitation_token}`,
+                invitation_id : member_invitation.id
             }
         })
 

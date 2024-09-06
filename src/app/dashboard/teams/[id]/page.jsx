@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import useSWR from 'swr'
 //import { ListItemTable } from "../(components)/agents-list/tableOfItems"
 import { ListItemTable } from "../(components)/people-list/tableOfItems"
+import { ListInvitees } from "../(components)/invitees-list/tableOfItems"
 import { AddMemberDialog } from "../(components)/createPersonDialog"
 
 import {
@@ -31,11 +32,12 @@ export default function Page() {
 
   const path = usePathname()
   const teamId = path.split("/")[path.split("/").length - 1]
-  const { data, isLoading, error } = useSWR(`/api/people/${teamId}`, fetcher)
+  const { data : users, isLoading : usersLoading, error : usersError } = useSWR(`/api/people/${teamId}`, fetcher)
+  const { data : invitees, isLoading : inviteesLoading, error : inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
 
-  if (error) return <div>falhou em carregar</div>
-  if (isLoading) return <div>carregando...</div>
-  console.log("DATA: ", data)
+  if (usersError || inviteesError) return <div>falhou em carregar</div>
+  if (usersLoading || inviteesLoading) return <div>carregando...</div>
+  
   return (
     <>
 
@@ -46,7 +48,7 @@ export default function Page() {
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="active">Members</TabsTrigger>
-              <TabsTrigger value="Invitations">Invitations</TabsTrigger>
+              <TabsTrigger value="invitations">Invitations</TabsTrigger>
             </TabsList>
             <AddMemberDialog />
           </div>
@@ -55,7 +57,13 @@ export default function Page() {
           </TabsContent>
           <TabsContent value="active">
             <div className="">
-              <ListItemTable people={data.people} />
+              <ListItemTable people={users.people} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="invitations">
+            <div className="">
+              <ListInvitees invitees={invitees.invitees_data} />
             </div>
           </TabsContent>
 

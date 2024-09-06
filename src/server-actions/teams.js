@@ -59,8 +59,8 @@ export async function postTeam(_prevstate, formData) {
 
       const user_privelege = await prisma.user_privilege.create({
         data : {
-          privilege : 'Owner',
-          status : 'active',
+          user_role : 'owner',
+          status : 'active',  // is it necessary??
           user_id : session?.user?.id,
           team_id : newTeam.team_id
         }
@@ -85,12 +85,26 @@ export async function postTeam(_prevstate, formData) {
 export async function getAllTeams() {
   const session = await auth()
   try {
-    const data = await prisma.team.findMany({
+
+    const myTeams = await prisma.user_privilege.findMany({
       where : {
         user_id : session?.user?.id
+      },
+      include : {
+        team : true
       }
     })
-    return data
+
+    const myTeamsToReturn = myTeams.flatMap((team) => {
+      return {
+        team_id : team.team_id,
+        name : team.team.name,
+        description : team.team.description,
+        user_id : team.id
+      }
+    })
+
+    return myTeamsToReturn
   } catch(error) {
     console.log(error)
   }
