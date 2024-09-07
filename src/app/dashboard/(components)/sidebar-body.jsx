@@ -26,27 +26,27 @@ export function SiderBarBody({events}) {
             <SidebarSection>
               <Sidebar_item href={"/dashboard"} path={"/dashboard"}>
                 <House strokeWidth={path === '/dashboard' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Home</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Home</SidebarLabel>
               </Sidebar_item>
               
               <Sidebar_item href={"/dashboard/agents"} path={"/dashboard/agents"}>
                 <Bot strokeWidth={path === '/dashboard/agents' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Agents</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Agents</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/teams"} path={"/dashboard/teams"}>
                 <Users strokeWidth={path === '/dashboard/teams' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Teams</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Teams</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/channels"}>
                 <Rss strokeWidth={path === '/dashboard/channels' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Channels</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Channels</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/filesystem"} path={"/dashboard/filesystem"}>
                 <DatabaseZap strokeWidth={path === '/dashboard/filesystem' ? 1.75 : 1.25} size={20} />
-                <SidebarLabel>Filesystem</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Filesystem</SidebarLabel>
               </Sidebar_item>  
             </SidebarSection>
 
@@ -64,11 +64,11 @@ export function SiderBarBody({events}) {
             <SidebarSection>
               <SidebarItem href="#">
                 <CircleHelp size={20} strokeWidth={1.25} />
-                <SidebarLabel>Support</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>Support</SidebarLabel>
               </SidebarItem>
               <SidebarItem href="/dashboard/playground">
                 <Sparkles size={20} strokeWidth={1.25} />
-                <SidebarLabel>playground</SidebarLabel>
+                <SidebarLabel className={"font-normal"}>playground</SidebarLabel>
               </SidebarItem>
             </SidebarSection>
           </SidebarBody>

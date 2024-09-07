@@ -4,9 +4,10 @@ import { z } from "zod"
 // IRL, you will have a schema for your data models.
 export const taskSchema = z.object({
   name: z.string(),
+  role : z.string(),
   //img: z.string(),
   email: z.string(),
-  
+  status : z.string()
 })
 
 export type Task = z.infer<typeof taskSchema>

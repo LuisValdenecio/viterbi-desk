@@ -9,6 +9,9 @@ import {
   StopwatchIcon,
 } from "@radix-ui/react-icons"
 
+import { BadgeCheck, EyeIcon, KeySquare, ShieldAlert, ShieldCheck, UserRoundX } from "lucide-react"
+
+
 export const labels = [
   {
     value: "bug",
@@ -24,21 +27,39 @@ export const labels = [
   },
 ]
 
+export const active_statuses = [
+  {
+    value: "active",
+    label : "Active",
+    icon : BadgeCheck
+  },
+  {
+    value: "suspended",
+    label : "Suspended",
+    icon : ShieldAlert
+  },
+  {
+    value: "removed",
+    label : "Removed",
+    icon : UserRoundX
+  },
+]
+
 export const statuses = [
   {
-    value: "Admin",
-    label: "admin",
-    icon: CheckCircledIcon,
+    value: "owner",
+    label: "Owner",
+    icon: KeySquare,
   },
   {
-    value: "Consultant",
-    label: "consultant",
-    icon: StopwatchIcon,
+    value: "admin",
+    label: "Admin",
+    icon: ShieldCheck,
   },
   {
-    value: "Auditor",
-    label: "auditor",
-    icon: CrossCircledIcon,
+    value: "reader",
+    label: "Reader",
+    icon: EyeIcon,
   },
 ]
 

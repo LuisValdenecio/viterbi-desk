@@ -9,22 +9,27 @@ export const GET = async (req, { params }) => {
             where : {
                 team_id : params.id
             }, 
-            select : {
-                user_id : true
-            }
-        })
-
-        const users_id = users_from_team.map(user => user.user_id)
- 
-        const people = await prisma.user.findMany({
-            where : {
-                user_id: {
-                    in : users_id
+            include : {
+                user : {
+                    select : {
+                        user_id : true,
+                        name : true,
+                        img : true,
+                        email : true,
+                    }
                 }
             }
         })
 
-        //const people = await prisma.user_privilege.findMany()
+        const people = users_from_team.flatMap((member) => {
+            return {
+                name : member.user.name,
+                email : member.user.email,
+                role : member.user_role,
+                status : member.status
+            }
+        })
+
         return Response.json({ people })
 
     } catch (error) {

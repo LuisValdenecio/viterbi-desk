@@ -46,79 +46,98 @@ export async function getMyAgents() {
   const session = await auth()
 
   try {
+    // make these set of queries a transaction later...
 
-    const channels = await prisma.channel.findMany({
+    const my_teams = await prisma.user_privilege.findMany({
       where : {
-        owner_id : session?.user?.id
+        user_id : session?.user?.id
+      }, 
+      select : {
+        team_id : true
       }
     })
 
-    const channels_id = channels.map(channel => channel.channel_id)
+    const my_teams_ids = my_teams.flatMap(team => team.team_id)
 
-    const agents = await prisma.agent.findMany({
+    const my_channels = await prisma.team_channel.findMany({
+      where : {
+        team_id : {
+          in : my_teams_ids
+        }
+      },
+      select : {
+        channel_id : true
+      },
+      distinct: ['channel_id']
+    })
+
+    const my_channels_id = my_channels.flatMap(channel => channel.channel_id)
+
+    const my_agents = await prisma.agent.findMany({
       where : {
         channel_id : {
-          in : channels_id
+          in : my_channels_id
+        }
+      },
+      include : {
+        tasks : {
+          select : {
+            name : true,
+            priority : true,
+            status : true,
+            task_id : true
+          }
         }
       }
     })
 
-    return agents
+    const channels_owned = await prisma.channel.findMany({
+      where : {
+        owner_id : session?.user?.id
+      },
+      select : {
+        channel_id : true
+      }
+    })
+
+    if (channels_owned) {
+
+      const channels_owned_id = channels_owned.flatMap(channel => channel.channel_id)
+
+      const agents_owned = await prisma.agent.findMany({
+        where : {
+          channel_id : {
+            in : channels_owned_id
+          }
+        },
+        include : {
+          tasks : {
+            select : {
+              name : true,
+              priority : true,
+              status : true,
+              task_id : true
+            }
+          }
+        }
+      })
+  
+      const results = my_agents.concat(agents_owned)
+      const filtered = results.filter((value, index) => 
+        results.findIndex((channel) => channel.agent_id == value.agent_id) == index  
+      ) 
+      console.log("FILTERED DATA: ", filtered)
+      return filtered
+    }
+
+
+    return my_agents
 
   } catch (error) {
     console.log(error)
   }
 }
 
-
-
-export async function getAllAgents() {
-
-  const session = await auth()
-  
-  try {
-
-    const teams = await prisma.team.findMany({
-      where : {
-        user_id : session?.user?.id
-      }
-    })
-
-    console.log("TEAMS: ", teams)
-
-    const teams_id = teams.map(team => team.team_id)
-
-    console.log("TEAMS IDS: ", teams_id)
-
-    const channels_teams = await prisma.team_channel.findMany({
-      where : {
-        teamId : {
-          in : teams_id
-        }
-      }
-    })
-
-    console.log("CHANNELS: ", channels_teams)
-
-    const channels = channels_teams.map(channel => channel.channelId)
-
-    console.log("CHANNELS IDS: ", channels)
-
-    const agents = await prisma.agent.findMany({
-      where : {
-        channel_id : {
-          in : channels
-        }
-      }
-    })
-
-    console.log("AGENTS: ", agents)
-
-    return agents
-  } catch(error) {
-    console.log(error)
-  }
-}
 /*
 export async function getAgentsByChannel(channelId) {
   try {

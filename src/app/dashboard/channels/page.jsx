@@ -1,5 +1,5 @@
 
-import { getAllChannels } from '@/server-actions/channels'
+import { getAllMyChannels } from '@/server-actions/channels'
 import { ListItemTable } from './(components)/item-list/tableOfItems'
 
 export const metadata = {
@@ -8,8 +8,7 @@ export const metadata = {
 
 export default async function Page({ searchParams }) {
 
-  const channels = await getAllChannels()
-  console.log("ALL CHANNELS: ", channels)
+  const channels = await getAllMyChannels()
   return (
     <>
      <ListItemTable channels={channels} />

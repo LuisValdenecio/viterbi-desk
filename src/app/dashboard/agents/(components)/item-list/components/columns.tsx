@@ -36,11 +36,11 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "_id",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Agent" />
     ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue("id")}</div>,
+    cell: ({ row }) => <div className="w-[150px] truncate">{row.getValue("name")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -87,6 +87,26 @@ export const columns: ColumnDef<Task>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
+    },
+    enableSorting: false,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "tasks",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tasks" />
+    ),
+    cell: ({ row }) => {
+      //const label = labels.find((label) => label.value === row.original.label)
+
+      return (
+        <div className="flex items-center">
+          {/*label && <Badge variant="outline">{label.label}</Badge>*/}
+          <span className="max-w-[500px] truncate font-bold">
+            {row.getValue("tasks").length}
+          </span>
+        </div>
+      )
     },
   },
   /*

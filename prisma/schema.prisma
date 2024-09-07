@@ -19,6 +19,7 @@ model Team {
   name String @db.VarChar(255)
   channel_connection Team_channel[]
   member_invitation Member_invitation[]
+  status String @default("functioning")
   description String @db.VarChar(500)
   person User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
   user_id String
@@ -58,10 +59,10 @@ model User {
 
 model Team_channel {
   id String @id @default(cuid())
-  team Team @relation(fields: [teamId], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
-  channel Channel @relation(fields: [channelId], references: [channel_id], onDelete: Cascade, onUpdate: Cascade)
-  teamId String
-  channelId String
+  team Team @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
+  channel Channel @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate: Cascade)
+  team_id String @map("teamId")
+  channel_id String @map("channelId")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }

@@ -47,15 +47,60 @@ export async function getContactsSearch(perPage, page, searchQuery){
   }
 }
 */
-export async function getAllChannels() {
+
+
+export async function getAllMyChannels() {
   const session = await auth()
   try {
+    // all the queries here must be packed in a transaction
+    const teams = await prisma.user_privilege.findMany({
+      where : {
+        user_id : session?.user?.id
+      },
+      include : {
+        team : true
+      }
+    })
+
+    const team_ids = teams.flatMap(team => team.team_id)
+
+    const my_channels = await prisma.team_channel.findMany({
+      where : {
+        team_id : {
+          in : team_ids
+        }
+      },
+      select : {
+        channel_id : true
+      },
+      distinct : ['channel_id']
+    })
+
+    const channel_ids = my_channels.flatMap(channel => channel.channel_id)
+    
+    
     const channels = await prisma.channel.findMany({
       where : {
-        owner_id : session?.user?.id
+        channel_id : {
+          in : channel_ids
+        }
       },
     })
-    return channels
+
+    const channels_onwed = await prisma.channel.findMany({
+      where : {
+        owner_id : session?.user?.id
+      }
+    })
+
+    const results =  channels.concat(channels_onwed)
+    const filtered = results.filter((value, index) => 
+      results.findIndex((channel) => channel.channel_id == value.channel_id) == index  
+    ) 
+    
+    // avoids duplicates
+    return filtered
+
   } catch (error) {
     console.log(error)
   }

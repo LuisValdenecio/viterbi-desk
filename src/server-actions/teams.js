@@ -52,8 +52,8 @@ export async function postTeam(_prevstate, formData) {
 
       const teamChannel = channels.map((channel) => {
         return {
-          channelId : channel,
-          teamId : newTeam.team_id
+          channel_id : channel,
+          team_id : newTeam.team_id
         }
       })
 
@@ -95,16 +95,19 @@ export async function getAllTeams() {
       }
     })
 
-    const myTeamsToReturn = myTeams.flatMap((team) => {
+    const teams = myTeams.flatMap((team) => {
       return {
         team_id : team.team_id,
         name : team.team.name,
         description : team.team.description,
-        user_id : team.id
+        user_id : team.id,
+        user_role : team.user_role
       }
     })
 
-    return myTeamsToReturn
+    console.log(teams)
+
+    return teams
   } catch(error) {
     console.log(error)
   }

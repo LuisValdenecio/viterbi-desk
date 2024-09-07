@@ -7,7 +7,7 @@ export const taskSchema = z.object({
   name: z.string(),
   channel_id: z.string(),
   description: z.string(),
-
+  tasks: z.any()
 })
 
 export type Task = z.infer<typeof taskSchema>

@@ -48,7 +48,6 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => <div className="w-[150px] flex items-center gap-2">
         <Avatar className="size-6">
-          
           <AvatarFallback>{row.getValue("guest_email").charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <span className="truncate">{row.getValue("guest_email")}</span>

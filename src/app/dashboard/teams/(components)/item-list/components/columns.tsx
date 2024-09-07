@@ -36,11 +36,11 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "teamName",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Team" />
     ),
-    cell: ({ row }) => <div className="w-[100px] truncate">{row.getValue("teamName")}</div>,
+    cell: ({ row }) => <div className="w-[200px] truncate">{row.getValue("name")}</div>,
     enableSorting: false,
     enableHiding: false,
   },
@@ -55,7 +55,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[300px] truncate font-medium">
             {row.getValue("description")}
           </span>
         </div>
@@ -63,13 +63,13 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "user_role",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Your role" />
     ),
     cell: ({ row }) => {
       const status = statuses.find(
-        (status) => status.value === row.getValue("status")
+        (status) => status.value === row.original["user_role"]
       )
 
       if (!status) {
@@ -86,7 +86,8 @@ export const columns: ColumnDef<Task>[] = [
       )
     },
     filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id))
+      console.log("ROW: ", row, id, value)
+      return value.includes(row.original["user_role"])
     },
   },
   /*

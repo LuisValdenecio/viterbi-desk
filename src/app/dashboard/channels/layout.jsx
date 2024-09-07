@@ -14,8 +14,7 @@ import { Dashboard } from '@/components/data-template'
 export default async function layout({ children }) {
 
     const links = [
-        {name : 'Owner', href : '/dashboard/channels'},
-        {name : 'Paricipant', href : '/dashboard/channels/participant'},
+        {name : 'My channels', href : '/dashboard/channels'},
         {name : 'All', href : '/dashboard/channels'},
       
     ]
