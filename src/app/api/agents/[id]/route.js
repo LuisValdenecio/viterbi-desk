@@ -6,7 +6,17 @@ export const GET = async (req, { params }) => {
         const agents = await prisma.agent.findMany({
             where : {
                 channel_id : params.id
-            }
+            },
+            include : {
+                tasks : {
+                  select : {
+                    name : true,
+                    priority : true,
+                    status : true,
+                    task_id : true
+                  }
+                }
+              }
         })
         
         return Response.json({ agents })

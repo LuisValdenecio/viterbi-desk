@@ -45,7 +45,7 @@ export async function sendInvitation(_prevstate, formData) {
         const member_invitation = await prisma.member_invitation.create({
             data : {
                 guest_email : email, 
-                role : role,
+                guest_role : role,
                 team_id : teamId,
             }
         })

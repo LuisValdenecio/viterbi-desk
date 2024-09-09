@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import useSWR from 'swr'
-import { ListItemTable } from "../(components)/agents-list/tableOfItems"
+import { ListItemTable } from "../../agents/(components)/item-list/tableOfItems"
 import { CreateAgentDialog } from "../(components)/createAgentDialog"
 
 import {
@@ -12,6 +12,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Overview } from '../(components)/overview/overview'
+import  Loader_component  from "@/components/loader"
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -33,7 +34,7 @@ export default function Page() {
   console.log("DATA: ", data)
 
   if (error) return <div>falhou em carregar</div>
-  if (isLoading) return <div>carregando...</div>
+  if (isLoading) return <Loader_component />
   return (
     <>
 

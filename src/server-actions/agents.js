@@ -3,6 +3,7 @@
 import prisma from '@/lib/prisma'
 import { z } from "zod"
 import { auth } from '@/auth'
+import bcrypt from "bcrypt"
 
 const AgentFormSchema = z.object({
     agentName : z.string().min(1,{
@@ -28,18 +29,17 @@ const UpdateAgentFormSchema = z.object({
     }),
 })
 
-const DeleteAgentSchema = z.object({
-  agentName : z.string().min(1,{
-    message : 'Please type the name to remove the agent.'
+const DeleteAgentFormSchema = z.object({
+  password: z.string().min(1, {
+      message: 'Please type in a valid password'
   }),
-  agentId : z.string().min(1,{
-    message : 'Add a valid channel id'
+  agents_id: z.string().min(1, {
+      message: 'Please type in a valid agent id'
   }),
 })
 
-
 const AgentCreationSession = AgentFormSchema.omit({})
-const AgentDeletionSession = DeleteAgentSchema.omit({})
+const DeleteAgentSession = DeleteAgentFormSchema.omit({})
 const UpdateAgentSession = UpdateAgentFormSchema.omit({})
 
 export async function getMyAgents() {
@@ -126,7 +126,6 @@ export async function getMyAgents() {
       const filtered = results.filter((value, index) => 
         results.findIndex((channel) => channel.agent_id == value.agent_id) == index  
       ) 
-      console.log("FILTERED DATA: ", filtered)
       return filtered
     }
 
@@ -138,58 +137,66 @@ export async function getMyAgents() {
   }
 }
 
-/*
-export async function getAgentsByChannel(channelId) {
+export async function deleteAgents(_prevstate, formData) {
+  const session = await auth()
+  
+  const validatedFields = DeleteAgentSession.safeParse({
+      password : formData.get('password'),
+      agents_ids : formData.get('agents_id')
+  })
+
+  /*
+  if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields',
+      };
+  }
+
+  const { password, agents_ids } = validatedFields.data
+  */
   try {
-    const data = JSON.parse(
-      JSON.stringify(
-        await AgentModel
-        .find({channelId : channelId})
-        )
-    )
-    console.log("DATA FETCHED: ", data)
-    return data
-  } catch(error) {
-    console.log(error)
+      const user = await prisma.user.findUnique({
+          where : {
+              user_id : session?.user?.id
+          }
+      })
+
+      console.log("USER : ", user)
+
+      if (user) {
+          const passwordMatch = await bcrypt.compare(
+              formData.get('password'),
+              user.password
+          )
+
+          if (passwordMatch) {
+
+              const array_of_agents_ids = formData.get('agents_id').split(",")
+              console.log("AGENTS IDS: ", array_of_agents_ids)
+              const deletedAgents = await prisma.agent.deleteMany({
+                  where : {
+                      agent_id : {
+                          in : array_of_agents_ids
+                      }
+                  }
+              })
+
+              return {
+                  message : 'Success'
+              }
+          } else {
+              return {
+                  message : 'incorrect password'
+              }
+          }
+      }
+          
+  } catch (error) {
+      console.log(error)
   }
 }
 
-export async function deleteAgent(_prevstate, formData) {
-
-    const validateFields = AgentDeletionSession.safeParse({
-        agentName : formData.get('agentName'),
-        agentId : formData.get('agentId')
-    })
-
-    if (!validateFields.success) {
-        return {
-          errors: validateFields.error.flatten().fieldErrors,
-          message: 'Missing Fields',
-        };
-    }
-
-    const { agentName, agentId } = validateFields.data
-
-    try {
-
-      const realName = await AgentModel.find({_id : agentId})
-      console.log("AGENT: ", realName[0].agentName)
-
-      if (realName[0].agentName !== agentName) {
-        return {
-          errors : [],
-          message : 'The name does not match'
-        }
-      } else {
-        // delete the agent here
-        await AgentModel.deleteOne({_id : agentId})
-      }
-
-    } catch (err) {
-      console.log(err)
-    }
-}
-*/
 
 export async function postAgent(_prevstate, formData) {
     const validateFields = AgentCreationSession.safeParse({
@@ -228,40 +235,3 @@ export async function postAgent(_prevstate, formData) {
         return {errMsg : error.message}
     }
 }
-
-/*
-export async function updateAgent(_prevstate, formData) {
-    console.log("FORM DATA : ", formData)
-    const validateFields = UpdateAgentSession.safeParse({
-        agentName : formData.get('agentName'),
-        agentId : formData.get('agentId'),
-        action : formData.get('action')
-    })
-
-    console.log("VALIDATED FIELDS", validateFields)
-
-    if (!validateFields.success) {
-        return {
-          errors: validateFields.error.flatten().fieldErrors,
-          message: 'Missing Fields',
-        };
-    }
-    
-    const { agentName, agentId, action } = validateFields.data
-
-    try {
-        const agent = await AgentModel.findOne({_id : agentId})
-        agent.agentName = agentName
-        agent.action = action
-        agent.save()
-
-        return {
-          message : 'Success',
-        }
-
-    } catch(error) {
-        console.log(error)
-        return {errMsg : error.message}
-    }
-}
-*/

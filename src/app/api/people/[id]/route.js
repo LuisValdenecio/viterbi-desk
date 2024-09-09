@@ -25,7 +25,7 @@ export const GET = async (req, { params }) => {
             return {
                 name : member.user.name,
                 email : member.user.email,
-                role : member.user_role,
+                role : member.role,
                 status : member.status
             }
         })

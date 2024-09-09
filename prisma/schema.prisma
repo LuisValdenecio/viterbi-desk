@@ -14,6 +14,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Plan {
+  enterprise
+  professional
+  free
+}
+
+enum Subscription_period {
+  monthly
+  yearly
+}
+
+enum Task_priority {
+  high
+  medium
+  low
+}
+
+enum Role {
+  owner
+  admin
+  reader
+}
+
 model Team {
   team_id String @id @default(cuid())
   name String @db.VarChar(255)
@@ -33,10 +56,9 @@ model User_privilege {
   status String
   user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
   team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
-  role Team_role? @relation(fields: [user_role], references: [role], onDelete: Cascade, onUpdate: Cascade)
+  role Role
   user_id String 
   team_id String 
-  user_role String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -49,10 +71,13 @@ model User {
   password String 
   teams Team[]
   member_invitation Member_invitation[]
+  plan Plan @default(free)
+  customerId String? @unique // Stripe customer ID, this will be important when we need to delete the subscription
+
   invitation_info Invitation_info[]
   channels Channel[]
   user_privilege User_privilege[]
-  Stripe_sub Stripe_sub?
+  Stripe_sub Stripe_subscription?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -61,24 +86,22 @@ model Team_channel {
   id String @id @default(cuid())
   team Team @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: Cascade)
   channel Channel @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate: Cascade)
-  team_id String @map("teamId")
-  channel_id String @map("channelId")
+  team_id String 
+  channel_id String 
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
 
-model Stripe_sub {
-  sub_id String @id @default(cuid())
+model Stripe_subscription {
+  id String @id @default(cuid())
   user User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
+  plan Plan
   user_id String @unique
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-}
+  period Subscription_period
 
-model Team_role {
-  role String @id
-  user_role User_privilege[]
-  member_invitation Member_invitation[]
+  startDate DateTime @default(now())
+  endDate DateTime
+
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -90,10 +113,9 @@ model Member_invitation {
   invitation_link Invitation_link[]
   user User? @relation(fields: [guest_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
   team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate : Cascade)
-  guest_role Team_role? @relation(fields: [role], references: [role], onDelete: Cascade, onUpdate : Cascade)
+  guest_role Role
   guest_id String?
   team_id String
-  role String
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -170,7 +192,7 @@ model Discord_token {
 model Task {
   task_id String @id @default(cuid())
   name String @db.VarChar(255)
-  priority String @db.VarChar(500)
+  priority Task_priority
   status String @default("functioning")
   agent Agent? @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade, onUpdate : Cascade)
   recurrent Boolean?

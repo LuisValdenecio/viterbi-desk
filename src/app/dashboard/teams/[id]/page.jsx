@@ -14,6 +14,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Button } from '@/components/ui/button'
+import Loader_component from '@/components/loader'
 //import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -36,7 +37,7 @@ export default function Page() {
   const { data : invitees, isLoading : inviteesLoading, error : inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
 
   if (usersError || inviteesError) return <div>falhou em carregar</div>
-  if (usersLoading || inviteesLoading) return <div>carregando...</div>
+  if (usersLoading || inviteesLoading) return <Loader_component />
   
   return (
     <>

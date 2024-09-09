@@ -58,8 +58,26 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[500px] truncate font-normal">
             {row.getValue("description")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "agents",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Agents" />
+    ),
+    cell: ({ row }) => {
+      //const label = labels.find((label) => label.value === row.original.label)
+
+      return (
+        <div className="flex space-x-2">
+          {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
+          <span className="max-w-[500px] truncate font-normal">
+            {row.getValue("agents").length}
           </span>
         </div>
       )

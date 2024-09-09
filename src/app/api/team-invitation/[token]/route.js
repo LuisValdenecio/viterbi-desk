@@ -35,7 +35,7 @@ export const GET = async (req, { params }) => {
         // add the user to the team with the assigned privilege (it should a transaction):
         const user_privelege = await prisma.user_privilege.create({
             data : {
-              user_role : invitation_info[0].role,
+              role : invitation_info[0].guest_role,
               status : 'active',  // is it necessary??
               user_id : session?.user?.id,
               team_id : invitation_info[0].team_id

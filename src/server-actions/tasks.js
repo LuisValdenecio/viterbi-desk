@@ -6,8 +6,18 @@ import { executeDiscordTask } from '../server-actions/provider-based-task'
 
 import { z } from 'zod'
 import prisma from '@/lib/prisma'
+import { auth } from '@/auth'
+import bcrypt from "bcrypt"
 
-
+const DeleteTaskForSchema = z.object({
+    password: z.string().min(1, {
+        message: 'Please type in a valid password'
+    }),
+    tasks_ids: z.string().min(1, {
+        message: 'Please type in a valid agent id'
+    }),
+})
+   
 const TaskFormSchema = z.object({
     taskName : z.string().min(1, {
         message : 'Please type in a valid name for the task'
@@ -37,6 +47,63 @@ const TaskFormSchema = z.object({
 })
 
 const TaskCreationSession = TaskFormSchema.omit({})
+const DeleteTaskSession = DeleteTaskForSchema.omit({})
+
+export async function deleteTaks(_prevstate, formData) {
+    
+    const session = await auth()
+
+    const validatedFields = DeleteTaskSession.safeParse({
+        password : formData.get('password'),
+        tasks_ids : formData.get('tasks_ids')
+    })
+
+    if (!validatedFields.success) {
+        return {
+          errors: validatedFields.error.flatten().fieldErrors,
+          message: 'Missing Fields',
+        };
+    }
+
+    const { password, tasks_ids } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where : {
+                user_id : session?.user?.id
+            }
+        })
+
+        if (user) {
+            const passwordMatch = await bcrypt.compare(
+                password,
+                user.password
+            )
+
+            if (passwordMatch) {
+
+                const array_of_tasks_ids = tasks_ids.split(",")
+                const deleletedPosts = await prisma.task.deleteMany({
+                    where : {
+                        task_id : {
+                            in : array_of_tasks_ids
+                        }
+                    }
+                })
+
+                return {
+                    message : 'Success'
+                }
+            } else {
+                return {
+                    message : 'incorrect password'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export async function executeTask(formData) {
 
@@ -115,25 +182,33 @@ export async function postTask(_prevstate, formData) {
         hour_minute,
     } = validatedFields.data
 
-    console.log("DATA: ", validatedFields.data)
+    try {   
+        const taskSchedule = await prisma.task_Schedule.create({
+            data : {
+                timezone : timezone, 
+                day : day, 
+                dayPeriod : day_period, 
+                hourAndMinute : hour_minute
+            }
+        })
+    
+        const newTask = await prisma.task.create({
+            data : {
+                name : taskName,
+                priority : priority,
+                status : status,
+                agent_id : agentId,
+                schedule : taskSchedule.id
+            }
+        })
 
-    const taskSchedule = await prisma.task_Schedule.create({
-        data : {
-            timezone : timezone, 
-            day : day, 
-            dayPeriod : day_period, 
-            hourAndMinute : hour_minute
+        return {
+            message : 'Success',
+            taskName : newTask.name,
         }
-    })
 
-    const newTask = await prisma.task.create({
-        data : {
-            name : taskName,
-            priority : priority,
-            status : status,
-            agent_id : agentId,
-            schedule : taskSchedule.id
-        }
-    })
 
+    } catch (error) {
+        console.log(error)
+    }
 }

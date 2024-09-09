@@ -15,7 +15,7 @@ export const GET = async (req, { params }) => {
             }
         })
 
-        return Response.json(privilege[0].user_role)
+        return Response.json(privilege[0].role)
 
     } catch (error) {
         console.log(error)

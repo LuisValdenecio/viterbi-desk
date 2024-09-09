@@ -22,6 +22,7 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  console.log("LET'S SEE: ", table.getFilteredSelectedRowModel().rows)
   return (
     <div className="flex items-center justify-between">
       <div className="flex-1 text-sm text-muted-foreground">

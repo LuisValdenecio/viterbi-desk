@@ -10,6 +10,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import useSWR from 'swr'
+import Loader_component from '@/components/loader'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -20,7 +21,7 @@ export default function Page() {
     const { data, isLoading,  error } = useSWR(`/api/tasks/${agentId}`, fetcher)
 
     if (error) return <div>falhou em carregar</div>
-    if (isLoading) return <div>carregando...</div>
+    if (isLoading) return <Loader_component />
 
     return (
         <>
@@ -31,14 +32,14 @@ export default function Page() {
                     <div className="flex justify-between items-center">
                         <TabsList>
                             <TabsTrigger value="overview">Overview</TabsTrigger>
-                            <TabsTrigger value="agents">Tasks</TabsTrigger>
+                            <TabsTrigger value="tasks">Tasks</TabsTrigger>
                         </TabsList>
                         <CreateTaskDialog/>
                     </div>
                     <TabsContent value="overview" >
 
                     </TabsContent>
-                    <TabsContent value="agents">
+                    <TabsContent value="tasks">
                         <ListItemTable agents={data.tasks} />
                     </TabsContent>
 

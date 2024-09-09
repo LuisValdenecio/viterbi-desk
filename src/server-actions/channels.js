@@ -85,11 +85,17 @@ export async function getAllMyChannels() {
           in : channel_ids
         }
       },
+      include : {
+        agents : true
+      }
     })
 
     const channels_onwed = await prisma.channel.findMany({
       where : {
         owner_id : session?.user?.id
+      },
+      include : {
+        agents : true
       }
     })
 
@@ -99,6 +105,8 @@ export async function getAllMyChannels() {
     ) 
     
     // avoids duplicates
+    console.log("FILTERED CHANNELS: ", filtered)
+
     return filtered
 
   } catch (error) {

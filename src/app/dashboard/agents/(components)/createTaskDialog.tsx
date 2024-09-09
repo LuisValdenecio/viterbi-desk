@@ -5,6 +5,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button"
+import  SubmitBtn  from "@/components/submit-button"
 import {
   Dialog,
   DialogContent,
@@ -37,16 +38,16 @@ import {
   SelectLabel,
 
 } from "@/components/ui/select"
-import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { postAgent } from '@/server-actions/agents'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { postTask } from '@/server-actions/tasks'
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 //@ts-ignore
-import { useFormStatus } from "react-dom";
 import { useFormState } from 'react-dom'
 import { z } from "zod"
 import { useEffect } from "react"
@@ -60,15 +61,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-
-export function SubmitBtn() {
-  const { pending } = useFormStatus();
-  return (
-    <Button className="w-full" type="submit" disabled={pending}>
-      {pending ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : 'Create Agent'}
-    </Button>
-  )
-}
 
 const formSchema = z.object({
   taskName: z.string().min(1, {
@@ -89,6 +81,9 @@ export function CreateTaskDialog() {
 
   const path = usePathname()
   const agentId = path.split("/")[path.split("/").length - 1]
+  const [open, setOpen] = React.useState(false)
+  const router = useRouter()
+  const { toast } = useToast()
 
   const initialState = {
     errors: {
@@ -115,12 +110,16 @@ export function CreateTaskDialog() {
   useEffect(() => {
 
     if (state?.message) {
-
-      /*
       if (state?.message === 'Success') {
-        router.push(`/dashboard/agents/${state?.agentID}`)
+        setOpen(false)
+        toast({
+          title: "Task created",
+          description: `${state?.taskName} created successfully`,
+          action: (
+            <ToastAction altText="Refresh">Undo</ToastAction>
+          ),
+        })
       }
-      */
     }
 
     if (Array.isArray(state?.errors)) {
@@ -131,7 +130,6 @@ export function CreateTaskDialog() {
   }, [state?.errors]);
 
 
-  const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
   if (isDesktop) {
@@ -376,7 +374,9 @@ export function CreateTaskDialog() {
               </fieldset>
 
              
-              <SubmitBtn />
+              <SubmitBtn>
+                Create Task
+              </SubmitBtn>
             </form>
           </Form>
 
@@ -497,7 +497,7 @@ export function CreateTaskDialog() {
                 <FormMessage>{state?.errors?.action}</FormMessage>
               </Select>
             </div>
-            <SubmitBtn />
+            <SubmitBtn>Create Task</SubmitBtn>
           </form>
         </Form>
         <DrawerFooter className="pt-2">

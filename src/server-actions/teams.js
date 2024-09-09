@@ -59,7 +59,7 @@ export async function postTeam(_prevstate, formData) {
 
       const user_privelege = await prisma.user_privilege.create({
         data : {
-          user_role : 'owner',
+          role : 'owner',
           status : 'active',  // is it necessary??
           user_id : session?.user?.id,
           team_id : newTeam.team_id
@@ -101,7 +101,7 @@ export async function getAllTeams() {
         name : team.team.name,
         description : team.team.description,
         user_id : team.id,
-        user_role : team.user_role
+        user_role : team.role
       }
     })
 
