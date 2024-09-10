@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 import { z } from "zod"
 import { auth } from '@/auth'
+import bcrypt from "bcrypt"
 
 const TeamFormSchema = z.object({
     teamName : z.string().min(1,{
@@ -18,7 +19,17 @@ const TeamFormSchema = z.object({
     }),
 })
 
+const DeleteTeamFormSchema = z.object({
+  password: z.string().min(1, {
+      message: 'Please type in a valid password'
+  }),
+  teams_id: z.string().min(1, {
+      message: 'Please type in a valid team id'
+  }),
+})
+
 const TeamCreationSession = TeamFormSchema.omit({})
+const DeleteTeamSession = DeleteTeamFormSchema.omit({})
 
 export async function postTeam(_prevstate, formData) {
     console.log("FORM DATA: ", formData)
@@ -81,6 +92,63 @@ export async function postTeam(_prevstate, formData) {
     }
 
 }
+
+export async function deleteTeams(_prevstate, formData) {
+
+  const session = await auth()
+
+  const validatedFields = DeleteTeamSession.safeParse({
+      password : formData.get('password'),
+      teams_id : formData.get('teams_id')
+  })
+
+  if (!validatedFields.success) {
+      return {
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: 'Missing Fields',
+      };
+  }
+
+  const { password, teams_id } = validatedFields.data
+
+  try {
+      const user = await prisma.user.findUnique({
+          where : {
+              user_id : session?.user?.id
+          }
+      })
+
+      if (user) {
+          const passwordMatch = await bcrypt.compare(
+              password,
+              user.password
+          )
+
+          if (passwordMatch) {
+
+              const array_of_teams_ids = teams_id.split(",")
+              const deleletedPosts = await prisma.team.deleteMany({
+                  where : {
+                      team_id : {
+                          in : array_of_teams_ids
+                      }
+                  }
+              })
+
+              return {
+                  message : 'Success'
+              }
+          } else {
+              return {
+                  message : 'incorrect password'
+              }
+          }
+      }
+  } catch (error) {
+      console.log(error)
+  }
+}
+
 
 export async function getAllTeams() {
   const session = await auth()

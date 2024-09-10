@@ -142,10 +142,9 @@ export async function deleteAgents(_prevstate, formData) {
   
   const validatedFields = DeleteAgentSession.safeParse({
       password : formData.get('password'),
-      agents_ids : formData.get('agents_id')
+      agents_id : formData.get('agents_id')
   })
 
-  /*
   if (!validatedFields.success) {
       return {
         errors: validatedFields.error.flatten().fieldErrors,
@@ -153,8 +152,8 @@ export async function deleteAgents(_prevstate, formData) {
       };
   }
 
-  const { password, agents_ids } = validatedFields.data
-  */
+  const { password, agents_id } = validatedFields.data
+  
   try {
       const user = await prisma.user.findUnique({
           where : {
@@ -162,18 +161,15 @@ export async function deleteAgents(_prevstate, formData) {
           }
       })
 
-      console.log("USER : ", user)
-
       if (user) {
           const passwordMatch = await bcrypt.compare(
-              formData.get('password'),
+              password,
               user.password
           )
 
           if (passwordMatch) {
 
-              const array_of_agents_ids = formData.get('agents_id').split(",")
-              console.log("AGENTS IDS: ", array_of_agents_ids)
+              const array_of_agents_ids = agents_id.split(",")
               const deletedAgents = await prisma.agent.deleteMany({
                   where : {
                       agent_id : {

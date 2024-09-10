@@ -165,7 +165,7 @@ export function AddMemberDialog() {
       return (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="h-8 gap-1" >
+            <Button variant="outline" size="sm" className="h-8 gap-1" >
 
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">

@@ -124,7 +124,7 @@ import { useToast } from "@/components/ui/use-toast"
 
     useEffect(() => {
 
-      console.log(state?.message)
+      console.log(state)
 
       if (state?.message) {
         if (state?.message === 'Success') {

@@ -20,6 +20,8 @@ export async function getUserPlan() {
             }
         })
 
+        console.log("USER FOUND: ", user)
+
         const filtered_results = {
           plan : user.plan,
           period : user.Stripe_sub.period

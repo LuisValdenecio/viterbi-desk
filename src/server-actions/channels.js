@@ -3,7 +3,16 @@
 import { z } from "zod"
 import prisma from "@/lib/prisma";
 import { auth } from '@/auth'
+import bcrypt from "bcrypt"
 
+const DeleteChannelFormSchema = z.object({
+  password: z.string().min(1, {
+      message: 'Please type in a valid password'
+  }),
+  channels_ids: z.string().min(1, {
+      message: 'Please type in a valid channel id'
+  }),
+})
 
 const ChannelFormSchema = z.object({
   channelName : z.string().min(1,{
@@ -21,32 +30,70 @@ const ChannelFormSchema = z.object({
 })
 
 const ChannelCreationSession = ChannelFormSchema.omit({})
-/*
-export async function getContactsSearch(perPage, page, searchQuery){
+const DeleteChannelSession = DeleteChannelFormSchema.omit({})
+
+export async function deleteTeam(_prevstate, formData) {
+    
+  const session = await auth()
+  
+  const validatedFields = DeleteChannelSession.safeParse({
+    password : formData.get('password'),
+    channels_ids : formData.get('channels_ids')
+  })
+  console.log("FORM DATA: ", formData)
+  console.log(validatedFields.success)
+  console.log(validatedFields )
+  
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields',
+    };
+  }
+  console.log("VALIDATION STATUS: ", validatedFields.success)
+  
+  const { password, channels_ids } = validatedFields.data
+  
   try {
-           
-    let regex = new RegExp(searchQuery)
-    const rawData = await ChannelModel
-    .find({name: regex})
-  
+    const user = await prisma.user.findUnique({
+      where : {
+        user_id : session?.user?.id
+      }
+    })
+    
+    if (user) {
+      const passwordMatch = await bcrypt.compare(
+        password,
+        user.password
+      )
+      console.log("step 3")
+      
+      if (passwordMatch) {
+        
+        console.log("step 4")
+        
+        const arrays_of_channels_ids = channels_ids.split(",")
+        const deleletedChannels = await prisma.channel.deleteMany({
+          where : {
+            channel_id : {
+              in : arrays_of_channels_ids
+                      }
+                  }
+              })
 
-    const data = JSON.parse(
-      JSON.stringify(
-        await ChannelModel
-        .find({name: regex})
-        .skip(perPage * (page - 1))
-        .limit(perPage)
-        )
-    )
-
-    const items_count = rawData.length
-  
-    return { data, items_count  }
+              return {
+                  message : 'Success'
+              }
+          } else {
+              return {
+                  message : 'incorrect password'
+              }
+          }
+      }
   } catch (error) {
-   console.log(error)
+      console.log(error)
   }
 }
-*/
 
 
 export async function getAllMyChannels() {
@@ -113,35 +160,6 @@ export async function getAllMyChannels() {
     console.log(error)
   }
 }
-/*
-export async function getChannles(){
-  try {
-     
-    const data = JSON.parse(
-      JSON.stringify(
-        await ChannelModel
-        .find()
-        .limit(4)
-        )
-    )
-
-    return data
-  } catch (error) {
-   console.log(error)
-  }
-}
-
-export async function getChannel(channelId) {
-  try {
-    const data = JSON.parse(
-      JSON.stringify(await ChannelModel.findOne({_id : channelId})))
-      console.log("data ", data)
-    return data
-  } catch(err) {
-    console.log(err)
-  }
-}
-*/
 
 export async function postChannel(_prevstate, formData) {
 
@@ -178,15 +196,11 @@ export async function postChannel(_prevstate, formData) {
             }
           })
 
-          console.log("GOOGLE TOKEN", google_token)
-
           if (!google_token) {
             return {
               message : 'Invalid token'
             }
           }
-
-          console.log("CREATE CHANNEL")
 
           const userOwner = await prisma.user.findFirst({
             where : {
@@ -210,16 +224,25 @@ export async function postChannel(_prevstate, formData) {
             }
           })
 
-
-          //const newChannel = await ChannelModel.create({name, id, description, provider})
-          //newChannel.googleToken = token_id
-          //newChannel.save()
-
           return {
             message : 'Success',
             channelId : newChannel.channel_id
           }
-              
+        case 'Discord' :
+          
+          const newDiscordChannel = await prisma.channel.create({
+            data : {
+              name : channelName,
+              provider : 'Discord',
+              description : description,
+              owner_id : session?.user?.id,
+            }
+          })
+
+          return {
+            message : 'Success',
+            channelId : newDiscordChannel.channel_id
+          }   
         default :
           break
       }

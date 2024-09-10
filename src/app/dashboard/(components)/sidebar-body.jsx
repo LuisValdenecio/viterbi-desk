@@ -16,11 +16,8 @@ import { usePathname } from 'next/navigation';
 
 export function SiderBarBody({events}) {
 
-    const {data:session} = useSession()
-    console.log(session)
-
     const path = usePathname()
-    console.log(path)
+
     return (
         <SidebarBody>
             <SidebarSection>
