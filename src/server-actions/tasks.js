@@ -17,6 +17,37 @@ const DeleteTaskForSchema = z.object({
         message: 'Please type in a valid agent id'
     }),
 })
+
+const EditTaskFormSchema = z.object({
+    taskName : z.string().min(1, {
+        message : 'Please type in a valid name for the task'
+    }),
+    priority : z.string().min(1,{
+        message : 'Please select a valid priority.'
+    }),
+    task_id: z.string().min(1, {
+        message: 'Add a valid channel id'
+    }),
+    taskSchedule_id : z.string().min(1, {
+        message: 'Add a valid schedule id'
+    }),
+    status : z.string().min(1,{
+        message : 'Please select a valid status.',
+    }).optional(),
+
+    timezone : z.string().min(1, {
+        message : 'Select a time zone'
+    }),
+    day : z.string().min(1, {
+        message : 'Please select a valid time point'
+    }),
+    day_period : z.string().min(1, {
+        message : 'Please select a valid time point'
+    }),
+    hour_minute : z.string().min(1, {
+        message : 'Please select a valid time point'
+    }),
+  })
    
 const TaskFormSchema = z.object({
     taskName : z.string().min(1, {
@@ -27,6 +58,9 @@ const TaskFormSchema = z.object({
     }),
     agentId : z.string().min(1, {
         message : ''
+    }),
+    taskSchedule_id : z.string().min(1, {
+        message: 'Add a valid schedule id'
     }),
     status : z.string().min(1,{
         message : 'Please select a valid status.',
@@ -47,6 +81,7 @@ const TaskFormSchema = z.object({
 })
 
 const TaskCreationSession = TaskFormSchema.omit({})
+const EditTaskSession = EditTaskFormSchema.omit({})
 const DeleteTaskSession = DeleteTaskForSchema.omit({})
 
 export async function deleteTaks(_prevstate, formData) {
@@ -150,6 +185,37 @@ export async function executeTask(formData) {
 }
 
 
+export async function getTask(task_id) {
+    try {
+        const task = await prisma.task.findUnique({
+            where : {
+                task_id : task_id
+            },
+            include : {
+                task_schedule : true
+            }
+        })
+
+        const resultData = {
+            name : task.name,
+            priority : task.priority,
+            status : task.status,
+            timezone : task.task_schedule.timezone,
+            day : task.task_schedule.day,
+            taskScheduleId : task.task_schedule.id,
+            dayPeriod : task.task_schedule.dayPeriod,
+            hourAndMinute : task.task_schedule.hourAndMinute
+        }
+
+        console.log("DATA FROM SERVER: ", resultData)
+    
+        return resultData
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export async function postTask(_prevstate, formData) {
     
     const validatedFields = TaskCreationSession.safeParse({
@@ -211,4 +277,74 @@ export async function postTask(_prevstate, formData) {
     } catch (error) {
         console.log(error)
     }
+}
+
+export async function editTask(_prevstate, formData) {
+    
+    const validatedFields = EditTaskSession.safeParse({
+        taskName : formData.get('taskName'),
+        priority : formData.get('priority'),
+        task_id : formData.get('task_id'),
+        taskSchedule_id : formData.get('taskSchedule_id'),
+        status : 'functioning',
+        timezone : formData.get('timezone'),
+        day : formData.get('day'),
+        day_period : formData.get('day_period'),
+        hour_minute : formData.get('hour_minute'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+          errors: validatedFields.error.flatten().fieldErrors,
+          message: 'Missing Fields',
+        };
+    }
+    
+    const { 
+        taskName,
+        priority,
+        task_id,
+        taskSchedule_id,
+        status,
+        timezone,
+        day,
+        day_period,
+        hour_minute,
+    } = validatedFields.data
+
+    console.log("DATA FORM: ", validatedFields.data)
+    
+    try {   
+        const taskSchedule = await prisma.task_Schedule.update({
+            where : {
+                id : taskSchedule_id
+            },
+            data : {
+                timezone : timezone, 
+                day : day, 
+                dayPeriod : day_period, 
+                hourAndMinute : hour_minute
+            }
+        })
+    
+        const editedTask = await prisma.task.update({
+            where : {
+                task_id : task_id
+            },
+            data : {
+                name : taskName,
+                priority : priority,
+                status : status,
+            }
+        })
+
+        return {
+            message : 'Success',
+            taskName : editedTask.name,
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+   
 }
