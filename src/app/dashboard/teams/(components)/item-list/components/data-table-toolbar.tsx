@@ -86,7 +86,7 @@ export function DataTableToolbar<TData>({
             options={priorities}
           />
         )}
-         {(table.getFilteredSelectedRowModel().rows.length > 0) && (
+        {(table.getFilteredSelectedRowModel().rows.length > 0) && (
           <DeleteTasksDialog data_to_delete={table.getFilteredSelectedRowModel().rows} />
         )}
         {isFiltered && (

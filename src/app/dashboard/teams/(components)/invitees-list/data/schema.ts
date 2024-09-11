@@ -6,6 +6,7 @@ export const taskSchema = z.object({
   guest_email: z.string(),
   inviter_id: z.string(),
   guest_role: z.string(),
+  invitation_id : z.string(),
   inviter_name: z.string(),
   inviter_email: z.string(),
 })

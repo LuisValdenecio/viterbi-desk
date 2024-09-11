@@ -55,6 +55,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import Loader_component from "@/components/loader"
 
   export function SubmitBtn() {
     const { pending } = useFormStatus();
@@ -145,10 +146,8 @@ import { useToast } from "@/components/ui/use-toast"
       }
     }, [state?.errors]);
     
-
-
     if (error) return <div>falhou em carregar</div>
-    if (isLoading) return <div>carregando...</div>
+    if (isLoading) return <Loader_component />
     return (
       <div className="grid">
 

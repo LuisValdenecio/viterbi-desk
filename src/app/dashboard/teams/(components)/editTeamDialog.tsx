@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight } from "lucide-react"
+import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight, Edit2Icon } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -37,9 +37,11 @@ import {
 } from "@/components/ui/select"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { postAgent } from '@/server-actions/agents'
+import { getAgent, editAgent } from '@/server-actions/agents'
 import { usePathname } from 'next/navigation'
 
 
@@ -48,8 +50,6 @@ import { useFormStatus } from "react-dom";
 import { useFormState } from 'react-dom'
 import { z } from "zod"
 import { useEffect } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 
 import {
   Form,
@@ -60,70 +60,65 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-
-export function SubmitBtn() {
-  const { pending } = useFormStatus();
-  return (
-    <Button className="w-full" type="submit" disabled={pending}>
-      {pending ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : 'Create Agent'}
-    </Button>
-  )
-}
+import { editChannel, getChannel } from "@/server-actions/channels"
+import SubmitBtn from "@/components/submit-button"
+import { editTeam, getTeam } from "@/server-actions/teams"
 
 const formSchema = z.object({
-  agentName: z.string().min(1, {
-    message: 'Please enter a valid name for the Agent.'
+  teamName: z.string().min(1, {
+    message: 'Please enter a valid name for the team.'
   }),
-  channel: z.string().min(1, {
-    message: 'Add a valid channel id'
+  teamId: z.string().min(1, {
+    message: 'Please enter a valid id for the team.'
   }),
   description: z.string().min(1, {
     message: 'Please select a valid action.'
   }),
 })
 
-export function CreateAgentDialog() {
+export function EditTeamDialog({ team_id }) {
 
-  const path = usePathname()
-  const channelId = path.split("/")[path.split("/").length - 1]
+  let team_to_edit : any = null;
   const { toast } = useToast()
-
+  
   const initialState = {
     errors: {
-      agentName: undefined,
-      channel: undefined,
-      action: undefined,
+      teamName: undefined,
+      teamId : undefined,
       description : undefined
     },
     message: undefined
   };
 
-  const initialValues: { agentName: string, channel: string, description: string } = {
-    agentName: "",
-    channel: channelId,
-    description: ""
-  };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialValues
-  })
-
-  const [state, formAction] = useFormState(postAgent, initialState);
+  const [state, formAction] = useFormState(editTeam, initialState);
+  const [teamData, setTeamData] = React.useState("")
 
   useEffect(() => {
 
+    const fetchData = async () => {
+      team_to_edit = await getTeam(team_id)
+      setTeamData(team_to_edit)
+      console.log("TEAM TO EDIT: ", team_to_edit)
+    };
+
+    fetchData().catch((e) => {
+      console.error('An error occured while fetching the data');
+    });
+
     if (state?.message) {
-      setOpen(false)
+
+      
       if (state?.message === 'Success') {
+        setOpen(false)
         toast({
-          title: "Agent created successfully",
-          description: `${state?.agentID} created successfully`,
+          title: "Task updated",
+          description: `${state?.taskName} created successfully`,
           action: (
             <ToastAction altText="Refresh">Undo</ToastAction>
           ),
         })
       }
+      
     }
 
     if (Array.isArray(state?.errors)) {
@@ -133,6 +128,16 @@ export function CreateAgentDialog() {
     }
   }, [state?.errors]);
 
+  const initialValues: { teamName: string, teamId : string, description: string } = {
+    teamName: teamData?.name,
+    teamId : team_id,
+    description: teamData?.description
+  };
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialValues
+  })
 
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -144,16 +149,16 @@ export function CreateAgentDialog() {
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="font-normal h-8 lg:flex w-full flex justify-between border-none"
         >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          New
+          Edit 
+          <Edit2Icon className="h-4 w-4 text-muted-foreground" />
         </Button>
           
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create a new agent</DialogTitle>
+            <DialogTitle>Edit Team</DialogTitle>
             <DialogDescription>
               Agents can do things on your behalf on your channels.
             </DialogDescription>
@@ -163,26 +168,26 @@ export function CreateAgentDialog() {
 
               <FormField
                 control={form.control}
-                name="agentName"
+                name="teamName"
                 render={({ field }) => (
                   <FormItem className="mb-4">
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="type in the name of the Agent" {...field} />
+                      <Input defaultValue={teamData?.name} placeholder="type in the name of the Agent" {...field} />
                     </FormControl>
-                    <FormMessage>{state?.errors?.agentName}</FormMessage>
+                    <FormMessage>{state?.errors?.teamName}</FormMessage>
                   </FormItem>
                 )}
               />
 
               <FormField
                 control={form.control}
-                name="channel"
+                name="teamId"
                 render={({ field }) => (
                   <FormItem className="hidden">
                     <FormLabel>Channel id</FormLabel>
                     <FormControl>
-                      <Input defaultValue={channelId} {...field} />
+                      <Input defaultValue={team_id} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -197,7 +202,7 @@ export function CreateAgentDialog() {
                   <FormItem className="mb-4">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." />
+                      <Textarea defaultValue={teamData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
                     </FormControl>
                     <FormMessage>{state?.errors?.description}</FormMessage>
                   </FormItem>
@@ -205,7 +210,7 @@ export function CreateAgentDialog() {
               />
 
               </div>
-              <SubmitBtn />
+              <SubmitBtn>Edit Channel</SubmitBtn>
             </form>
           </Form>
 

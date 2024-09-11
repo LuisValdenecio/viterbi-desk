@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight } from "lucide-react"
+import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight, Edit2Icon } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -37,9 +37,11 @@ import {
 } from "@/components/ui/select"
 import { useRouter } from "next/router"
 import { useForm } from "react-hook-form"
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { postAgent } from '@/server-actions/agents'
+import { getAgent, editAgent } from '@/server-actions/agents'
 import { usePathname } from 'next/navigation'
 
 
@@ -48,8 +50,6 @@ import { useFormStatus } from "react-dom";
 import { useFormState } from 'react-dom'
 import { z } from "zod"
 import { useEffect } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
 
 import {
   Form,
@@ -74,56 +74,58 @@ const formSchema = z.object({
   agentName: z.string().min(1, {
     message: 'Please enter a valid name for the Agent.'
   }),
-  channel: z.string().min(1, {
-    message: 'Add a valid channel id'
+  agentId: z.string().min(1, {
+    message: 'Please enter a valid name for the Agent.'
   }),
   description: z.string().min(1, {
     message: 'Please select a valid action.'
   }),
 })
 
-export function CreateAgentDialog() {
+export function EditAgentDialog({ agent_id }) {
 
-  const path = usePathname()
-  const channelId = path.split("/")[path.split("/").length - 1]
+  let agent_to_edit : any = null;
   const { toast } = useToast()
-
+  
   const initialState = {
     errors: {
       agentName: undefined,
-      channel: undefined,
+      agentId : undefined,
       action: undefined,
       description : undefined
     },
     message: undefined
   };
 
-  const initialValues: { agentName: string, channel: string, description: string } = {
-    agentName: "",
-    channel: channelId,
-    description: ""
-  };
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialValues
-  })
-
-  const [state, formAction] = useFormState(postAgent, initialState);
+  const [state, formAction] = useFormState(editAgent, initialState);
+  const [agentData, setAgentData] = React.useState("")
 
   useEffect(() => {
 
+    const fetchData = async () => {
+      agent_to_edit = await getAgent(agent_id)
+      setAgentData(agent_to_edit)
+      console.log("AGENT TO EDIT: ", agent_to_edit)
+    };
+
+    fetchData().catch((e) => {
+      console.error('An error occured while fetching the data');
+    });
+
     if (state?.message) {
-      setOpen(false)
+
+      
       if (state?.message === 'Success') {
+        setOpen(false)
         toast({
-          title: "Agent created successfully",
-          description: `${state?.agentID} created successfully`,
+          title: "Task updated",
+          description: `${state?.taskName} created successfully`,
           action: (
             <ToastAction altText="Refresh">Undo</ToastAction>
           ),
         })
       }
+      
     }
 
     if (Array.isArray(state?.errors)) {
@@ -133,6 +135,16 @@ export function CreateAgentDialog() {
     }
   }, [state?.errors]);
 
+  const initialValues: { agentName: string, agentId : string, description: string } = {
+    agentName: agentData?.name,
+    agentId : agent_id,
+    description: agentData?.description
+  };
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialValues
+  })
 
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
@@ -144,10 +156,10 @@ export function CreateAgentDialog() {
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className=" h-8 lg:flex w-full flex justify-between border-none"
         >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          New
+          Edit 
+          <Edit2Icon className="h-4 w-4" />
         </Button>
           
         </DialogTrigger>
@@ -168,7 +180,7 @@ export function CreateAgentDialog() {
                   <FormItem className="mb-4">
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="type in the name of the Agent" {...field} />
+                      <Input defaultValue={agentData?.name} placeholder="type in the name of the Agent" {...field} />
                     </FormControl>
                     <FormMessage>{state?.errors?.agentName}</FormMessage>
                   </FormItem>
@@ -177,12 +189,12 @@ export function CreateAgentDialog() {
 
               <FormField
                 control={form.control}
-                name="channel"
+                name="agentId"
                 render={({ field }) => (
                   <FormItem className="hidden">
                     <FormLabel>Channel id</FormLabel>
                     <FormControl>
-                      <Input defaultValue={channelId} {...field} />
+                      <Input defaultValue={agent_id} {...field} />
                     </FormControl>
                   </FormItem>
                 )}
@@ -197,7 +209,7 @@ export function CreateAgentDialog() {
                   <FormItem className="mb-4">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." />
+                      <Textarea defaultValue={agentData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
                     </FormControl>
                     <FormMessage>{state?.errors?.description}</FormMessage>
                   </FormItem>

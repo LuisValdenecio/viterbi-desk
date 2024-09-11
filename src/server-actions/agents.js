@@ -17,16 +17,16 @@ const AgentFormSchema = z.object({
     }).optional(),
 })
 
-const UpdateAgentFormSchema = z.object({
-    agentName : z.string().min(1,{
-      message : 'Please enter a valid name for the Agent.'
-    }),
-    agentId : z.string().min(1,{
-      message : 'Add a valid channel id'
-    }),
-    action : z.string().min(1,{
-      message : 'Please select a valid action.'
-    }),
+const editAgentFormSchema = z.object({
+  agentName: z.string().min(1, {
+    message: 'Please enter a valid name for the Agent.'
+  }),
+  agentId: z.string().min(1, {
+    message: 'Please enter a valid name for the Agent.'
+  }),
+  description: z.string().min(1, {
+    message: 'Please select a valid action.'
+  }),
 })
 
 const DeleteAgentFormSchema = z.object({
@@ -40,7 +40,7 @@ const DeleteAgentFormSchema = z.object({
 
 const AgentCreationSession = AgentFormSchema.omit({})
 const DeleteAgentSession = DeleteAgentFormSchema.omit({})
-const UpdateAgentSession = UpdateAgentFormSchema.omit({})
+const UpdateAgentSession = editAgentFormSchema.omit({})
 
 export async function getMyAgents() {
   const session = await auth()
@@ -193,6 +193,24 @@ export async function deleteAgents(_prevstate, formData) {
   }
 }
 
+export async function getAgent(agentId) {
+  try {
+    const agent = await prisma.agent.findUnique({
+      where : {
+        agent_id : agentId
+      },
+      select : {
+        name : true,
+        description : true
+      }
+    })
+
+    return agent
+
+  } catch (error) {
+    console.log(error)    
+  }
+}
 
 export async function postAgent(_prevstate, formData) {
     const validateFields = AgentCreationSession.safeParse({
@@ -231,3 +249,43 @@ export async function postAgent(_prevstate, formData) {
         return {errMsg : error.message}
     }
 }
+
+export async function editAgent(_prevstate, formData) {
+    const validateFields = UpdateAgentSession.safeParse({
+        agentName : formData.get('agentName'),
+        agentId : formData.get('agentId'),
+        description : formData.get('description')
+    })
+
+    if (!validateFields.success) {
+        return {
+          errors: validateFields.error.flatten().fieldErrors,
+          message: 'Missing Fields',
+        };
+    }
+
+    const { agentName, agentId, description } = validateFields.data
+
+    try {
+      const editedAgent = await prisma.agent.update({
+        where : {
+          agent_id : agentId
+        },
+        data : {
+          name : agentName,
+          description : description,
+        }
+      })
+
+      return {
+        message : 'Success',
+        agentID : ""+editedAgent.agent_id
+      }
+
+    } catch(error) {
+        console.log(error)
+        return {errMsg : error.message}
+    }
+}
+
+

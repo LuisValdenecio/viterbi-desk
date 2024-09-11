@@ -13,6 +13,7 @@ export const GET = async (req, { params }) => {
                         user : {
                             select : {
                                 user_id : true,
+                                invitation_info : true,
                                 name : true,
                                 email : true
                             }
@@ -26,6 +27,7 @@ export const GET = async (req, { params }) => {
             return {
                 guest_email : invitee.guest_email,
                 guest_role : invitee.guest_role,
+                invitation_id : invitee.invitation_info.flatMap(ele => ele.invitation_info)[0],
                 inviter_id : invitee.invitation_info.flatMap(ele => ele.inviter_id)[0],
                 inviter_name : invitee.invitation_info.flatMap(ele=> ele.user.name)[0],
                 inviter_email : invitee.invitation_info.flatMap(ele=> ele.user.email)[0]

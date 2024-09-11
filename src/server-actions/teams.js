@@ -19,6 +19,19 @@ const TeamFormSchema = z.object({
     }),
 })
 
+const TeamUpdateFormSchema = z.object({
+  teamName: z.string().min(1, {
+    message: 'Please enter a valid name for the team.'
+  }),
+  teamId: z.string().min(1, {
+    message: 'Please enter a valid id for the team.'
+  }),
+  description: z.string().min(1, {
+    message: 'Please select a valid action.'
+  }),
+})
+
+
 const DeleteTeamFormSchema = z.object({
   password: z.string().min(1, {
       message: 'Please type in a valid password'
@@ -30,6 +43,66 @@ const DeleteTeamFormSchema = z.object({
 
 const TeamCreationSession = TeamFormSchema.omit({})
 const DeleteTeamSession = DeleteTeamFormSchema.omit({})
+const UpdateTeamSession = TeamUpdateFormSchema.omit({})
+
+export async function getTeam(team_id) {
+  try { 
+    const team = prisma.team.findUnique({
+      where : {
+        team_id
+      },
+      select : {
+        name : true,
+        description : true
+      }
+    })
+    return team
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function editTeam(_prevstate, formData) {
+  
+  const validatedFields = UpdateTeamSession.safeParse({
+    teamName : formData.get('teamName'),
+    teamId : formData.get('teamId'),
+    description : formData.get('description')
+  })
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields',
+    }
+  }
+
+  const {teamName, teamId, description} = validatedFields.data
+
+  try {
+
+    const editedTeam = await prisma.team.update({
+      where :  {
+        team_id : teamId
+      },
+      data : {
+        name : teamName,
+        description
+      }
+    }) 
+    
+    return {
+      message : 'Success'
+    }
+
+
+  } catch (error) {
+    console.log(error)
+    return {
+      message : 'something went wrong'
+    }
+  }
+}
 
 export async function postTeam(_prevstate, formData) {
     console.log("FORM DATA: ", formData)

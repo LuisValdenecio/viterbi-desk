@@ -59,9 +59,6 @@ const TaskFormSchema = z.object({
     agentId : z.string().min(1, {
         message : ''
     }),
-    taskSchedule_id : z.string().min(1, {
-        message: 'Add a valid schedule id'
-    }),
     status : z.string().min(1,{
         message : 'Please select a valid status.',
     }).optional(),
@@ -217,6 +214,8 @@ export async function getTask(task_id) {
 }
 
 export async function postTask(_prevstate, formData) {
+
+    console.log("FORMDATA: ", formData)
     
     const validatedFields = TaskCreationSession.safeParse({
         taskName : formData.get('taskName'),
@@ -228,6 +227,8 @@ export async function postTask(_prevstate, formData) {
         day_period : formData.get('day_period'),
         hour_minute : formData.get('hour_minute'),
     })
+
+    //return {message : 'Success'}
 
     if (!validatedFields.success) {
         return {
@@ -243,7 +244,6 @@ export async function postTask(_prevstate, formData) {
         status,
         timezone,
         day,
-        id,
         day_period,
         hour_minute,
     } = validatedFields.data

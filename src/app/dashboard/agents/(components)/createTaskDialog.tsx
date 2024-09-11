@@ -108,7 +108,7 @@ export function CreateTaskDialog() {
   const [state, formAction] = useFormState(postTask, initialState);
 
   useEffect(() => {
-
+    console.log("FORM STATE: ", state)
     if (state?.message) {
       if (state?.message === 'Success') {
         setOpen(false)

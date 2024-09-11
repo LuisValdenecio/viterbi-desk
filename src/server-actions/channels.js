@@ -14,6 +14,18 @@ const DeleteChannelFormSchema = z.object({
   }),
 })
 
+const ChannelUpdateSchema = z.object({
+  channelName: z.string().min(1, {
+    message: 'Please enter a valid name for the channel.'
+  }),
+  channelId: z.string().min(1, {
+    message: 'Please enter a valid id for the channel.'
+  }),
+  description: z.string().min(1, {
+    message: 'Please select a valid description for the channel.'
+  }),
+})
+
 const ChannelFormSchema = z.object({
   channelName : z.string().min(1,{
     message : 'Please enter a valid name for the channel.'
@@ -31,6 +43,24 @@ const ChannelFormSchema = z.object({
 
 const ChannelCreationSession = ChannelFormSchema.omit({})
 const DeleteChannelSession = DeleteChannelFormSchema.omit({})
+const channelUpdateSession = ChannelUpdateSchema.omit({})
+
+export async function getChannel(channel_id) {
+  try { 
+    const channel = prisma.channel.findUnique({
+      where : {
+        channel_id
+      },
+      select : {
+        name : true,
+        description : true
+      }
+    })
+    return channel
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export async function deleteTeam(_prevstate, formData) {
     
@@ -161,7 +191,49 @@ export async function getAllMyChannels() {
   }
 }
 
+export async function editChannel(_prevstate, formData) {
+
+  const validatedFields = channelUpdateSession.safeParse({
+    channelName : formData.get('channelName'),
+    channelId : formData.get('channelId'),
+    description : formData.get('description')
+  })
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields',
+    };
+  }
+
+  const {channelName, channelId, description} = validatedFields.data
+
+  try {
+
+    const editedChannel = await prisma.channel.update({
+      where : {
+        channel_id : channelId
+      },
+      data : {
+        name : channelName,
+        description : description
+      }
+    })
+
+    return {
+      message : 'Success'
+    }
+
+  } catch (error) {
+    console.log(error) 
+    return {
+      message : 'something went wrong'
+    }
+  }
+}
+
 export async function postChannel(_prevstate, formData) {
+
 
     const session = await auth()
     

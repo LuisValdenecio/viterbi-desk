@@ -102,10 +102,6 @@ export function EditTaskDialog({taskId}) {
   const router = useRouter()
   const { toast } = useToast()
 
-  const submutForm = (event) => {
-    event.preventDefault()
-  }
-
   const initialState = {
     errors: {
       taskName: undefined,
@@ -168,16 +164,14 @@ export function EditTaskDialog({taskId}) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <form onSubmit={submutForm}>
-              
-                <button className="flex justify-between w-full p-2">
-                  Edit Task
-                  
-                    <Edit2Icon className=" h-4 w-4 text-muted-foreground" />
-                 
-                </button>
-          </form>
-
+          <Button
+            variant="outline"
+            size="sm"
+            className="font-normal h-8 lg:flex w-full flex justify-between border-none"
+          >
+              Edit 
+            <Edit2Icon className="h-4 w-4 text-muted-foreground" />
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

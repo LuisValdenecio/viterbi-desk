@@ -22,6 +22,7 @@ import { labels } from "../data/data"
 import { taskSchema } from "../data/schema"
 import { Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { EditAgentDialog } from "@/app/dashboard/channels/(components)/editAgentDialog"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -44,18 +45,8 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <EditAgentDialog agent_id={row.original?.agent_id}/>
         <DropdownMenuSeparator />
-        {
-          /*
-          <DropdownMenuItem>
-            Run Task
-            <DropdownMenuShortcut>
-              <Play className=" h-4 w-4 text-muted-foreground" />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
-          */
-        }
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
              Go to
@@ -63,37 +54,7 @@ export function DataTableRowActions<TData>({
               <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
           </Link>
-           
-        </DropdownMenuItem>
-        {
-          /*
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuSeparator />
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuRadioGroup value={task.label}>
-                  {labels.map((label) => (
-                    <DropdownMenuRadioItem key={label.value} value={label.value}>
-                      {label.label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          <DropdownMenuSeparator />
-          */
-        }
-        
-        <DropdownMenuItem asChild>
-          <button className="flex w-full cursor-pointer">
-            Delete
-            <DropdownMenuShortcut>
-              <Trash2 className=" h-4 w-4 text-muted-foreground"></Trash2>
-            </DropdownMenuShortcut>
-          </button>
-          
-        </DropdownMenuItem>
+        </DropdownMenuItem>        
       </DropdownMenuContent>
     </DropdownMenu>
   )
