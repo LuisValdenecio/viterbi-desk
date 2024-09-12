@@ -3,6 +3,7 @@ import * as React from "react"
 
 import { Cross2Icon, PlusCircledIcon } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
+import useSWR from 'swr'
 
 import { Button } from "@/components/ui/button"
 import { DataTableViewOptions } from "./data-table-view-options"
@@ -56,23 +57,33 @@ import { Label } from "@/components/ui/label"
 
 import { priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { ArchiveIcon, DeleteIcon, Trash2Icon } from "lucide-react"
+import { ArchiveIcon, DeleteIcon, PlusCircle, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { deleteTaks } from "@/server-actions/tasks"
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
+import { OperationDeniedAlert } from "@/app/dashboard/(components)/operationDenied"
+import { usePathname } from "next/navigation"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
 }
 
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+  const path = usePathname()
+  const agentId = path.split("/")[path.split("/").length - 1]
+
+  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/agents/${agentId}`, fetcher)
   
+  if (permissionError) return <div>falhou em carregar</div>
+  if (permissionLoading) return <div>carregando...</div>
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -99,7 +110,7 @@ export function DataTableToolbar<TData>({
           />
         )}
         {(table.getFilteredSelectedRowModel().rows.length > 0) && (
-          <DeleteTasksDialog data_to_delete={table.getFilteredSelectedRowModel().rows} />
+          <DeleteTasksDialog permission={permission} data_to_delete={table.getFilteredSelectedRowModel().rows} />
         )}
         {isFiltered && (
           <Button
@@ -117,7 +128,7 @@ export function DataTableToolbar<TData>({
   )
 }
 
-export function DeleteTasksDialog({data_to_delete}) {
+export function DeleteTasksDialog({data_to_delete, permission}) {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
@@ -126,26 +137,37 @@ export function DeleteTasksDialog({data_to_delete}) {
   }
  
   if (isDesktop) {
-    return (
-      
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+    if (permission === 'owner') {
+      return (
+        
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8 border-dashed"> 
+              <Trash2Icon className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Delete Tasks</DialogTitle>
+              <DialogDescription>
+                Type in your password to delete
+              </DialogDescription>
+            </DialogHeader>
+            <ProfileForm dataToDelete={data_to_delete} closeParentDialog={() => toggleDeleteDialog(false)} />
+          </DialogContent>
+        </Dialog>
+      )
+    } else {
+      return (
+        <OperationDeniedAlert>
           <Button variant="outline" size="sm" className="h-8 border-dashed"> 
             <Trash2Icon className="mr-2 h-4 w-4" />
             Delete
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Delete Tasks</DialogTitle>
-            <DialogDescription>
-              Type in your password to delete
-            </DialogDescription>
-          </DialogHeader>
-          <ProfileForm dataToDelete={data_to_delete} closeParentDialog={() => toggleDeleteDialog(false)} />
-        </DialogContent>
-      </Dialog>
-    )
+        </OperationDeniedAlert>
+      )
+    }
   }
  
   return (

@@ -9,7 +9,7 @@ import {
     SidebarSpacer,
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
-  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users } from 'lucide-react'
+  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users, ListCheckIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
@@ -39,6 +39,11 @@ export function SiderBarBody({events}) {
               <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/channels"}>
                 <Rss strokeWidth={path === '/dashboard/channels' ? 1.75 : 1.25} size={20} />
                 <SidebarLabel className={"font-normal"}>Channels</SidebarLabel>
+              </Sidebar_item>
+
+              <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/tasks"}>
+                <ListCheckIcon strokeWidth={path === '/dashboard/channels' ? 1.75 : 1.25} size={20} />
+                <SidebarLabel className={"font-normal"}>Tasks</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/filesystem"} path={"/dashboard/filesystem"}>

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import useSWR from 'swr'
-import { ListItemTable } from "../../agents/(components)/item-list/tableOfItems"
+import { ListItemTable } from "../(components)/agent-list-with-select/tableOfItems"
 import { CreateAgentDialog } from "../(components)/createAgentDialog"
 
 import {
@@ -11,7 +11,6 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
-import { Overview } from '../(components)/overview/overview'
 import  Loader_component  from "@/components/loader"
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -37,9 +36,7 @@ export default function Page() {
   if (isLoading) return <Loader_component />
   return (
     <>
-
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-
         <Tabs defaultValue="overview">
           <div className="flex justify-between items-center">
             <TabsList>
@@ -49,7 +46,7 @@ export default function Page() {
             <CreateAgentDialog />
           </div>
           <TabsContent value="overview" >
-            <Overview />
+            {/*<Overview />*/}
           </TabsContent>
           <TabsContent value="agents">
             <div className="">
@@ -59,11 +56,6 @@ export default function Page() {
 
         </Tabs>
       </div>
-
-
-
     </>
-
   )
-
 }

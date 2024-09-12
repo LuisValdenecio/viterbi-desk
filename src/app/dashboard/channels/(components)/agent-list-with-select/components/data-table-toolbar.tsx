@@ -1,20 +1,33 @@
 "use client"
-
 import * as React from "react"
 import useSWR from 'swr'
 
-import { Input } from "@/components/ui/input"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import { Table } from "@tanstack/react-table"
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { DataTableViewOptions } from "./data-table-view-options"
+
+import { priorities, statuses } from "../data/data"
+import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import  SubmitBtn  from "@/components/submit-button"
 import { useFormState } from "react-dom"
 import { useForm } from "react-hook-form"
+import { useState } from "react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { useToast } from "@/components/ui/use-toast"
+import { ToastAction } from "@/components/ui/toast"
 
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 import {
@@ -35,99 +48,88 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-
-import { Trash2Icon } from "lucide-react"
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { deleteTaks } from "@/server-actions/tasks"
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
-import { deleteTeams } from "@/server-actions/teams"
-
-import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Row } from "@tanstack/react-table"
-
-import { Button } from "@/components/ui//button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
-import { taskSchema } from "../data/schema"
-import { SquareArrowUpRight } from "lucide-react"
-import Link from "next/link"
-import { EditTeamDialog } from "../../editTeamDialog"
+import { Edit2Icon, Trash2Icon } from "lucide-react"
+import { deleteAgents } from "@/server-actions/agents"
 import { OperationDeniedAlert } from "@/app/dashboard/(components)/operationDenied"
+import { usePathname } from "next/navigation"
 
-interface DataTableRowActionsProps<TData> {
-  row: Row<TData>
+interface DataTableToolbarProps<TData> {
+  table: Table<TData>
 }
 
-export function DataTableRowActions<TData>({
-  row,
-}: DataTableRowActionsProps<TData>) {
-  const task = taskSchema.parse(row.original)
-  console.log("ROW INFO", row)
+export function DataTableToolbar<TData>({
+  table,
+}: DataTableToolbarProps<TData>) {
+  const isFiltered = table.getState().columnFilters.length > 0
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-        >
-          <DotsHorizontalIcon className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
-        <EditTeamDialog team_id={row.original?.team_id} />
-        <DeleteTeamDialog data_to_delete={row.original?.team_id}/>
-        <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/teams/${row.original?.team_id}`}>
-             Go to
-            <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
-            </DropdownMenuShortcut>
-          </Link>
-        </DropdownMenuItem> 
-        
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <div className="flex items-center justify-between">
+      <div className="flex flex-1 items-center space-x-2">
+        <Input
+          placeholder="Filter tasks..."
+          value={(table.getColumn("description")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("description")?.setFilterValue(event.target.value)
+          }
+          className="h-8 w-[150px] lg:w-[250px]"
+        />
+        {table.getColumn("status") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("status")}
+            title="Status"
+            options={statuses}
+          />
+        )}
+        {table.getColumn("priority") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("priority")}
+            title="Priority"
+            options={priorities}
+          />
+        )}
+        {(table.getFilteredSelectedRowModel().rows.length > 0) && (
+          <DeleteTasksDialog data_to_delete={table.getFilteredSelectedRowModel().rows} />
+        )}
+        {isFiltered && (
+          <Button
+            variant="ghost"
+            onClick={() => table.resetColumnFilters()}
+            className="h-8 px-2 lg:px-3"
+          >
+            Reset
+            <Cross2Icon className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+      </div>
+      <DataTableViewOptions table={table} />
+    </div>
   )
 }
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
-export function DeleteTeamDialog({data_to_delete}) {
+export function DeleteTasksDialog({data_to_delete}) {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
-  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/team/${data_to_delete}`, fetcher)
+  const path = usePathname()
+  const channel_id = path.split("/")[path.split("/").length - 1]
 
-  console.log("DATA LOADING : ", permission)
+  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/channel/${channel_id}`, fetcher)
 
   const toggleDeleteDialog = (toggler : boolean) => {
     setOpen(toggler)
   }
  
-  if (permissionError) return <h1>failed to load</h1>
-  if (permissionLoading) return <h1>loadiing...</h1>
   if (isDesktop) {
+
     if (permission === 'owner') {
       return (
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-          <Button
-                  variant="outline"
-                  size="sm"
-                  className="font-normal h-8 lg:flex w-full flex justify-between border-none"
-                >
-                    Delete 
-                  <Trash2Icon className="h-4 w-4 text-muted-foreground" />
-              </Button>
+            <Button variant="outline" size="sm" className="h-8 border-dashed"> 
+              <Trash2Icon className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
@@ -143,14 +145,10 @@ export function DeleteTeamDialog({data_to_delete}) {
     } else {
       return (
         <OperationDeniedAlert>
-          <Button
-                variant="outline"
-                size="sm"
-                className="font-normal h-8 lg:flex w-full flex justify-between border-none"
-              >
-                  Delete 
-                <Trash2Icon className="h-4 w-4 text-muted-foreground" />
-          </Button>
+         <Button variant="outline" size="sm" className="h-8 border-dashed"> 
+              <Trash2Icon className="mr-2 h-4 w-4" />
+              Delete
+            </Button>
         </OperationDeniedAlert>
       )
     }
@@ -183,8 +181,8 @@ const formSchema = z.object({
   password: z.string().min(1, {
     message: 'Please type in a valid password'
   }),
-  teams_id: z.string().min(1, {
-    message: 'Please type in a valid team id'
+  agents_id: z.string().min(1, {
+    message: 'Please type in a valid agent id'
   }),
 })
  
@@ -193,17 +191,19 @@ function ProfileForm({closeParentDialog, dataToDelete}) {
   const initialState = {
     errors : {
       password : undefined,
-      teams_id : undefined
+      agents_id : undefined
     },
     message : undefined
   };
 
-  //console.log("DATA TO DELETE: ", dataToDelete)
-  const teams = [dataToDelete]
+  console.log("DATA TO DELETE: ", dataToDelete)
+  const agents_id = dataToDelete.flatMap(task => task.original.agent_id)
 
-  const initialValues : {password : string, teams_id : string} = {
+  console.log("AGENTS IDS: ", agents_id)
+
+  const initialValues : {password : string, agents_id : string} = {
     password: "",
-    teams_id : teams.join(",")
+    agents_id : agents_id.join(",")
   }
 
   const form =  useForm<z.infer<typeof formSchema>>({
@@ -211,7 +211,7 @@ function ProfileForm({closeParentDialog, dataToDelete}) {
     defaultValues: initialValues
   })
 
-  const [state, formAction] = useFormState(deleteTeams, initialState);
+  const [state, formAction] = useFormState(deleteAgents, initialState);
   const [ incorrectPassword, setIncorrectPassword ] = useState(false)
   const { toast } = useToast()
 
@@ -222,7 +222,7 @@ function ProfileForm({closeParentDialog, dataToDelete}) {
     if (state.message == 'Success') {
       closeParentDialog()
       toast({
-        title: "Team removed",
+        title: "Task removed",
         description: `The task was delted successfully`,
         action: (
           <ToastAction altText="Refresh">Undo</ToastAction>
@@ -260,18 +260,16 @@ function ProfileForm({closeParentDialog, dataToDelete}) {
 
         <FormField
           control={form.control}
-          name="teams_id"
+          name="agents_id"
           render={({ field }) => (
             <FormItem className="hidden">
               <FormControl>
-                <Input defaultValue={teams.join(",")} {...field}/>
+                <Input defaultValue={agents_id.join(",")} {...field}/>
               </FormControl>
-              <FormMessage>{state?.errors?.password}</FormMessage>
-              {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
             </FormItem>
           )}
         />
-        <SubmitBtn>Remove tasks</SubmitBtn>
+        <SubmitBtn>Remove agents</SubmitBtn>
       </form>
     </Form>
   )

@@ -126,6 +126,7 @@ export async function getMyAgents() {
       const filtered = results.filter((value, index) => 
         results.findIndex((channel) => channel.agent_id == value.agent_id) == index  
       ) 
+      console.log("FILTERED DATA: ", filtered)
       return filtered
     }
 

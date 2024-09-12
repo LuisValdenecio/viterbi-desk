@@ -5,6 +5,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button"
+import useSWR from 'swr'
+
 import {
   Dialog,
   DialogContent,
@@ -27,7 +29,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight, Edit2Icon } from "lucide-react"
+import { PlusCircle, Loader2, Eye, PencilRuler, Zap, MoveUp, MoveDown, MoveRight, Edit2Icon, Trash2Icon } from "lucide-react"
 import {
   Select,
   SelectContent,
@@ -63,6 +65,7 @@ import {
 import { editChannel, getChannel } from "@/server-actions/channels"
 import SubmitBtn from "@/components/submit-button"
 import { editTeam, getTeam } from "@/server-actions/teams"
+import { OperationDeniedAlert } from "../../(components)/operationDenied"
 
 const formSchema = z.object({
   teamName: z.string().min(1, {
@@ -76,10 +79,13 @@ const formSchema = z.object({
   }),
 })
 
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+
 export function EditTeamDialog({ team_id }) {
 
   let team_to_edit : any = null;
   const { toast } = useToast()
+  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/team/${team_id}`, fetcher)
   
   const initialState = {
     errors: {
@@ -142,81 +148,98 @@ export function EditTeamDialog({ team_id }) {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
+  if (permissionError) return <div>falhou em carregar</div>
+  if (permissionLoading) return <div>carregando...</div>
   if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className="font-normal h-8 lg:flex w-full flex justify-between border-none"
-        >
-          Edit 
-          <Edit2Icon className="h-4 w-4 text-muted-foreground" />
-        </Button>
-          
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Team</DialogTitle>
-            <DialogDescription>
-              Agents can do things on your behalf on your channels.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form action={formAction}>
-
-              <FormField
-                control={form.control}
-                name="teamName"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input defaultValue={teamData?.name} placeholder="type in the name of the Agent" {...field} />
-                    </FormControl>
-                    <FormMessage>{state?.errors?.teamName}</FormMessage>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="teamId"
-                render={({ field }) => (
-                  <FormItem className="hidden">
-                    <FormLabel>Channel id</FormLabel>
-                    <FormControl>
-                      <Input defaultValue={team_id} {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid gap-3 mb-4">
-                
+    if (permission === 'owner') {
+      return (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="font-normal h-8 lg:flex w-full flex justify-between border-none"
+          >
+            Edit 
+            <Edit2Icon className="h-4 w-4 text-muted-foreground" />
+          </Button>
+            
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Team</DialogTitle>
+              <DialogDescription>
+                Agents can do things on your behalf on your channels.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form action={formAction}>
+  
                 <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea defaultValue={teamData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
-                    </FormControl>
-                    <FormMessage>{state?.errors?.description}</FormMessage>
-                  </FormItem>
-                )}
-              />
-
-              </div>
-              <SubmitBtn>Edit Channel</SubmitBtn>
-            </form>
-          </Form>
-
-        </DialogContent>
-      </Dialog>
-    )
+                  control={form.control}
+                  name="teamName"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input defaultValue={teamData?.name} placeholder="type in the name of the Agent" {...field} />
+                      </FormControl>
+                      <FormMessage>{state?.errors?.teamName}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+  
+                <FormField
+                  control={form.control}
+                  name="teamId"
+                  render={({ field }) => (
+                    <FormItem className="hidden">
+                      <FormLabel>Channel id</FormLabel>
+                      <FormControl>
+                        <Input defaultValue={team_id} {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+  
+                <div className="grid gap-3 mb-4">
+                  
+                  <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea defaultValue={teamData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
+                      </FormControl>
+                      <FormMessage>{state?.errors?.description}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+  
+                </div>
+                <SubmitBtn>Edit Channel</SubmitBtn>
+              </form>
+            </Form>
+  
+          </DialogContent>
+        </Dialog>
+      )
+    } else {
+      return (
+        <OperationDeniedAlert>
+          <Button
+            variant="outline"
+            size="sm"
+            className="font-normal h-8 lg:flex w-full flex justify-between border-none"
+          >
+            Edit 
+            <Edit2Icon className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </OperationDeniedAlert> 
+      )
+    }
   }
 
   return (

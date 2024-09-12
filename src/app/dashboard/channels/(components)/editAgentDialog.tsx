@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from "react"
+import useSWR from 'swr'
 
 import { cn } from "@/lib/utils"
 import { useMediaQuery } from "@/hooks/use-media-query"
@@ -60,6 +61,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import { OperationDeniedAlert } from "../../(components)/operationDenied"
 
 export function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -82,10 +84,14 @@ const formSchema = z.object({
   }),
 })
 
+const fetcher = (...args) => fetch(...args).then(res => res.json())
+
 export function EditAgentDialog({ agent_id }) {
 
   let agent_to_edit : any = null;
   const { toast } = useToast()
+
+  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/agents/${agent_id}`, fetcher)
   
   const initialState = {
     errors: {
@@ -149,81 +155,98 @@ export function EditAgentDialog({ agent_id }) {
   const [open, setOpen] = React.useState(false)
   const isDesktop = useMediaQuery("(min-width: 768px)")
 
+  if (permissionError) return <div>falhou em carregar</div>
+  if (permissionLoading) return <div>carregando...</div>
   if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-        <Button
-          variant="outline"
-          size="sm"
-          className=" h-8 lg:flex w-full flex justify-between border-none"
-        >
-          Edit 
-          <Edit2Icon className="h-4 w-4" />
-        </Button>
-          
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Create a new agent</DialogTitle>
-            <DialogDescription>
-              Agents can do things on your behalf on your channels.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form action={formAction}>
-
-              <FormField
-                control={form.control}
-                name="agentName"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input defaultValue={agentData?.name} placeholder="type in the name of the Agent" {...field} />
-                    </FormControl>
-                    <FormMessage>{state?.errors?.agentName}</FormMessage>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="agentId"
-                render={({ field }) => (
-                  <FormItem className="hidden">
-                    <FormLabel>Channel id</FormLabel>
-                    <FormControl>
-                      <Input defaultValue={agent_id} {...field} />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid gap-3 mb-4">
-                
+    if (permission === 'owner') {
+      return (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className=" h-8 lg:flex w-full flex justify-between border-none"
+          >
+            Edit 
+            <Edit2Icon className="h-4 w-4" />
+          </Button>
+            
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Create a new agent</DialogTitle>
+              <DialogDescription>
+                Agents can do things on your behalf on your channels.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form action={formAction}>
+  
                 <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="mb-4">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea defaultValue={agentData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
-                    </FormControl>
-                    <FormMessage>{state?.errors?.description}</FormMessage>
-                  </FormItem>
-                )}
-              />
-
-              </div>
-              <SubmitBtn />
-            </form>
-          </Form>
-
-        </DialogContent>
-      </Dialog>
-    )
+                  control={form.control}
+                  name="agentName"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input defaultValue={agentData?.name} placeholder="type in the name of the Agent" {...field} />
+                      </FormControl>
+                      <FormMessage>{state?.errors?.agentName}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+  
+                <FormField
+                  control={form.control}
+                  name="agentId"
+                  render={({ field }) => (
+                    <FormItem className="hidden">
+                      <FormLabel>Channel id</FormLabel>
+                      <FormControl>
+                        <Input defaultValue={agent_id} {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+  
+                <div className="grid gap-3 mb-4">
+                  
+                  <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem className="mb-4">
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea defaultValue={agentData?.description} name="description" placeholder="Type a short description of what you expect this agent to do." />
+                      </FormControl>
+                      <FormMessage>{state?.errors?.description}</FormMessage>
+                    </FormItem>
+                  )}
+                />
+  
+                </div>
+                <SubmitBtn />
+              </form>
+            </Form>
+  
+          </DialogContent>
+        </Dialog>
+      )
+    } else {
+      return (
+        <OperationDeniedAlert>
+          <Button
+              variant="outline"
+              size="sm"
+              className="font-normal h-8 lg:flex w-full flex justify-between border-none"
+            >
+                Edit 
+              <Edit2Icon className="h-4 w-4 text-muted-foreground" />
+          </Button>
+        </OperationDeniedAlert>
+      )
+    }
   }
 
   return (

@@ -294,11 +294,13 @@ export function EditInvitationDialog({invitation_id}) {
     } else {
       return (
         <OperationDeniedAlert>
-            <Button size="sm" className="h-8 gap-1" >
-              <PlusCircle className="h-3.5 w-3.5" />
-              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Member
-              </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-normal h-8 lg:flex w-full flex justify-between border-none"
+            >
+                Edit 
+              <Edit2Icon className="h-4 w-4 text-muted-foreground" />
             </Button>
         </OperationDeniedAlert>
       )
