@@ -41,8 +41,8 @@ export function SiderBarBody({events}) {
                 <SidebarLabel className={"font-normal"}>Channels</SidebarLabel>
               </Sidebar_item>
 
-              <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/tasks"}>
-                <ListCheckIcon strokeWidth={path === '/dashboard/channels' ? 1.75 : 1.25} size={20} />
+              <Sidebar_item href={"/dashboard/tasks"} path={"/dashboard/tasks"}>
+                <ListCheckIcon strokeWidth={path === '/dashboard/tasks' ? 1.75 : 1.25} size={20} />
                 <SidebarLabel className={"font-normal"}>Tasks</SidebarLabel>
               </Sidebar_item>
 
