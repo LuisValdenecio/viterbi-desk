@@ -64,7 +64,7 @@ export const GET = async (req, { params }) => {
                 agent_id : {
                     in : agents_id
                 }
-            }
+            },
         })
          
         return Response.json({ tasks })

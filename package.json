@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.651.1",
+    "@aws-sdk/client-lambda": "^3.651.1",
     "@faker-js/faker": "^8.4.1",
     "@headlessui/react": "^2.1.1",
     "@heroicons/react": "^2.1.3",
