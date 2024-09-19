@@ -63,14 +63,22 @@ export async function deleteMember(_prevstate, formData) {
                     }
                 }
 
-                /*
-                const deletedInvitations = await prisma.user_privilege.delete({
+                const member_to_deete = await prisma.user_privilege.findMany({
                     where : {
                        user_id : member_id,
                        team_id : team_id
+                    },
+                    select : {
+                        id : true
                     }
                 })
-                */
+
+                const deleted_member = await prisma.user_privilege.delete({
+                    where : {
+                        id : member_to_deete[0].id
+                    }
+                })
+                
                 return {
                     message : 'Success'
                 }

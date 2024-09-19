@@ -28,7 +28,12 @@ export const GET = async (req, { params }) => {
             }
         })
 
-        if (invitation_info[0].invitation_link[0].token !== url_token) {
+        console.log("INVITATION INFO: ", invitation_info)
+
+        const foundTokenMatch = invitation_info.flatMap(invitation => invitation.invitation_link[0].token)
+            .filter(token => token === url_token)
+
+        if (foundTokenMatch.length === 0) {
             return Response.json("Token was not meant for this user")
         }
 
