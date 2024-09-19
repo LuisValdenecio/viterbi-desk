@@ -45,6 +45,7 @@ import { EyeIcon, KeySquare, Loader2, MoveDown, MoveRight, MoveUp, ShieldCheck }
 
 import { useEffect } from 'react'
 import { deleteTaks, editTask } from '@/server-actions/tasks'
+import { deleteMember } from '@/server-actions/members'
 import {
   Select,
   SelectContent,
@@ -71,6 +72,7 @@ import {
 } from "@/components/ui/tabs"
 import Loader_component from '@/components/loader'
 import { deleteInvitations, editInvitation } from "@/server-actions/invitations";
+import path from "path";
 //import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -95,6 +97,7 @@ export default function Page() {
   const { data: invitees, isLoading: inviteesLoading, error: inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
   const [deleteInvitationDialog, setDeleteInvitationDialog] = useState(false)
   const [editInvitationDialog, setEditInvitationDialog] = useState(false)
+  const [deleteTeamMemberDialog, setDeleteTeamMemberDialog] = useState(false)
 
   const params = new URLSearchParams(searchParams);
 
@@ -103,15 +106,21 @@ export default function Page() {
       setDeleteInvitationDialog(true)
     } else if (searchParams.get('edit')?.toString()) {
       setEditInvitationDialog(true)
+    } else if (searchParams.get('delete_member')?.toString()) {
+      setDeleteTeamMemberDialog(true)
     }
   }, [searchParams])
 
   const onDialogClose = () => {
     setDeleteInvitationDialog(false)
+    setDeleteTeamMemberDialog(false)
     setEditInvitationDialog(false)
     params.delete('delete')
+    params.delete('delete_member')
+    params.delete('name')
     params.delete('guest_email')
     params.delete('edit')
+    params.delete('role')
     params.delete('guest_role')
     replace(`${pathname}?${params.toString()}`);
   }
@@ -135,6 +144,7 @@ export default function Page() {
           </TabsContent>
           <TabsContent value="active">
             <div className="">
+              <DeleteTeamMemberDialog open={deleteTeamMemberDialog} openChange={onDialogClose} />
               <ListItemTable people={users.people} />
             </div>
           </TabsContent>
@@ -154,6 +164,10 @@ export default function Page() {
   )
 
 }
+
+/*************************************
+ * THE FOLLOWING CONCERNS INVITATIONS
+ ************************************/
 
 const formSchema = z.object({
   password: z.string().min(1, {
@@ -464,4 +478,153 @@ export function EditInvitationDialog({ open, openChange }) {
 
 }
 
+/*************************************
+ * THE FOLLOWING CONCERNS MEMBERSHIP
+ ************************************/
 
+const DeleteMemberFormSchema = z.object({
+  password: z.string().min(1, {
+    message: 'Please type in a valid password'
+  }),
+  member_id: z.string().min(1, {
+    message: 'Please type in a valid agent id'
+  }),
+  team_id: z.string().min(1, {
+    message: 'Please type in a valid agent id'
+  }),
+})
+
+export function DeleteTeamMemberDialog({ open, openChange }) {
+
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [member_id, setMember_id] = useState(searchParams.get('delete_member')?.toString())
+
+  const initialState = {
+    errors: {
+      password: undefined,
+      member_id: undefined,
+      team_id : undefined
+    },
+    message: undefined
+  };
+
+  const initialValues: { password: string, member_id: string, team_id : string } = {
+    password: "",
+    member_id: searchParams.get('delete_member')?.toString(),
+    team_id : pathname.split("/")[pathname.split("/").length - 1]
+  }
+
+  const form = useForm<z.infer<typeof DeleteMemberFormSchema>>({
+    resolver: zodResolver(DeleteMemberFormSchema),
+    defaultValues: initialValues
+  })
+
+  const [state, formAction] = useFormState(deleteMember, initialState);
+  const [incorrectPassword, setIncorrectPassword] = React.useState(false)
+  const { toast } = useToast()
+
+  React.useEffect(() => {
+    setMember_id(searchParams.get('delete_member')?.toString())
+    setIncorrectPassword(false)
+    if (state?.message == 'Success') {
+      openChange()
+      toast({
+        title: "Task removed",
+        description: `The task was delted successfully`,
+        action: (
+          <ToastAction altText="Refresh">Undo</ToastAction>
+        ),
+      })
+    }
+
+    if (Array.isArray(state?.errors)) {
+      state.errors.forEach((error) => {
+        form.setError(error.field, { message: error.message });
+      })
+    } else {
+      if (state?.message === 'incorrect password') {
+        setIncorrectPassword(true)
+      } else if (state?.message === 'access denied') {
+        openChange()
+        toast({
+          title: "Operation blocked",
+          description: `You don't have the privileges to complete this.`,
+        })
+      } else if (state?.message === 'deleting founder') {
+        openChange()
+        toast({
+          title: "Operation blocked",
+          description: `You attempting to delete the founding member`,
+        })
+      }
+
+    }
+  }, [state?.errors, searchParams]);
+
+  return (
+    <AlertDialog open={open} onOpenChange={openChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {searchParams.get('name')?.toString()}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This member will be permanently deleted from this team.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <Form {...form}>
+          <form action={formAction} className="grid items-start gap-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="password" placeholder="type in your password" {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="team_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input defaultValue={pathname.split("/")[pathname.split("/").length - 1]} {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="member_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input defaultValue={searchParams.get('delete_member')?.toString()} {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
+                </FormItem>
+              )}
+            />
+
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <EditSubmitBtn />
+            </AlertDialogFooter>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}
