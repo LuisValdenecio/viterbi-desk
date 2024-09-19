@@ -122,8 +122,41 @@ export async function checkPrivilege(team_id, member_id) {
         // if you're nononwer, you can't delete others
         if (my_role[0].role !== 'owner') {
             return false
+        } 
+
+        // if the user attempting to delete a member is not 
+        // the founding member, he can't delete owners
+        const member_role = await prisma.user_privilege.findMany({
+            where : {
+                user_id : member_id,
+                team_id : team_id
+            }, 
+            select : {
+                role : true
+            }
+        })
+
+        // check if the attempting deleter is the founding member
+        const founding_member = await prisma.team.findUnique({
+            where : {
+                team_id : team_id,
+                user_id : session?.user?.id
+            }
+        })
+
+        if (member_role[0].role === 'owner' && !founding_member) {
+            return false
+        } 
+        
+        // this is the founding member, deleting an owner member
+        if (member_role[0].role === 'owner' && founding_member) {
+            return true
         }
 
+        // owner members can delete readers and admins
+        if (my_role[0].role === 'owner' && member_role[0].role !== 'owner') {
+            return true
+        }
 
     } catch (error) {
         console.log(error)
