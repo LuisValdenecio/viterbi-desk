@@ -126,6 +126,8 @@ export function CreateTaskDialog() {
             <ToastAction altText="Refresh">Undo</ToastAction>
           ),
         })
+
+        router.push(`/dashboard/tasks/${state?.taskId}`)
       }
     }
 
@@ -153,7 +155,7 @@ export function CreateTaskDialog() {
             className="ml-auto hidden h-8 lg:flex"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            New
+            Task
           </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">

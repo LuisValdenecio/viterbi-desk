@@ -9,6 +9,8 @@ import { DataTableViewOptions } from "./data-table-view-options"
 
 import { active_statuses, priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { AddMemberDialog } from "../../createPersonDialog"
+import { AddPeopleDialog } from "../../createPeopleDialog"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -55,7 +57,11 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <AddPeopleDialog />
+        <AddMemberDialog />
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   )
 }

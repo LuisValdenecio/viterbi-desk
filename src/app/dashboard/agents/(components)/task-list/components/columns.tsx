@@ -13,6 +13,12 @@ import { DataTableRowActions } from "./data-table-row-actions"
 import { PlusCircle, Loader2, Eye, PencilRuler, Zap, ClockIcon, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { executeTask } from "@/server-actions/tasks"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import { Gauge } from "@/app/dashboard/(components)/circleGraph"
 
 export function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -26,12 +32,12 @@ export function SubmitBtn() {
           
           {pending ? 
           (
-            <div className="flex items-center">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Run
+            <div className="flex items-center text-muted-foreground">
+              <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Run
             </div>
           ) : (
-            <div className="flex items-center">
-              <Play className="mr-2 h-4 w-4" /> Run
+            <div className="flex items-center text-muted-foreground">
+              <Play className="mr-2 h-3 w-3" /> Run
             </div>
           )}
         </Button>
@@ -66,11 +72,16 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
+      <DataTableColumnHeader column={column} title="Task Name" />
     ),
-    cell: ({ row }) => <div className="w-[150px] truncate">{row.getValue("name")}</div>,
-    enableSorting: false,
-    enableHiding: false,
+    cell: ({ row }) => <div className="w-[150px] truncate flex items-center gap-2">
+        <Avatar className="size-6">
+          <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <span className="truncate">{row.getValue("name")}</span>
+    </div>,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "priority",
@@ -158,6 +169,30 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id))
     },
   },
+
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Completion Rate" />
+    ),
+    cell: ({ row }) => {
+      const status = statuses.find(
+        (status) => status.value === row.getValue("status")
+      )
+
+      if (!status) {
+        return null
+      }
+
+      return (
+        <div className="flex gap-1 w-[60px] items-center">
+         <Gauge value={Math.floor(Math.random() * 101)} size="small" showValue={false} />
+          <span>{Math.floor(Math.random() * 101)}%</span>
+        </div>
+      )
+    },
+  },
+  
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,

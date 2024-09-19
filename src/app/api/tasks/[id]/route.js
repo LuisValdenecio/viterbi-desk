@@ -6,6 +6,9 @@ export const GET = async (req, { params }) => {
         const tasks = await prisma.task.findMany({
             where : {
                 agent_id : params.id
+            },
+            include : {
+                task_schedule : true
             }
         })
         

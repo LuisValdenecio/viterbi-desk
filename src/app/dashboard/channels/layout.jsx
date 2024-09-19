@@ -1,8 +1,5 @@
-import { Divider } from '@/components/divider'
-import { Heading } from '@/components/heading'
-import  Section_Heading  from '@/components/section-heading'
+import { BreadCrumpComponent } from '@/components/breadcrump'
 
-import { Dashboard } from '@/components/data-template'
 
 /*
 <Heading>Channels</Heading>
@@ -13,22 +10,10 @@ import { Dashboard } from '@/components/data-template'
 
 export default async function layout({ children }) {
 
-    const links = [
-        {name : 'My channels', href : '/dashboard/channels'},
-        {name : 'All', href : '/dashboard/channels'},
-      
-    ]
-
-    const cta_button = {
-        name : 'New Channel',
-        href : '/dashboard/channels/new'
-    }
-
     return <>
-    
-        <Dashboard cta_button={cta_button} links={links} showButtons={true} showSearch={false}>
+        <BreadCrumpComponent />
+        <div className='mt-2'>
             {children}
-        </Dashboard>
-        
+        </div>    
     </>
 }

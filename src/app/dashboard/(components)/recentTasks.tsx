@@ -164,7 +164,7 @@ export function SubmitBtn() {
 
             {pending ?
                 (
-                    <div className="flex items-center">
+                    <div className="flex items-center text-muted-foreground">
                         <Loader2 className="mr-2 h-3 w-3 animate-spin" /> Run
                     </div>
                 ) : (

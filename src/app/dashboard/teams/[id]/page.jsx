@@ -44,14 +44,12 @@ export default function Page() {
 
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
 
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue="active">
           <div className="flex justify-between items-center">
             <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="active">Members</TabsTrigger>
               <TabsTrigger value="invitations">Invitations</TabsTrigger>
             </TabsList>
-            <AddMemberDialog />
           </div>
           <TabsContent value="overview" >
             

@@ -1,46 +1,22 @@
 "use client"
 import * as React from "react"
 
-import { Cross2Icon, PlusCircledIcon } from "@radix-ui/react-icons"
+import { Cross2Icon } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
 import useSWR from 'swr'
 
 import { Button } from "@/components/ui/button"
 import { DataTableViewOptions } from "./data-table-view-options"
-import { cn } from "@/lib/utils"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import  SubmitBtn  from "@/components/submit-button"
 import { useFormState } from "react-dom"
 import { useForm } from "react-hook-form"
-
 
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,18 +30,21 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useFormStatus } from "react-dom";
+
 
 import { priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { ArchiveIcon, DeleteIcon, PlusCircle, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { deleteTaks } from "@/server-actions/tasks"
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
-import { OperationDeniedAlert } from "@/app/dashboard/(components)/operationDenied"
 import { usePathname } from "next/navigation"
+import { CreateTaskDialog } from "../../createTaskDialog"
+import Loader_component from "@/components/loader"
+import { Loader2, Trash2Icon } from "lucide-react"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -79,11 +58,12 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0
   const path = usePathname()
   const agentId = path.split("/")[path.split("/").length - 1]
-
+  const [open, openChange] = useState(false)
+  
   const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/agents/${agentId}`, fetcher)
   
   if (permissionError) return <div>falhou em carregar</div>
-  if (permissionLoading) return <div>carregando...</div>
+  if (permissionLoading) return <Loader_component />  
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -110,7 +90,13 @@ export function DataTableToolbar<TData>({
           />
         )}
         {(table.getFilteredSelectedRowModel().rows.length > 0) && (
-          <DeleteTasksDialog permission={permission} data_to_delete={table.getFilteredSelectedRowModel().rows} />
+          <div>
+            <DeleteTasksDialog open={open} openChange={openChange} data_to_delete={table.getFilteredSelectedRowModel().rows} />
+            <Button variant="outline" size="sm" className="h-8 border-dashed" onClick={openChange}> 
+                <Trash2Icon className="mr-2 h-4 w-4" />
+                Delete
+            </Button>
+          </div>
         )}
         {isFiltered && (
           <Button
@@ -123,73 +109,11 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <CreateTaskDialog />
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
-  )
-}
-
-export function DeleteTasksDialog({data_to_delete, permission}) {
-  const [open, setOpen] = React.useState(false)
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-
-  const toggleDeleteDialog = (toggler : boolean) => {
-    setOpen(toggler)
-  }
- 
-  if (isDesktop) {
-    if (permission === 'owner') {
-      return (
-        
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 border-dashed"> 
-              <Trash2Icon className="mr-2 h-4 w-4" />
-              Delete
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Delete Tasks</DialogTitle>
-              <DialogDescription>
-                Type in your password to delete
-              </DialogDescription>
-            </DialogHeader>
-            <ProfileForm dataToDelete={data_to_delete} closeParentDialog={() => toggleDeleteDialog(false)} />
-          </DialogContent>
-        </Dialog>
-      )
-    } else {
-      return (
-        <OperationDeniedAlert>
-          <Button variant="outline" size="sm" className="h-8 border-dashed"> 
-            <Trash2Icon className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </OperationDeniedAlert>
-      )
-    }
-  }
- 
-  return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
-            Type in your password to delete
-          </DrawerDescription>
-        </DrawerHeader>
-        
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
   )
 }
 
@@ -201,40 +125,45 @@ const formSchema = z.object({
     message: 'Please type in a valid agent id'
   }),
 })
- 
-function ProfileForm({closeParentDialog, dataToDelete}) {
 
+export function DeleteTasksDialog({ open, openChange, data_to_delete}) {
+
+  console.log("DATA TO SEND: ", data_to_delete)
+  
   const initialState = {
-    errors : {
-      password : undefined,
-      tasks_ids : undefined
+    errors: {
+      password: undefined,
+      tasks_ids: undefined
     },
-    message : undefined
+    message: undefined
   };
 
-  //console.log("DATA TO DELETE: ", dataToDelete)
-  const tasks_id = dataToDelete.flatMap(task => task.original.task_id)
+  //const [tasks_id, setTasks_id] = useState(data_to_delete.flatMap(task => task.original.task_id))
 
+  const tasks_id = data_to_delete.flatMap(task => task.original.task_id)
+  
   const initialValues : {password : string, tasks_ids : string} = {
     password: "",
-    tasks_ids : tasks_id.join(",")
+    tasks_ids : data_to_delete.flatMap(task => task.original.task_id)
   }
 
-  const form =  useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialValues
   })
 
   const [state, formAction] = useFormState(deleteTaks, initialState);
-  const [ incorrectPassword, setIncorrectPassword ] = useState(false)
+  const [incorrectPassword, setIncorrectPassword] = React.useState(false)
+  const [ accessDenied, setAccessDenied ] = React.useState(false)
   const { toast } = useToast()
 
-
   React.useEffect(() => {
-    setIncorrectPassword(false)
 
+    //setTasks_id(data_to_delete.flatMap(task => task.original.task_id))
+
+    setIncorrectPassword(false)
     if (state.message == 'Success') {
-      closeParentDialog()
+      openChange()
       toast({
         title: "Task removed",
         description: `The task was delted successfully`,
@@ -251,42 +180,74 @@ function ProfileForm({closeParentDialog, dataToDelete}) {
     } else {
       if (state.message === 'incorrect password') {
         setIncorrectPassword(true)
-      }
+      } else if (state.message == 'access denied') {
+        setAccessDenied(true)
+      } 
+
     }
   }, [state?.errors]);
 
   return (
-    <Form {...form}>
-      <form action={formAction} className="grid items-start gap-4">
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input type="password" placeholder="type in your password" {...field}/>
-              </FormControl>
-              <FormMessage>{state?.errors?.password}</FormMessage>
-              {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
-            </FormItem>
-          )}
-        />
+    <AlertDialog open={open} onOpenChange={openChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            Delete Tasks
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This task will no longer be
+            accessible by you or others you&apos;ve shared it with.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-        <FormField
-          control={form.control}
-          name="tasks_ids"
-          render={({ field }) => (
-            <FormItem className="hidden">
-              <FormControl>
-                <Input defaultValue={tasks_id.join(",")} {...field}/>
-              </FormControl>
-              <FormMessage>{state?.errors?.password}</FormMessage>
-              {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
-            </FormItem>
-          )}
-        />
-        <SubmitBtn>Remove tasks</SubmitBtn>
-      </form>
-    </Form>
+        <Form {...form}>
+          <form action={formAction} className="grid items-start gap-4">
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="password" placeholder="type in your password" {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
+                  {accessDenied && (<FormMessage>Access denied. Ask the owner to remove this task</FormMessage>)}
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tasks_ids"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <input defaultValue={tasks_id.join(",")} {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
+                </FormItem>
+              )}
+            />
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <EditSubmitBtn />
+            </AlertDialogFooter>
+          </form>
+        </Form>
+      </AlertDialogContent>
+    </AlertDialog>
   )
+    
+}
+
+export function EditSubmitBtn() {
+  const { pending } = useFormStatus();
+  return (
+    <Button variant="destructive" type="submit" disabled={pending}>
+      {pending ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : "Delete"}
+    </Button>
+  )
+    
 }

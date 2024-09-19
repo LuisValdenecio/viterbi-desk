@@ -63,10 +63,10 @@ export default function RecentAgents() {
                                         </Avatar>
                                         <div className="grid gap-1">
                                             <p className="text-sm font-medium leading-none">
-                                                {agent.name.split("").filter((a, i) => i < 15).join("") + "..."}
+                                                {agent.name.split("").filter((a, i) => i < 85).join("") + "..."}
                                             </p>
                                             <p className="text-sm text-muted-foreground">
-                                                {agent.description.split("").filter((a, i) => i < 25).join("") + "..."}
+                                                {agent.description.split("").filter((a, i) => i < 85).join("") + "..."}
                                             </p>
                                         </div>
 

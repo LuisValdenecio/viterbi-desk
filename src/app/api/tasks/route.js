@@ -2,10 +2,9 @@ import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
 
-export const GET = async (req, { params }) => {
+export const GET = async (req, res) => {
 
     const session = await auth()
-    console.log("USER ID: ", session?.user?.id)
     try {
         
         const teams = await prisma.user_privilege.findMany({
@@ -65,6 +64,9 @@ export const GET = async (req, { params }) => {
                     in : agents_id
                 }
             },
+            include : {
+                task_schedule : true
+            }
         })
          
         return Response.json({ tasks })

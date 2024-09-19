@@ -36,7 +36,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 
-import { Trash2Icon } from "lucide-react"
+import { PencilIcon, Trash2, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -53,6 +53,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -84,17 +85,29 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <EditTeamDialog team_id={row.original?.team_id} />
-        <DeleteTeamDialog data_to_delete={row.original?.team_id}/>
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/teams/${row.original?.team_id}`}>
-             Go to
+        <Link className="flex cursor-pointer" href={`/dashboard/teams/${row.original?.team_id}`}>
+          Open
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/teams?edit=${row.original?.team_id}&team_name=${row.original?.name}&description=${row.original?.description}`}>
+             Edit
             <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
+              <PencilIcon className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/teams?delete=${row.original?.team_id}&team_name=${row.original?.name}`}>
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>
             </DropdownMenuShortcut>
           </Link>
-        </DropdownMenuItem> 
-        
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

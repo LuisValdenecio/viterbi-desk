@@ -43,7 +43,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 
-import { Trash2Icon } from "lucide-react"
+import { PlusCircle, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -51,6 +51,7 @@ import { deleteTaks } from "@/server-actions/tasks"
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { deleteTeams } from "@/server-actions/teams"
+import Link from "next/link"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -100,7 +101,18 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <Button size="sm" variant="outline" className="h-8 gap-1" asChild>
+          <Link href="/dashboard/teams/new">
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Team
+            </span>
+          </Link>
+
+        </Button>
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   )
 }

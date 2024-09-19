@@ -20,7 +20,7 @@ import {
 
 import { labels } from "../data/data"
 import { taskSchema } from "../data/schema"
-import { Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
+import { PencilIcon, Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { EditAgentDialog } from "@/app/dashboard/channels/(components)/editAgentDialog"
 
@@ -45,16 +45,29 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <EditAgentDialog agent_id={row.original?.agent_id}/>
+        <DropdownMenuItem asChild>
+        <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
+          Open
+        </Link>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
-             Go to
+          <Link className="flex cursor-pointer" href={`?edit=${row.original?.agent_id}&agent_name=${row.original?.name}&description=${row.original?.description}`}>
+             Edit
             <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
+              <PencilIcon className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`?delete=${row.original?.agent_id}&agent_name=${row.original?.name}`}>
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>
             </DropdownMenuShortcut>
           </Link>
-        </DropdownMenuItem>        
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

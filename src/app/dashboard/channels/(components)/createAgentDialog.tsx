@@ -156,7 +156,7 @@ export function CreateAgentDialog() {
             className="ml-auto hidden h-8 lg:flex"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            New
+            Agent
           </Button>
             
           </DialogTrigger>

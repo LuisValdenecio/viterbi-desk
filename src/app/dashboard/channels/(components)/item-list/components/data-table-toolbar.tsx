@@ -12,6 +12,8 @@ import { Input } from "@/components/ui/input"
 
 import { statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { PlusCircle } from "lucide-react"
+import Link from "next/link"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -51,7 +53,17 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <Button size="sm" variant="outline" className="h-8 gap-1" asChild>
+          <Link href="/dashboard/channels/new">
+            <PlusCircle className="h-3.5 w-3.5" />
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+              Channel
+            </span>
+          </Link>
+        </Button>
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   )
 }

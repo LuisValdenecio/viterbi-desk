@@ -27,7 +27,7 @@ const TeamUpdateFormSchema = z.object({
     message: 'Please enter a valid id for the team.'
   }),
   description: z.string().min(1, {
-    message: 'Please select a valid action.'
+    message: 'Please select a valid description.'
   }),
 })
 
@@ -81,6 +81,14 @@ export async function editTeam(_prevstate, formData) {
 
   try {
 
+    const privilege = await checkPrivilege(teamId)
+
+    if (!privilege) {
+      return {
+        message : 'access denied'
+      }
+    }
+
     const editedTeam = await prisma.team.update({
       where :  {
         team_id : teamId
@@ -95,13 +103,25 @@ export async function editTeam(_prevstate, formData) {
       message : 'Success'
     }
 
-
   } catch (error) {
     console.log(error)
     return {
       message : 'something went wrong'
     }
   }
+}
+
+export async function checkPrivilege(team_id) {
+  const session = await auth()
+  const privilege = await prisma.user_privilege.findMany({
+    where : {
+      user_id : session?.user?.id,
+      team_id : team_id,
+      role : 'owner'
+    }
+  })
+
+  return privilege.length
 }
 
 export async function postTeam(_prevstate, formData) {
@@ -199,6 +219,13 @@ export async function deleteTeams(_prevstate, formData) {
 
           if (passwordMatch) {
 
+              const privilege = await checkPrivilege(teams_id.split(",")[0])
+              if (!privilege) {
+                return {
+                  message : 'access denied'
+                }
+              }
+
               const array_of_teams_ids = teams_id.split(",")
               const deleletedPosts = await prisma.team.deleteMany({
                   where : {
@@ -236,17 +263,37 @@ export async function getAllTeams() {
       }
     })
 
+    const teams_ids = myTeams.flatMap(team => team.team_id)
+
+    const members_in_teams = await prisma.user_privilege.findMany({
+      where : {
+        team_id : {
+          in : teams_ids
+        } 
+      }
+    })
+
+    const members = await members_in_teams.flatMap((team) => {
+      return {
+        team_id : team.team_id,
+        members : members_in_teams.filter(currentTeam => currentTeam.team_id === team.team_id).length
+      }
+    })
+
+    const unique_members = members.filter((value, index) => 
+      members.findIndex((team) => team.team_id == value.team_id) == index
+    )
+
     const teams = myTeams.flatMap((team) => {
       return {
         team_id : team.team_id,
         name : team.team.name,
+        members : unique_members.filter(currentTeam => currentTeam.team_id == team.team_id)[0].members,
         description : team.team.description,
         user_id : team.id,
         user_role : team.role
       }
     })
-
-    console.log(teams)
 
     return teams
   } catch(error) {

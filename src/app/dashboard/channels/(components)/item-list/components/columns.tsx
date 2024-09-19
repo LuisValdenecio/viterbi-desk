@@ -11,6 +11,11 @@ import { Task } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Gmail, Discord } from '@/components/svg-icons'
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -18,7 +23,12 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[180px] truncate">{row.getValue("name")}</div>,
+    cell: ({ row }) => <div className="w-[180px] flex items-center gap-2 truncate">
+        <Avatar className="size-6">
+          <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <span className="truncate">{row.getValue("name")}</span>
+    </div>,
     enableSorting: true,
     enableHiding: true,
   },
@@ -81,6 +91,15 @@ export const columns: ColumnDef<Task>[] = [
             <div className="flex w-[100px] items-center">
               {status.icon &&  (
                 <Gmail  />
+              )}
+            <span>{status.label}</span>
+            </div>
+          )
+        case 'Discord' :
+          return (
+            <div className="flex w-[100px] items-center">
+              {status.icon &&  (
+                <Discord />
               )}
             <span>{status.label}</span>
             </div>

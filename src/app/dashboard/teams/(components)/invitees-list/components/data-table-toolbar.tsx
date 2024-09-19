@@ -52,6 +52,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { deleteTeams } from "@/server-actions/teams"
 import { deleteInvitations } from "@/server-actions/invitations"
+import { AddMemberDialog } from "../../createPersonDialog"
+import { AddPeopleDialog } from "../../createPeopleDialog"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -101,7 +103,11 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <AddPeopleDialog />
+        <AddMemberDialog />
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   )
 }

@@ -52,6 +52,7 @@ import { Edit2Icon, Trash2Icon } from "lucide-react"
 import { deleteAgents } from "@/server-actions/agents"
 import { OperationDeniedAlert } from "@/app/dashboard/(components)/operationDenied"
 import { usePathname } from "next/navigation"
+import { CreateAgentDialog } from "../../createAgentDialog"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -101,7 +102,10 @@ export function DataTableToolbar<TData>({
           </Button>
         )}
       </div>
-      <DataTableViewOptions table={table} />
+      <div className="flex gap-2">
+        <CreateAgentDialog />
+        <DataTableViewOptions table={table} />
+      </div>
     </div>
   )
 }

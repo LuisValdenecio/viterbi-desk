@@ -27,6 +27,7 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
+import Link from "next/link"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -93,19 +94,25 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
+                  <TableRow
+                    
+                    key={row.id}
+                    className="cursor-pointer"
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {/*<Link href="/dashboard" className="w-full">*/}
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          
+                        </TableCell>
+                      ))}
+                    {/*</Link>*/}
+                  </TableRow>
               ))
             ) : (
               <TableRow>

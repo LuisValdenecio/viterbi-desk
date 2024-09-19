@@ -9,6 +9,11 @@ import { labels, priorities, statuses } from "../data/data"
 import { Task } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -40,9 +45,14 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Agent" />
     ),
-    cell: ({ row }) => <div className="w-[150px] truncate">{row.getValue("name")}</div>,
-    enableSorting: false,
-    enableHiding: false,
+    cell: ({ row }) => <div className="w-[150px] truncate flex items-center gap-2">
+        <Avatar className="size-6">
+          <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <span className="truncate">{row.getValue("name")}</span>
+    </div>,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "description",

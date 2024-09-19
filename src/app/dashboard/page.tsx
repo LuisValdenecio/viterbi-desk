@@ -4,6 +4,7 @@ import  TasksCard from "./(components)/tasksCard"
 import AgentsCard from "./(components)/agentsCard"
 import RecentAgents from "./(components)/recentAgents"
 import RecentTasks from "./(components)/recentTasks"
+import Providers from "./(components)/providers"
 
 export const description =
   "An application shell with a header and main content area. The header has a navbar, a search input and and a user nav dropdown. The user nav is toggled by a button with an avatar image."
@@ -23,6 +24,7 @@ export default function Page() {
           <RecentTasks />
           <RecentAgents />
         </div>
+       
       </main>
     </div>
   )

@@ -9,16 +9,27 @@ import { labels, priorities, statuses } from "../data/data"
 import { Task } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
+import { trusted } from "mongoose"
 
 export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team" />
+      <DataTableColumnHeader column={column} title="Team Name" />
     ),
-    cell: ({ row }) => <div className="w-[200px] truncate">{row.getValue("name")}</div>,
-    enableSorting: false,
-    enableHiding: false,
+    cell: ({ row }) => <div className="w-[200px] truncate flex items-center gap-2">
+        <Avatar className="size-6">
+          <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <span className="truncate">{row.getValue("name")}</span>
+    </div>,
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "description",
@@ -33,6 +44,24 @@ export const columns: ColumnDef<Task>[] = [
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
           <span className="max-w-[300px] truncate font-normal">
             {row.getValue("description")}
+          </span>
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "members",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Members" />
+    ),
+    cell: ({ row }) => {
+      //const label = labels.find((label) => label.value === row.original.label)
+
+      return (
+        <div className="flex space-x-2">
+          {/*label && <Badge variant="outline">{label.label}</Badge>*/}
+          <span className="max-w-[300px] truncate font-normal">
+            {row.getValue('members')}
           </span>
         </div>
       )

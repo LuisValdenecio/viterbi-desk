@@ -84,7 +84,7 @@ const DeleteTaskSession = DeleteTaskForSchema.omit({})
 export async function deleteTaks(_prevstate, formData) {
     
     const session = await auth()
-
+    
     const validatedFields = DeleteTaskSession.safeParse({
         password : formData.get('password'),
         tasks_ids : formData.get('tasks_ids')
@@ -96,7 +96,7 @@ export async function deleteTaks(_prevstate, formData) {
           message: 'Missing Fields',
         };
     }
-
+    
     const { password, tasks_ids } = validatedFields.data
 
     try {
@@ -107,6 +107,7 @@ export async function deleteTaks(_prevstate, formData) {
         })
 
         if (user) {
+
             const passwordMatch = await bcrypt.compare(
                 password,
                 user.password
@@ -114,7 +115,18 @@ export async function deleteTaks(_prevstate, formData) {
 
             if (passwordMatch) {
 
+                // check and see if this user can delete this task:
                 const array_of_tasks_ids = tasks_ids.split(",")
+                const privilege = await checkPrivilege(tasks_ids.split(",")[0])
+                
+                if (!privilege) {
+                    return {
+                        message : 'access denied'
+                    }
+                }
+
+                console.log("TASKS IDS: ", tasks_ids.split(","))
+
                 const deleletedPosts = await prisma.task.deleteMany({
                     where : {
                         task_id : {
@@ -131,6 +143,72 @@ export async function deleteTaks(_prevstate, formData) {
                     message : 'incorrect password'
                 }
             }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+    
+}
+
+export async function checkPrivilege(taskId) {
+    const session = await auth()
+
+    try {
+        
+        // give back all the teams I own
+        const my_teams = await prisma.user_privilege.findMany({
+            where : {
+                role : 'owner',
+                user_id : session?.user?.id
+            }, 
+            select : {
+                team_id : true
+            }
+        })
+
+        const my_teams_ids = my_teams.flatMap(team => team.team_id)
+
+        // fetch all channels related to the teams I own
+        const my_channels = await prisma.team_channel.findMany({
+            where : {
+                team_id : {
+                    in : my_teams_ids
+                }
+            },
+            select : {
+                channel_id : true
+            }
+        })
+
+        const my_channels_ids = my_channels.flatMap(channel => channel.channel_id)
+
+        // fetch the agent that owns the task
+        const agentId = await prisma.task.findUnique({
+            where : {
+                task_id : taskId
+            },
+            select : {
+                agent_id : true
+            }
+        })
+
+        // get the id of the channel this agent belongs to
+        const channel = await prisma.agent.findUnique({
+            where : {
+                agent_id : agentId.agent_id
+            },
+            select : {
+                channel_id : true
+            }
+        })
+        
+        // get the channel that the agent belongs to:
+        const privileges = my_channels_ids.filter((chnnl) => chnnl === channel.channel_id)
+
+        if (privileges.length > 0) {
+            return true
+        } else {
+            return false
         }
     } catch (error) {
         console.log(error)
@@ -203,8 +281,6 @@ export async function getTask(task_id) {
             dayPeriod : task.task_schedule.dayPeriod,
             hourAndMinute : task.task_schedule.hourAndMinute
         }
-
-        console.log("DATA FROM SERVER: ", resultData)
     
         return resultData
 
@@ -270,6 +346,7 @@ export async function postTask(_prevstate, formData) {
 
         return {
             message : 'Success',
+            taskId : newTask.task_id,
             taskName : newTask.name,
         }
 
@@ -280,7 +357,9 @@ export async function postTask(_prevstate, formData) {
 }
 
 export async function editTask(_prevstate, formData) {
-    
+
+    console.log("FORM DATA: ", formData)
+
     const validatedFields = EditTaskSession.safeParse({
         taskName : formData.get('taskName'),
         priority : formData.get('priority'),
@@ -311,10 +390,18 @@ export async function editTask(_prevstate, formData) {
         day_period,
         hour_minute,
     } = validatedFields.data
-
-    console.log("DATA FORM: ", validatedFields.data)
     
     try {   
+
+        // check and see if this user can delete this task:
+        const privilege = await checkPrivilege(task_id.split(",")[0])
+                
+        if (!privilege) {
+            return {
+                message : 'access denied'
+            }
+        }
+
         const taskSchedule = await prisma.task_Schedule.update({
             where : {
                 id : taskSchedule_id

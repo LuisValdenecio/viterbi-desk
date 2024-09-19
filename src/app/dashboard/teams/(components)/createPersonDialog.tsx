@@ -74,6 +74,8 @@ import { useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { usePathname } from "next/navigation"
 import { OperationDeniedAlert } from "../../(components)/operationDenied"
+import { LoadingButton } from "@/components/loading-button"
+import Loader_component from "@/components/loader"
 
 export function SubmitBtn() {
   const { pending } = useFormStatus();
@@ -157,7 +159,7 @@ export function AddMemberDialog() {
   }, [state?.errors]);
 
   if (permissionError) return <div>falhou em carregar</div>
-  if (permissionLoading) return <div>carregando...</div>
+  if (permissionLoading) return <Loader_component />
 
   if (isDesktop) {
 
@@ -169,7 +171,7 @@ export function AddMemberDialog() {
 
               <PlusCircle className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Member
+                Member
               </span>
 
 

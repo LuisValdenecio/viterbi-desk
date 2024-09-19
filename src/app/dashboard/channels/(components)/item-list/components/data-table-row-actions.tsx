@@ -56,7 +56,7 @@ import { Label } from "@/components/ui/label"
 
 import { statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { ArchiveIcon, DeleteIcon, Trash2Icon } from "lucide-react"
+import { ArchiveIcon, DeleteIcon, PencilIcon, Trash2Icon } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -114,18 +114,29 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <EditChannelDialog channel_id={row.original?.channel_id} />
-        <DeleteChannelDialog data_to_delete={row.original?.channel_id} />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/channels/${row.original?.channel_id}`}>
-             Go to
+        <Link className="flex cursor-pointer" href={`/dashboard/channels/${row.original?.channel_id}`}>
+          Open
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/channels?edit=${row.original?.channel_id}&channel_name=${row.original?.name}&description=${row.original?.description}`}>
+             Edit
             <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
+              <PencilIcon className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/channels?delete=${row.original?.channel_id}&channel_name=${row.original?.name}`}>
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>
             </DropdownMenuShortcut>
           </Link>
-           
         </DropdownMenuItem>
-      
       </DropdownMenuContent>
     </DropdownMenu>
   )

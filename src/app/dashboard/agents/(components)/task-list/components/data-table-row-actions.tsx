@@ -20,7 +20,7 @@ import {
 
 import { labels } from "../data/data"
 import { taskSchema } from "../data/schema"
-import { Edit2Icon, Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
+import { Edit2Icon, PencilIcon, Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { EditTaskDialog } from "../../editTaskDialog"
 
@@ -45,17 +45,31 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <EditTaskDialog taskId={row.original?.task_id}/>
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?._id}`}>
-             Go to
+        <Link className="flex cursor-pointer" href={`/dashboard/tasks/${row.original?.task_id}`}>
+          Open
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`?edit=${row.original?.task_id}&task_name=${row.original?.name}&priority=${row.original?.priority}&timezone=${row.original?.task_schedule?.timezone}&schedule_id=${row.original?.task_schedule?.id}&day=${row.original?.task_schedule?.day}&day_period=${row.original?.task_schedule?.dayPeriod}&hour_minute=${row.original?.task_schedule?.hourAndMinute}`}>
+             Edit
             <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
+              <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
           </Link>
            
         </DropdownMenuItem>
-       
+
+        <DropdownMenuItem asChild>
+        <Link className="flex cursor-pointer" href={`?delete=${row.original?.task_id}&task_name=${row.original?.name}`
+            }>
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
