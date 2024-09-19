@@ -22,6 +22,9 @@ const EditInvitationFormSchema = z.object({
     email: z.string().email({
       message: 'Please enter a valid email address.'
     }),
+    team_id : z.string().min(1, {
+        message: 'Please type in a valid id'
+    }),
     invitation_id: z.string().min(1, {
         message: 'Please type in a valid id'
     }),
@@ -177,6 +180,15 @@ export async function sendInvitation(_prevstate, formData) {
     const { email, role, teamId } = validatedFields.data
     
     try {   
+
+        const privilege = await checkRolePrivilege(teamId, role)
+
+        if (!privilege) {
+            return {
+                message: 'access denied'
+            }
+        }
+
         // make the queries below a transation, if one fails, all fail:
         const invitation_token = `${randomUUID()}${randomUUID()}`.replace(/-/g, '')
 
@@ -214,11 +226,10 @@ export async function sendInvitation(_prevstate, formData) {
 
 export async function editInvitation(_prevstate, formData) {
 
-    console.log("FORM DATA : ", formData)
-
     const validatedFields = EditInvitationSession.safeParse({
         email : formData.get('email'),
         invitation_id : formData.get('invitation_id'),
+        team_id : formData.get('team_id'),
         role : formData.get('role')
     })
 
@@ -229,7 +240,7 @@ export async function editInvitation(_prevstate, formData) {
         };
     }
 
-    const { email, invitation_id, role } = validatedFields.data
+    const { email, invitation_id, team_id, role } = validatedFields.data
     
     try {   
 
@@ -238,6 +249,14 @@ export async function editInvitation(_prevstate, formData) {
         if (!privilege) {
             return {
                 message : 'access denied'
+            }
+        }
+
+        const rolePrivilege = await checkRolePrivilege(team_id, role)
+
+        if (!rolePrivilege) {
+            return {
+                message: 'access denied'
             }
         }
         
@@ -253,6 +272,55 @@ export async function editInvitation(_prevstate, formData) {
 
         return {
             message : 'Success'
+        }
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// this function makes sure that non-authorized users 
+// promote members to certain roles
+export async function checkRolePrivilege(team_id, role) {
+    const session = await auth()
+
+    try {
+
+        // check your role on this team:
+        const my_role = await prisma.user_privilege.findMany({
+            where: {
+                user_id: session?.user?.id,
+                team_id: team_id
+            },
+            select: {
+                role: true
+            }
+        })
+
+        // if you're nononwer, you can't delete others
+        if (my_role[0].role !== 'owner') {
+            return false
+        }
+
+        // check if the attempting deleter is the founding member
+        const founding_member = await prisma.team.findUnique({
+            where: {
+                team_id: team_id,
+                user_id: session?.user?.id
+            }
+        })
+
+        // only the founding member can promoete to owner
+        if (!founding_member && role === 'owner') {
+            return false
+        }
+        
+        if (my_role[0].role === 'owner' && !founding_member && role != 'owner') {
+            return true
+        }
+        
+        if (founding_member) {
+            return true
         }
 
     } catch (error) {

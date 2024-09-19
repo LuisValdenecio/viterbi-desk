@@ -308,6 +308,9 @@ const editFormSchema = z.object({
   email: z.string().email({
     message: 'Please enter a valid email address.'
   }),
+  team_id : z.string().min(1, {
+    message: 'Please type in a valid id'  
+  }),
   invitation_id: z.string().min(1, {
     message: 'Please type in a valid id'
   }),
@@ -319,13 +322,14 @@ const editFormSchema = z.object({
 export function EditInvitationDialog({ open, openChange }) {
 
   const searchParams = useSearchParams()
-  const [invitations_id, setInvitations_id] = useState(searchParams.get('edit')?.toString())
+  const pathname = usePathname()
 
   const { toast } = useToast()
 
   const initialState = {
     errors: {
       email: undefined,
+      team_id : undefined,
       invitation_id: undefined,
       role: undefined,
     },
@@ -362,8 +366,9 @@ export function EditInvitationDialog({ open, openChange }) {
     }
   }, [state?.errors]);
 
-  const initialValues: { email: string, invitation_id: string, role: string } = {
+  const initialValues: { email: string, team_id : string, invitation_id: string, role: string } = {
     email: searchParams.get('guest_email')?.toString(),
+    team_id : pathname.split("/")[pathname.split("/").length - 1],
     invitation_id: searchParams.get('edit')?.toString(),
     role: searchParams.get('role')?.toString(),
   };
@@ -404,9 +409,20 @@ export function EditInvitationDialog({ open, openChange }) {
               name="invitation_id"
               render={({ field }) => (
                 <FormItem className="hidden">
-                  <FormLabel>E-mail</FormLabel>
                   <FormControl>
                     <Input defaultValue={searchParams.get('edit')?.toString()} {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="team_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input defaultValue={pathname.split("/")[pathname.split("/").length - 1]} {...field} />
                   </FormControl>
                 </FormItem>
               )}

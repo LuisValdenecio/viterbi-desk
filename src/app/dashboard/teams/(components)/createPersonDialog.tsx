@@ -153,7 +153,13 @@ export function AddMemberDialog() {
         state.errors.forEach((error) => {
           form.setError(error.field, { message: error.message });
         })
-      }
+      } else if (state?.message === 'access denied') {
+        setOpen(false)
+        toast({
+          title: "Operation blocked",
+          description: "You lack privileges to perform this action",
+        })
+      } 
 
     }
   }, [state?.errors]);
