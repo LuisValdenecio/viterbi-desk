@@ -45,7 +45,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`?edit=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}`}>
+          <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}`}>
              Re-assign role
             <DropdownMenuShortcut>
               <BlocksIcon className=" h-4 w-4 text-muted-foreground" />

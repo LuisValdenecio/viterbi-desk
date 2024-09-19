@@ -45,7 +45,7 @@ import { EyeIcon, KeySquare, Loader2, MoveDown, MoveRight, MoveUp, ShieldCheck }
 
 import { useEffect } from 'react'
 import { deleteTaks, editTask } from '@/server-actions/tasks'
-import { deleteMember } from '@/server-actions/members'
+import { deleteMember, reassignMemberRole } from '@/server-actions/members'
 import {
   Select,
   SelectContent,
@@ -98,6 +98,7 @@ export default function Page() {
   const [deleteInvitationDialog, setDeleteInvitationDialog] = useState(false)
   const [editInvitationDialog, setEditInvitationDialog] = useState(false)
   const [deleteTeamMemberDialog, setDeleteTeamMemberDialog] = useState(false)
+  const [reassignMemberRole, setReassignMemberRole ] = useState(false)
 
   const params = new URLSearchParams(searchParams);
 
@@ -108,6 +109,8 @@ export default function Page() {
       setEditInvitationDialog(true)
     } else if (searchParams.get('delete_member')?.toString()) {
       setDeleteTeamMemberDialog(true)
+    } else if (searchParams.get('member')?.toString()) {
+      setReassignMemberRole(true)
     }
   }, [searchParams])
 
@@ -115,9 +118,11 @@ export default function Page() {
     setDeleteInvitationDialog(false)
     setDeleteTeamMemberDialog(false)
     setEditInvitationDialog(false)
+    setReassignMemberRole(false)
     params.delete('delete')
     params.delete('delete_member')
     params.delete('name')
+    params.delete('member')
     params.delete('guest_email')
     params.delete('edit')
     params.delete('role')
@@ -145,6 +150,7 @@ export default function Page() {
           <TabsContent value="active">
             <div className="">
               <DeleteTeamMemberDialog open={deleteTeamMemberDialog} openChange={onDialogClose} />
+              <ReassignMemberRole open={reassignMemberRole} openChange={onDialogClose} />
               <ListItemTable people={users.people} />
             </div>
           </TabsContent>
@@ -494,6 +500,18 @@ const DeleteMemberFormSchema = z.object({
   }),
 })
 
+const UpdateMemberRoleSchema = z.object({
+  role: z.string().min(1, {
+      message: 'Please type in a valid role'
+  }),
+  member_id: z.string().min(1, {
+      message: 'Please type in a valid id'
+  }),
+  team_id: z.string().min(1, {
+      message: 'Please type in a valid id'
+  }),
+})
+
 export function DeleteTeamMemberDialog({ open, openChange }) {
 
   const pathname = usePathname()
@@ -627,4 +645,174 @@ export function DeleteTeamMemberDialog({ open, openChange }) {
       </AlertDialogContent>
     </AlertDialog>
   )
+}
+
+export function ReassignMemberRole({ open, openChange }) {
+
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const { toast } = useToast()
+
+  const initialState = {
+    errors: {
+      role: undefined,
+      member_id: undefined,
+      team_id: undefined,
+    },
+    message: undefined
+  };
+
+  const [state, formAction] = useFormState(reassignMemberRole, initialState);
+
+  useEffect(() => {
+    if (state?.message) {
+      if (state?.message === 'Success') {
+        openChange()
+        toast({
+          title: "Scheduled: Catch up ",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+          action: (
+            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+          ),
+        })
+      }
+
+      if (Array.isArray(state?.errors)) {
+        state.errors.forEach((error) => {
+          form.setError(error.field, { message: error.message });
+        })
+      } else if (state.message == 'access denied') {
+          openChange()
+          toast({
+            title: "Operation blocked",
+            description: `You don't have the privileges to complete this.`,
+          })
+      } else if (state.message == 'reassigning founder') {
+        openChange()
+          toast({
+            title: "Operation blocked",
+            description: `You can't re-assign the role of the team founder`,
+          })
+      }
+    }
+  }, [state?.errors]);
+
+  const initialValues: { role: string, member_id: string, team_id: string } = {
+    role: searchParams.get('role')?.toString(),
+    member_id: searchParams.get('member')?.toString(),
+    team_id: pathname.split("/")[pathname.split("/").length - 1],
+  };
+
+  const form = useForm<z.infer<typeof UpdateMemberRoleSchema>>({
+    resolver: zodResolver(UpdateMemberRoleSchema),
+    defaultValues: initialValues
+  })
+
+  return (
+    <Dialog open={open} onOpenChange={openChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{searchParams.get('name')?.toString()}</DialogTitle>
+          <DialogDescription>
+            Assign a new role for this member
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form action={formAction}>
+          
+            <FormField
+              control={form.control}
+              name="member_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input defaultValue={searchParams.get('member')?.toString()} {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="team_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input defaultValue={pathname.split("/")[pathname.split("/").length - 1]} {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className="grid gap-3 mb-4">
+              <Label htmlFor="model">Role</Label>
+              <Select name="role" defaultValue={searchParams.get('role')?.toString()}>
+                <SelectTrigger
+                  id="model"
+                  className="items-start [&_[data-description]]:hidden"
+                >
+                  <SelectValue placeholder="Select a role for this invitation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <ShieldCheck className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+
+                          <span className="font-medium text-foreground">
+                            Admin
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          Reads all the data and makes reports
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="reader">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <EyeIcon className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+                          <span className="font-medium text-foreground">
+                            Reader
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          Tasks run once stack is free
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="owner">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <KeySquare className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+                          <span className="font-medium text-foreground">
+                            Owner
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          The tasks run ASAP
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+                <FormMessage>{state?.errors?.role}</FormMessage>
+              </Select>
+            </div>
+
+            <SubmitBtn>
+              Update Role
+            </SubmitBtn>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
+
 }
