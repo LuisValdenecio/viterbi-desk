@@ -63,6 +63,14 @@ export async function deleteMember(_prevstate, formData) {
                     }
                 }
 
+                const privilege = await checkPrivilege(team_id, member_id)
+
+                if (!privilege) {
+                    return {
+                        message : 'access denied'
+                    }
+                }
+
                 const member_to_deete = await prisma.user_privilege.findMany({
                     where : {
                        user_id : member_id,
@@ -100,7 +108,21 @@ export async function checkPrivilege(team_id, member_id) {
     
     try {
 
+        // check your role on this team:
+        const my_role = await prisma.user_privilege.findMany({
+            where : {
+                user_id : session?.user?.id,
+                team_id : team_id
+            }, 
+            select : {
+                role : true
+            }
+        })
 
+        // if you're nononwer, you can't delete others
+        if (my_role[0].role !== 'owner') {
+            return false
+        }
 
 
     } catch (error) {
