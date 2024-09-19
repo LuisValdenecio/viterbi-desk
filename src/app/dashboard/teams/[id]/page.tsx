@@ -41,7 +41,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from 'react'
-import { Loader2, MoveDown, MoveRight, MoveUp } from "lucide-react"
+import { EyeIcon, KeySquare, Loader2, MoveDown, MoveRight, MoveUp, ShieldCheck } from "lucide-react"
 
 import { useEffect } from 'react'
 import { deleteTaks, editTask } from '@/server-actions/tasks'
@@ -70,7 +70,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import Loader_component from '@/components/loader'
-import { deleteInvitations } from "@/server-actions/invitations";
+import { deleteInvitations, editInvitation } from "@/server-actions/invitations";
 //import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -91,8 +91,8 @@ export default function Page() {
   const { replace } = useRouter()
   const searchParams = useSearchParams()
   const teamId = pathname.split("/")[pathname.split("/").length - 1]
-  const { data : users, isLoading : usersLoading, error : usersError } = useSWR(`/api/people/${teamId}`, fetcher)
-  const { data : invitees, isLoading : inviteesLoading, error : inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
+  const { data: users, isLoading: usersLoading, error: usersError } = useSWR(`/api/people/${teamId}`, fetcher)
+  const { data: invitees, isLoading: inviteesLoading, error: inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
   const [deleteInvitationDialog, setDeleteInvitationDialog] = useState(false)
   const [editInvitationDialog, setEditInvitationDialog] = useState(false)
 
@@ -118,7 +118,7 @@ export default function Page() {
 
   if (usersError || inviteesError) return <div>falhou em carregar</div>
   if (usersLoading || inviteesLoading) return <Loader_component />
-  
+
   return (
     <>
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
@@ -131,7 +131,7 @@ export default function Page() {
             </TabsList>
           </div>
           <TabsContent value="overview" >
-            
+
           </TabsContent>
           <TabsContent value="active">
             <div className="">
@@ -142,6 +142,7 @@ export default function Page() {
           <TabsContent value="invitations">
             <div className="">
               <DeleteInvitationDialog open={deleteInvitationDialog} openChange={onDialogClose} />
+              <EditInvitationDialog open={editInvitationDialog} openChange={onDialogClose} />
               <ListInvitees invitees={invitees.invitees_data} />
             </div>
           </TabsContent>
@@ -167,7 +168,6 @@ export function DeleteInvitationDialog({ open, openChange }) {
 
   const searchParams = useSearchParams()
   const [invitations_id, setInvitations_id] = useState(searchParams.get('delete')?.toString())
-  console.log("INVITATION TO DELETE:", searchParams.get('delete')?.toString())
 
   const initialState = {
     errors: {
@@ -283,3 +283,185 @@ export function EditSubmitBtn() {
     </Button>
   )
 }
+
+const editFormSchema = z.object({
+  email: z.string().email({
+    message: 'Please enter a valid email address.'
+  }),
+  invitation_id: z.string().min(1, {
+    message: 'Please type in a valid id'
+  }),
+  role: z.string().min(1, {
+    message: 'Please select a valid role'
+  }),
+})
+
+export function EditInvitationDialog({ open, openChange }) {
+
+  const searchParams = useSearchParams()
+  const [invitations_id, setInvitations_id] = useState(searchParams.get('edit')?.toString())
+
+  const { toast } = useToast()
+
+  const initialState = {
+    errors: {
+      email: undefined,
+      invitation_id: undefined,
+      role: undefined,
+    },
+    message: undefined
+  };
+
+  const [state, formAction] = useFormState(editInvitation, initialState);
+
+  useEffect(() => {
+    if (state?.message) {
+      if (state?.message === 'Success') {
+        openChange()
+        toast({
+          title: "Scheduled: Catch up ",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+          action: (
+            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+          ),
+        })
+      }
+
+      if (Array.isArray(state?.errors)) {
+        state.errors.forEach((error) => {
+          form.setError(error.field, { message: error.message });
+        })
+      } else if (state.message == 'access denied') {
+          openChange()
+          toast({
+            title: "Operation blocked",
+            description: `You don't have the privileges to complete this.`,
+          })
+        
+      }
+    }
+  }, [state?.errors]);
+
+  const initialValues: { email: string, invitation_id: string, role: string } = {
+    email: searchParams.get('guest_email')?.toString(),
+    invitation_id: searchParams.get('edit')?.toString(),
+    role: searchParams.get('role')?.toString(),
+  };
+
+  const form = useForm<z.infer<typeof editFormSchema>>({
+    resolver: zodResolver(editFormSchema),
+    defaultValues: initialValues
+  })
+
+  return (
+    <Dialog open={open} onOpenChange={openChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Invitation</DialogTitle>
+          <DialogDescription>
+            Make changes and save when you're done.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form action={formAction}>
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="mb-4">
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input defaultValue={searchParams.get('guest_email')?.toString()} type="email" placeholder="type in the e-mail" {...field} />
+                  </FormControl>
+                  <FormMessage>{state?.errors?.email}</FormMessage>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="invitation_id"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input defaultValue={searchParams.get('edit')?.toString()} {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+
+            <div className="grid gap-3 mb-4">
+              <Label htmlFor="model">Role</Label>
+              <Select name="role" defaultValue={searchParams.get('role')?.toString()}>
+                <SelectTrigger
+                  id="model"
+                  className="items-start [&_[data-description]]:hidden"
+                >
+                  <SelectValue placeholder="Select a role for this invitation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <ShieldCheck className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+
+                          <span className="font-medium text-foreground">
+                            Admin
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          Reads all the data and makes reports
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="reader">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <EyeIcon className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+                          <span className="font-medium text-foreground">
+                            Reader
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          Tasks run once stack is free
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="owner">
+                    <div className="flex items-start gap-3 text-muted-foreground">
+                      <KeySquare className="size-5" />
+                      <div className="grid gap-0.5">
+                        <p>
+                          <span className="font-medium text-foreground">
+                            Owner
+                          </span>
+                        </p>
+                        <p className="text-xs" data-description>
+                          The tasks run ASAP
+                        </p>
+                      </div>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+                <FormMessage>{state?.errors?.role}</FormMessage>
+              </Select>
+            </div>
+
+            <SubmitBtn>
+              Edit Invitation
+            </SubmitBtn>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  )
+
+}
+
+

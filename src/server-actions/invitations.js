@@ -209,9 +209,7 @@ export async function sendInvitation(_prevstate, formData) {
 
     } catch (error) {
         console.log(error)
-    }
-
-   
+    }   
 }
 
 export async function editInvitation(_prevstate, formData) {
@@ -234,6 +232,14 @@ export async function editInvitation(_prevstate, formData) {
     const { email, invitation_id, role } = validatedFields.data
     
     try {   
+
+        const privilege = await checkPrivilege(invitation_id)
+
+        if (!privilege) {
+            return {
+                message : 'access denied'
+            }
+        }
         
         const editedInvitation = await prisma.member_invitation.update({
             where : {
@@ -252,6 +258,4 @@ export async function editInvitation(_prevstate, formData) {
     } catch (error) {
         console.log(error)
     }
-
-   
 }
