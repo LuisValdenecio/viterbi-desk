@@ -8,19 +8,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
 import { labels } from "../data/data"
 import { taskSchema } from "../data/schema"
-import { Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
+import { PencilIcon, Play, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { EditInvitationDialog } from "../../editInvitationDialog"
 
@@ -45,15 +40,31 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <EditInvitationDialog invitation_id={row.original?.invitation_id} />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`/dashboard/teams/${row.original?.team_id}`}>
-             Go to
+        <Link className="flex cursor-pointer" href={`/dashboard/invitation/${row.original?.invitation_id}`}>
+          Open
+        </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`?edit=${row.original?.invitation_id}&guest_email=${row.original?.guest_email}&role=${row.original?.guest_role}`}>
+             Edit
             <DropdownMenuShortcut>
-              <SquareArrowUpRight className=" h-4 w-4 text-muted-foreground" />
+              <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
-          </Link> 
-        </DropdownMenuItem>  
+          </Link>
+           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+        <Link className="flex cursor-pointer" href={`?delete=${row.original?.invitation_id}&guest_email=${row.original?.guest_email}`
+            }>
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

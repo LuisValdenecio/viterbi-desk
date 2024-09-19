@@ -93,6 +93,14 @@ export async function deleteInvitations(_prevstate, formData) {
             )
   
             if (passwordMatch) {
+
+                const privilege = await checkPrivilege(invitations_id.split(",")[0])
+
+                if (!privilege) {
+                    return {
+                        message : 'access denied'
+                    }
+                }
   
                 const array_of_invitations_ids = invitations_id.split(",")
                 const deletedInvitations = await prisma.member_invitation.deleteMany({
@@ -112,6 +120,38 @@ export async function deleteInvitations(_prevstate, formData) {
                 }
             }
         }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function checkPrivilege(invitation_id) {
+    const session = await auth()
+    
+    try {
+        const team = await prisma.member_invitation.findUnique({
+            where : {
+                id : invitation_id
+            },
+            select : {
+                team_id : true
+            }
+        })
+
+        const privilege = await prisma.user_privilege.findMany({
+            where : {
+                team_id : team.team_id,
+                user_id : session?.user?.id,
+                role : 'owner'
+            }
+        })
+
+        if (privilege.length > 0) {
+            return true
+        } else {
+            return false
+        }
+
     } catch (error) {
         console.log(error)
     }
