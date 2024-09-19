@@ -127,8 +127,6 @@ const formSchema = z.object({
 })
 
 export function DeleteTasksDialog({ open, openChange, data_to_delete}) {
-
-  console.log("DATA TO SEND: ", data_to_delete)
   
   const initialState = {
     errors: {
@@ -154,7 +152,6 @@ export function DeleteTasksDialog({ open, openChange, data_to_delete}) {
 
   const [state, formAction] = useFormState(deleteTaks, initialState);
   const [incorrectPassword, setIncorrectPassword] = React.useState(false)
-  const [ accessDenied, setAccessDenied ] = React.useState(false)
   const { toast } = useToast()
 
   React.useEffect(() => {
@@ -181,7 +178,11 @@ export function DeleteTasksDialog({ open, openChange, data_to_delete}) {
       if (state.message === 'incorrect password') {
         setIncorrectPassword(true)
       } else if (state.message == 'access denied') {
-        setAccessDenied(true)
+        openChange()
+        toast({
+          title: "Operation blocked",
+          description: `You don't have the privileges to complete this.`,
+        })
       } 
 
     }
@@ -212,7 +213,6 @@ export function DeleteTasksDialog({ open, openChange, data_to_delete}) {
                   </FormControl>
                   <FormMessage>{state?.errors?.password}</FormMessage>
                   {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
-                  {accessDenied && (<FormMessage>Access denied. Ask the owner to remove this task</FormMessage>)}
                 </FormItem>
               )}
             />

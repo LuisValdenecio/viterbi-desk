@@ -115,13 +115,13 @@ export default function Page() {
                     <div className="flex justify-between items-center">
                         <TabsList>
                             <TabsTrigger value="tasks">Tasks</TabsTrigger>
-                            <TabsTrigger value="overview">Overview</TabsTrigger>
+                            <TabsTrigger value="logs">logs</TabsTrigger>
                         </TabsList>
                     </div>
                     <TabsContent value="tasks">
                         <ListItemTable agents={data.tasks} />
                     </TabsContent>
-                    <TabsContent value="overview" >
+                    <TabsContent value="logs" >
 
                     </TabsContent>
 

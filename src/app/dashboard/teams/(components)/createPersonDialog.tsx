@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { EyeIcon, KeySquare, Loader2, PlusCircle, ShieldCheck } from "lucide-react"
+import { EyeIcon, KeySquare, Loader2, PlusCircle, ShieldCheck, Users2, UsersIcon } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { sendInvitation } from "@/server-actions/invitations"
@@ -285,10 +285,10 @@ export function AddMemberDialog() {
     } else {
       return (
         <OperationDeniedAlert>
-            <Button size="sm" className="h-8 gap-1" >
-              <PlusCircle className="h-3.5 w-3.5" />
+            <Button variant="outline" size="sm" className="h-8 gap-1" >
+              <UsersIcon className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                Add Member
+                People
               </span>
             </Button>
         </OperationDeniedAlert>

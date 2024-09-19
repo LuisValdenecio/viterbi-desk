@@ -58,8 +58,8 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex gap-2">
-        <AddPeopleDialog />
         <AddMemberDialog />
+        <AddPeopleDialog />
         <DataTableViewOptions table={table} />
       </div>
     </div>

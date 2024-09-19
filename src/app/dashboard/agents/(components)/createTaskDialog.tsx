@@ -405,7 +405,7 @@ export function CreateTaskDialog() {
             className="ml-auto hidden h-8 lg:flex"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
-            New
+            Task
           </Button>
         </OperationDeniedAlert>
       )
