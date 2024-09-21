@@ -30,7 +30,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/middleware.js", "src/app/dashboard/channels/(components)/listAgents.jsx"  ],
+, "src/middleware.js", "src/app/dashboard/channels/(components)/listAgents.jsx", "src/server-actions/avatar-uploader.js", "src/app/dashboard/account/(avatar-uploader)/page.jsx"  ],
   "exclude": [
     "node_modules"
   ]

@@ -31,8 +31,6 @@ export async function doCredentialLogin(_prevstate, formData) {
       password : formData.get("password"),
     })
 
-
-
     console.log(validateFields.success)
 
     //const validateUserEmail = CheckEmailValidadeSession.safeParse({false})

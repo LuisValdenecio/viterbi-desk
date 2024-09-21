@@ -21,8 +21,10 @@ export const columns: ColumnDef<Task>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
-    cell: ({ row }) => <div className="w-[100px] flex items-center gap-2">
-      <Avatar className="size-6">    
+    cell: ({ row }) => 
+    <div className="w-[100px] flex items-center gap-2">
+      <Avatar className="size-6">   
+        <AvatarImage src={row.original.img ? `https://ucarecdn.com/${row.original.img}/-/crop/face/1:1/` : ''} alt="@shadcn" /> 
         <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
       </Avatar>
       <span className="truncate">{row.getValue("name")}</span>

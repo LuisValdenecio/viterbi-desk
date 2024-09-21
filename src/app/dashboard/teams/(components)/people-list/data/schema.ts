@@ -6,7 +6,7 @@ export const taskSchema = z.object({
   name: z.string(),
   role : z.string(),
   user_id : z.string(),
-  //img: z.string(),
+  img: z.any(), // to cover for null imgs
   email: z.string(),
   status : z.string()
 })

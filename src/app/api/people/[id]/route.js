@@ -25,11 +25,14 @@ export const GET = async (req, { params }) => {
             return {
                 name : member.user.name,
                 email : member.user.email,
+                img : member.user.img,
                 user_id : member.user.user_id,
                 role : member.role,
                 status : member.status
             }
         })
+
+        console.log("PEOPLE: ", people)
 
         return Response.json({ people })
 
