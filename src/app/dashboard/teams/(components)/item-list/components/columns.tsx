@@ -15,6 +15,7 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import { trusted } from "mongoose"
+import AvatarsStacked from "@/app/dashboard/(components)/avatarStacked"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -55,13 +56,13 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Members" />
     ),
     cell: ({ row }) => {
-      //const label = labels.find((label) => label.value === row.original.label)
-
+      console.log("ROW DATA: ", row.original)
       return (
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
           <span className="max-w-[300px] truncate font-normal">
-            {row.getValue('members')}
+            <AvatarsStacked members={row?.original?.actual_members} />
+            {/*row.getValue('members')*/}
           </span>
         </div>
       )

@@ -72,7 +72,7 @@ import { useFormState } from 'react-dom'
 import { z } from "zod"
 import { useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { OperationDeniedAlert } from "../../(components)/operationDenied"
 import { LoadingButton } from "@/components/loading-button"
 import Loader_component from "@/components/loader"
@@ -103,6 +103,7 @@ const fetcher = (...args) => fetch(...args).then(res => res.json())
 export function AddMemberDialog() {
 
   const path = usePathname()
+  
   const teamId = path.split("/")[path.split("/").length - 1]
 
   const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/${teamId}`, fetcher)
@@ -136,8 +137,7 @@ export function AddMemberDialog() {
   useEffect(() => {
 
     if (state?.message) {
-
-
+    
       if (state?.message === 'Success') {
         setOpen(false)
         toast({

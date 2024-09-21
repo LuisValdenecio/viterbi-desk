@@ -36,7 +36,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer"
 
-import { PencilIcon, Trash2, Trash2Icon } from "lucide-react"
+import { PencilIcon, Trash2, Trash2Icon, UserPlus } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -91,6 +91,7 @@ export function DataTableRowActions<TData>({
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`/dashboard/teams?edit=${row.original?.team_id}&team_name=${row.original?.name}&description=${row.original?.description}`}>
              Edit

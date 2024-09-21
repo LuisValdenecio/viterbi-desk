@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma";
 import { auth } from "@/auth";
+import { people } from "googleapis/build/src/apis/people";
 
 export const GET = async (req, res) => {
 
@@ -29,7 +30,8 @@ export const GET = async (req, res) => {
         const members = await members_in_teams.flatMap((team) => {
             return {
                 team_id: team.team_id,
-                members: members_in_teams.filter(currentTeam => currentTeam.team_id === team.team_id).length
+                members: members_in_teams.filter(currentTeam => currentTeam.team_id === team.team_id).length,
+                actual_members : members_in_teams.filter(currentTeam => currentTeam.team_id === team.team_id)
             }
         })
 
@@ -42,6 +44,7 @@ export const GET = async (req, res) => {
                 team_id: team.team_id,
                 name: team.team.name,
                 members: unique_members.filter(currentTeam => currentTeam.team_id == team.team_id)[0].members,
+                actual_members : unique_members.filter(currentTeam => currentTeam.team_id == team.team_id)[0].actual_members,
                 description: team.team.description,
                 user_id: team.id,
                 user_role: team.role
