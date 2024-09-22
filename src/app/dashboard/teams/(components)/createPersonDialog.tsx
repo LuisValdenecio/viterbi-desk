@@ -165,6 +165,12 @@ export function AddMemberDialog() {
           title: "Invitation already sent",
           description: "This e-mail is already sent.",
         })
+      } else if (state?.message === 'User already a member of this team') {
+        setOpen(false)
+        toast({
+          title: "Operation blocked",
+          description: "User already a member of this team",
+        })
       } 
 
     }

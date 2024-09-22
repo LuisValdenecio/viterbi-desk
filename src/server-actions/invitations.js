@@ -189,7 +189,23 @@ export async function sendInvitation(_prevstate, formData) {
             }
         })
 
-        console.log("EMAIL USED? : ", email_used)
+        // Fetch all users belonging to the team and select their emails
+        const existingTeamMembers = await prisma.user_privilege.findMany({
+            where: {
+                team_id: teamId
+            },
+            include: {
+                user : true
+            }
+        });
+
+        const existingEmails = existingTeamMembers.flatMap(member => member.user.email);
+
+        if (existingEmails.filter(member_email => member_email === email).length > 0) {
+            return {
+                message: 'User already a member of this team'
+            }
+        }
 
         if (email_used.length > 0 ) {
             return {
