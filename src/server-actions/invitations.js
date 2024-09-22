@@ -192,7 +192,6 @@ export async function sendInvitation(_prevstate, formData) {
         console.log("EMAIL USED? : ", email_used)
 
         if (email_used.length > 0 ) {
-            console.log("MUST SEND BACK TRUE")
             return {
                 message : 'email already invited'
             }

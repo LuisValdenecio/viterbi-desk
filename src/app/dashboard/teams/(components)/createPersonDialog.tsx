@@ -159,6 +159,12 @@ export function AddMemberDialog() {
           title: "Operation blocked",
           description: "You lack privileges to perform this action",
         })
+      } else if (state?.message === 'email already invited') {
+        setOpen(false)
+        toast({
+          title: "Invitation already sent",
+          description: "This e-mail is already sent.",
+        })
       } 
 
     }
