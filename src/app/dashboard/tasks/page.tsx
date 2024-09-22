@@ -275,7 +275,13 @@ export function EditTaskDialog({ open, openChange }) {
 
   const [state, formAction] = useFormState(editTask, initialState);
 
+  const form = useForm<z.infer<typeof taskEditformSchema>>({
+    resolver: zodResolver(taskEditformSchema),
+    defaultValues: null
+  })
+
   React.useEffect(() => {
+    console.log("FORM STATUS: ", state)
     if (state?.message) {
       if (state?.message === 'Success') {
         openChange()
@@ -286,6 +292,7 @@ export function EditTaskDialog({ open, openChange }) {
             <ToastAction altText="Refresh">Undo</ToastAction>
           ),
         })
+        window.location.reload()
       }
     }
 
@@ -299,13 +306,9 @@ export function EditTaskDialog({ open, openChange }) {
         title: "Operation blocked",
         description: `You don't have the privileges to complete this.`,
       })
+      window.location.reload()
     }
   }, [searchParams, state?.errors])
-
-  const form = useForm<z.infer<typeof taskEditformSchema>>({
-    resolver: zodResolver(taskEditformSchema),
-    defaultValues: null
-  })
 
   return (
     <Dialog open={open} onOpenChange={openChange}>

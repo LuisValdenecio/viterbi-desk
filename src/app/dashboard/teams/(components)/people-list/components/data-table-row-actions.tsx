@@ -39,7 +39,7 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-        <Link className="flex cursor-pointer" href={`/dashboard/members/${row.original?.user_id}`}>
+        <Link className="flex cursor-pointer" href={`/dashboard/members/${row.original?.user_id}?name=${row.original?.name}&role=${row.original?.role}&img=${row.original?.img}&email=${row.original?.email}`}>
           Open
         </Link>
         </DropdownMenuItem>

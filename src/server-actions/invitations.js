@@ -162,6 +162,8 @@ export async function checkPrivilege(invitation_id) {
 
 export async function sendInvitation(_prevstate, formData) {
 
+    console.log("INCOMMING FROM THE FORM: ", formData)
+
     const session = await auth()
 
     const validatedFields = InvitationSession.safeParse({
@@ -180,6 +182,21 @@ export async function sendInvitation(_prevstate, formData) {
     const { email, role, teamId } = validatedFields.data
     
     try {   
+
+        const email_used = await prisma.member_invitation.findMany({
+            where : {
+                guest_email : email
+            }
+        })
+
+        console.log("EMAIL USED? : ", email_used)
+
+        if (email_used.length > 0 ) {
+            console.log("MUST SEND BACK TRUE")
+            return {
+                message : 'email already invited'
+            }
+        }
 
         const privilege = await checkRolePrivilege(teamId, role)
 

@@ -134,9 +134,9 @@ export function AddPeopleDialog() {
   const [state, formAction] = useFormState(sendInvitation, initialState);
 
   useEffect(() => {
-
+    
+    console.log("STATE FROM SERVER: ", state?.message)
     if (state?.message) {
-
 
       if (state?.message === 'Success') {
         setOpen(false)
@@ -152,6 +152,14 @@ export function AddPeopleDialog() {
       if (Array.isArray(state?.errors)) {
         state.errors.forEach((error) => {
           form.setError(error.field, { message: error.message });
+        })
+      } else if (state?.message === 'email already invited') {
+        toast({
+          title: "Operation blocked",
+          description: "This e-mail was already invited",
+          action: (
+            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+          ),
         })
       }
 
