@@ -290,8 +290,6 @@ export async function getTask(task_id) {
 }
 
 export async function postTask(_prevstate, formData) {
-
-    console.log("FORMDATA: ", formData)
     
     const validatedFields = TaskCreationSession.safeParse({
         taskName : formData.get('taskName'),

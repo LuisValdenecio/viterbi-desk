@@ -47,6 +47,33 @@ export const GET = async (req, { params }) => {
 
         const privilege = my_channels_ids.filter(channel => channel === channl.channel_id)
         
+        // Check if the current user is the owner of the channel
+        //const isChannelOwner = channelDetails.owner_id === session?.user?.id;
+        
+        //const channelId = agentChannel.channel_id;
+        
+        // Fetch the channel the agent belongs to
+        const agentChannel = await prisma.agent.findUnique({
+            where: {
+                agent_id: params.id
+            },
+            select: {
+                channel_id: true
+            }
+        });
+
+        // Fetch the channel details including the owner_id
+        const channelOwnership = await prisma.channel.findUnique({
+            where: {
+                channel_id: agentChannel.channel_id,
+                owner_id : session?.user?.id
+            }
+        });
+
+        if (channelOwnership) {
+            return Response.json("owner")
+        } 
+
         if (privilege.length > 0) {
             return Response.json("owner")
         } else {
