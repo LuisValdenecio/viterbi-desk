@@ -15,7 +15,6 @@ export function Member() {
             <div className="flex flex-col">
                 <h2 className="text-2xl font-semibold ">{searchParams.get('name')?.toString()}</h2>
                 <span className="text-sm text-gray-500">{searchParams.get('email')?.toString()}</span> 
-                <span className="text-sm text-gray-500">{searchParams.get('role')?.toString()}</span>
             </div>
         </>
     )

@@ -23,6 +23,7 @@ import {
 } from '@/components/sidebar'
 import { SidebarLayout } from '@/components/sidebar-layout'
 import { SiderBarBody } from './(components)/sidebar-body'
+import { Logo } from '@/components/logo'
 
 import {
   ArrowRightStartOnRectangleIcon,
@@ -193,64 +194,10 @@ export default async function ApplicationLayout({ children }) {
       sidebar={
         <Sidebar>
           <SidebarHeader>
-            <Dropdown>
-              <DropdownButton as={SidebarItem} className="lg:mb-2.5">
-                <Avatar src="/teams/catalyst.svg" />
-                <SidebarLabel>Catalyst</SidebarLabel>
-                <ChevronDownIcon />
-              </DropdownButton>
-              <DropdownMenu className="min-w-80 lg:min-w-64" anchor="bottom start">
-                {channels?.length >= 4 ? (
-                  <>
-                    <DropdownItem href="/dashboard/settings">
-                      <Eye size={20} strokeWidth={1.25} />
-                      <DropdownLabel className="ml-1">See all channels</DropdownLabel>
-                    </DropdownItem>
-                    <DropdownDivider />
-                  </>
-                 
-                ) : (<></>)}
-                
-                
-                
-                {channels?.map((channel) => (
-                  <DropdownItem href="#">
-                    {channel.provider === 'Gmail' ? (
-                      <Avatar slot="icon" src="/teams/Gmail.svg" />
-                    ) : (
-                      channel.provider === 'Discord' ? (
-                        <Avatar slot="icon" src="/teams/Discord.svg" />
-                      ) : (
-                        channel.provider === 'LinkedIn' ? (
-                          <Avatar slot="icon" src="/teams/LinkedIn.svg" />
-                        ) : (
-                          <Avatar slot="icon" src="/teams/OtherSource.svg" />
-                        )
-                      )
-                    )}
-                   
-                   
-                    
-                    <DropdownLabel>{channel.name}</DropdownLabel>
-                  </DropdownItem>
-                ))}
-                
-                <DropdownItem href="/dashboard/channels">
-                  <PlusIcon />
-                  <DropdownLabel>New Channel</DropdownLabel>
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            <SidebarSection className="max-lg:hidden">
-              <SidebarItem href="/search">
-                <Search strokeWidth={1.25} size={20} />
-                <SidebarLabel>Search</SidebarLabel>
-              </SidebarItem>
-              <SidebarItem href="/inbox">
-                <Inbox size={20} strokeWidth={1.25} />
-                <SidebarLabel>Inbox</SidebarLabel>
-              </SidebarItem>
-            </SidebarSection>
+            <div className='p-2'>
+              <Logo />
+            </div>
+            
           </SidebarHeader>
 
           <SiderBarBody events={events} />
