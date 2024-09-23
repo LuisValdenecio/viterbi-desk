@@ -131,6 +131,8 @@ model Invitation_link {
   activatedAt DateTime?
   invitation Member_invitation @relation(fields : [invitation_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
   invitation_id String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 } 
 
 model Invitation_info {
@@ -213,6 +215,8 @@ model User_task {
   task Task? @relation(fields: [task_id], references: [task_id], onDelete: Cascade, onUpdate : Cascade)
   task_id String
   user_id String
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Task_Schedule {
