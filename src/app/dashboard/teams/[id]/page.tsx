@@ -142,6 +142,7 @@ export default function Page() {
               <TabsTrigger value="active">Members</TabsTrigger>
               <TabsTrigger value="invitations">Invitations</TabsTrigger>
               <TabsTrigger value="logs">Logs</TabsTrigger>
+              <TabsTrigger value="quota">Quota</TabsTrigger>
             </TabsList>
           </div>
           <TabsContent value="overview" >
@@ -160,6 +161,12 @@ export default function Page() {
               <DeleteInvitationDialog open={deleteInvitationDialog} openChange={onDialogClose} />
               <EditInvitationDialog open={editInvitationDialog} openChange={onDialogClose} />
               <ListInvitees invitees={invitees.invitees_data} />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="quota">
+            <div className="">
+              
             </div>
           </TabsContent>
 
