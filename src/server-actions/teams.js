@@ -9,10 +9,6 @@ const TeamFormSchema = z.object({
     teamName : z.string().min(1,{
       message : 'Please enter a valid name for the team.'
     }),
-
-    channels : z.string().min(1,{
-      message : 'Please select a channel'
-    }),
    
     description : z.string().min(1,{
       message : 'Please type in a description.'
@@ -127,11 +123,9 @@ export async function checkPrivilege(team_id) {
 export async function postTeam(_prevstate, formData) {
     console.log("FORM DATA: ", formData)
     const session = await auth()
-    const channels = formData.get('channels').split(",")
     
     const validateFields = TeamCreationSession.safeParse({
         teamName : formData.get('teamName'),
-        channels : formData.get('channels'),
         description : formData.get('description'),
     })
 
@@ -154,13 +148,6 @@ export async function postTeam(_prevstate, formData) {
         }
       })
 
-      const teamChannel = channels.map((channel) => {
-        return {
-          channel_id : channel,
-          team_id : newTeam.team_id
-        }
-      })
-
       const user_privelege = await prisma.user_privilege.create({
         data : {
           role : 'owner',
@@ -170,10 +157,7 @@ export async function postTeam(_prevstate, formData) {
         }
       })
 
-      const createManyTeamChannel = await prisma.team_channel.createMany({
-        data : teamChannel
-      })
-      
+    
       return {
           message : 'Success',
           teamId : ""+newTeam.team_id

@@ -78,10 +78,6 @@ import Loader_component from "@/components/loader"
     teamName : z.string().min(1,{
       message : 'Please enter a valid name for the team.'
     }),
-    
-    channels :  z.string().min(1,{
-      message : 'Please enter a valid name for the team.'
-    }),
    
     description : z.string().min(1,{
       message : 'Please type in a description.'
@@ -111,15 +107,13 @@ import Loader_component from "@/components/loader"
       errors: {
         teamName: undefined,
         description : undefined,
-        channels : undefined
       },
       message: undefined
     };
 
-    const initialValues: {teamName : string, description : string, channels : string} = {
+    const initialValues: {teamName : string, description : string } = {
         teamName: "",
         description : "",
-        channels : "",
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -160,8 +154,6 @@ import Loader_component from "@/components/loader"
                <Form {...form}>
                   <form action={formAction} className="grid w-full items-start gap-6">
 
-                     
-                    
                       <FormField
                         control={form.control}
                         name="teamName"
@@ -175,7 +167,6 @@ import Loader_component from "@/components/loader"
                           </FormItem>
                         )}
                       />
-
 
                       <FormField
                         control={form.control}
@@ -191,33 +182,6 @@ import Loader_component from "@/components/loader"
                         )}
                       />
 
-                    <FormField
-                      control={form.control}
-                      
-                      name="channels"
-                      render={({ field }) => (
-                        <FormItem >
-                          <FormLabel>Channels</FormLabel>
-                          <FormControl>
-                              <div className="w-full">
-                                <Input className="hidden" {...field} />
-                                <MultiSelect
-                                  options={channels}
-                                  onValueChange={field.onChange}
-                                  defaultValue={""}
-                                  placeholder="Select the channels this team will have acess to"
-                                  variant="inverted"
-                                  animation={2}
-                                  maxCount={3}
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage>{state?.errors?.channels}</FormMessage>
-                        </FormItem>
-                      )}
-                    />
-                  
-                    
                       <SubmitBtn />
                       
                     
