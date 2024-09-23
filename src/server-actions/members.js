@@ -284,6 +284,10 @@ export async function checkRolePrivilege(team_id, member_id, role) {
             }
         })
 
+        if (founding_member) {
+            return true
+        }
+
         // only the founding member can promoete to owner
         if (!founding_member && role === 'owner') {
             return false
