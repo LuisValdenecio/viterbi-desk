@@ -289,6 +289,21 @@ export async function getTask(task_id) {
     }
 }
 
+export async function checkTaskQuota(agentId) {
+    const session = await auth()
+
+    const channel_id = await prisma.agent.findUnique({
+        where : {
+            agent_id : agentId
+        },
+        select : {
+            channel_id : true
+        }
+    })
+
+    
+}
+
 export async function postTask(_prevstate, formData) {
     
     const validatedFields = TaskCreationSession.safeParse({

@@ -41,6 +41,7 @@ model Team {
   team_id String @id @default(cuid())
   name String @db.VarChar(255)
   channel_connection Team_channel[]
+  channels Channel[]
   member_invitation Member_invitation[]
   status String @default("functioning")
   description String @db.VarChar(500)
@@ -72,7 +73,10 @@ model User {
   email String @unique
   password String 
   teams Team[]
+  agent User_agent[]
+  channel User_channel[]
   member_invitation Member_invitation[]
+
   plan Plan @default(free)
   customerId String? @unique // Stripe customer ID, this will be important when we need to delete the subscription
 
@@ -151,6 +155,7 @@ model Agent {
   description String @db.VarChar(500)
   status String @default("functioning")
   tasks Task[]
+  user User_agent[]
   channel Channel? @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate : Cascade)
   channel_id String 
   createdAt  DateTime   @default(now())
@@ -164,11 +169,14 @@ model Channel {
   provider_connected Boolean @default(false)
   description String @db.VarChar(500)
   Team_channel Team_channel[]
+  user User_channel[]
   owner User? @relation(fields: [owner_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
   google_token Google_token? @relation(fields: [google_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
   discord_token Discord_token? @relation(fields: [discord_token_id], references: [id], onDelete: Cascade, onUpdate : Cascade)
+  team Team? @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate : Cascade)
   agents Agent[]
   owner_id String?
+  team_id String?
   google_token_id String? @unique
   discord_token_id String? @unique
   createdAt  DateTime   @default(now())
@@ -213,10 +221,30 @@ model User_task {
   id String @id @default(cuid())
   user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
   task Task? @relation(fields: [task_id], references: [task_id], onDelete: Cascade, onUpdate : Cascade)
-  task_id String
-  user_id String
+  task_id String?
+  user_id String?
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+}
+
+model User_agent {
+  id String @id @default(cuid())
+  user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
+  agent Agent? @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade, onUpdate : Cascade)
+  agent_id String?
+  user_id String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt 
+}
+
+model User_channel {
+  id String @id @default(cuid())
+  user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
+  channel Channel? @relation(fields: [channel_id], references: [channel_id], onDelete: Cascade, onUpdate : Cascade)
+  channel_id String?
+  user_id String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt 
 }
 
 model Task_Schedule {
