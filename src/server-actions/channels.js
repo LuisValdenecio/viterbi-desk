@@ -38,7 +38,10 @@ const ChannelFormSchema = z.object({
   }),
   description: z.string().min(1, {
     message: 'Please type in a valid description'
-  })
+  }),
+  team :  z.string().min(1,{
+    message : 'Please enter select a team.'
+  }),
 })
 
 const ChannelCreationSession = ChannelFormSchema.omit({})
@@ -287,14 +290,15 @@ export async function editChannel(_prevstate, formData) {
 
 export async function postChannel(_prevstate, formData) {
 
-
+  console.log("CHANNEL FORM DATA: ", formData)
   const session = await auth()
 
   const validateFields = ChannelCreationSession.safeParse({
     channelName: formData.get('channelName'),
     token: formData.get('token'),
     provider: formData.get('provider'),
-    description: formData.get('description')
+    description: formData.get('description'),
+    team : formData.get('team')
   })
 
   if (!validateFields.success) {
@@ -303,11 +307,11 @@ export async function postChannel(_prevstate, formData) {
       message: 'Missing Fields',
     };
   }
-
+  
+  
+  const { channelName, token, provider, description, team } = validateFields.data
   console.log("VALIDATED FIELDS: ", validateFields)
-
-  const { channelName, token, provider, description } = validateFields.data
-
+  
   try {
 
     const token_provider = token.split('-')[0]
@@ -346,6 +350,7 @@ export async function postChannel(_prevstate, formData) {
             description: description,
             owner_id: session?.user?.id,
             google_token_id: token_id,
+            team_id : team,
           }
         })
 
@@ -361,6 +366,7 @@ export async function postChannel(_prevstate, formData) {
             provider: 'Discord',
             description: description,
             owner_id: session?.user?.id,
+            team_id : team,
           }
         })
 

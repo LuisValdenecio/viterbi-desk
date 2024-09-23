@@ -6,7 +6,7 @@ import {
     Loader2
   } from "lucide-react"
   
-
+  import useSWR from 'swr'
   import { Button } from "@/components/ui/button"
   import { postChannel } from "@/server-actions/channels"
   import { usePathname, useRouter } from "next/navigation";
@@ -45,14 +45,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { GmailProviderDialog } from "../(components)/gmail-provider-dialog/provider"
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
-
-  export function SubmitBtn() {
-    const { pending } = useFormStatus();
-    return (
-        <Button className="w-full" type="submit" disabled={pending}>
-          {pending ? ( <Loader2 className="mr-2 h-4 w-4 animate-spin" />) : 'Create channel'}
-        </Button>
-    )
+import Loader_component from "@/components/loader"
+import SubmitBtn from "@/components/submit-button"
+import { TeamSelect } from "./team-select-ui/select-ui"
+  
+  function transformResultData (results : Array<any>) {
+    console.log("RESULTS", results)
+    const teams = results.map((team) => {
+      return {value : team.team_id, label : team.name}
+    })
+    return teams 
   }
 
   const formSchema = z.object({
@@ -67,16 +69,29 @@ import { useToast } from "@/components/ui/use-toast"
     }),
     description : z.string().min(1,{
       message : 'Please enter a provider'
-    })
+    }),
+    team :  z.string().min(1,{
+      message : 'Please enter select a team.'
+    }),
   })
 
-  export function RegisterNewChannel() {
+  const fetcher = (...args) => fetch(...args).then(res => res.json())
 
+  export function RegisterNewChannel() {
 
     const router = useRouter()
     const pathname = usePathname()
     const [gmailProvider, setGmailProvider] = useState(false)
     const searchParams = useSearchParams();
+    
+    const [selectedFrameworks, setSelectedFrameworks] = useState([]);
+    const { data, isLoading, error } = useSWR(`/api/my-teams`, fetcher)
+
+    let teams 
+    if (!isLoading) {
+      teams = transformResultData(data.teams)
+    }
+
     const [selectedProvider, setSelectedProvider] = useState(null)
     const { toast } = useToast()
 
@@ -86,16 +101,18 @@ import { useToast } from "@/components/ui/use-toast"
         channelName: undefined,
         provider: undefined,
         token: undefined,
-        description : undefined
+        description : undefined,
+        team : undefined
       },
       message: undefined
     };
 
-    const initialValues: {channelName : string, provider : string, token : string, description : string} = {
+    const initialValues: {channelName : string, provider : string, token : string, description : string, team : string} = {
       channelName: "",
       provider: searchParams.get("provider")?.split("-")[0],
       token: searchParams.get("provider"),
-      description : ""
+      description : "",
+      team : ""
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -139,6 +156,8 @@ import { useToast } from "@/components/ui/use-toast"
       }
     }, [state?.errors]);
     
+    if (error) return <div>falhou em carregar</div>
+    if (isLoading) return <Loader_component />
     return (
       <div className="grid">
 
@@ -154,7 +173,7 @@ import { useToast } from "@/components/ui/use-toast"
                   <form action={formAction} className="grid w-full items-start gap-6">
 
                       <div className="grid gap-3">
-                        <Label htmlFor="model">Provider</Label>
+                        <Label htmlFor="model">Data Provider</Label>
                         <Select name="provider" onValueChange={setProvider} defaultValue={searchParams.get("provider")?.split("-")[0]}>
                           <SelectTrigger
                             id="model"
@@ -162,7 +181,7 @@ import { useToast } from "@/components/ui/use-toast"
                             className="items-start [&_[data-description]]:hidden"
                             
                           >
-                            <SelectValue placeholder="Select a model" />
+                            <SelectValue placeholder="Select a source of data" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="Gmail">
@@ -264,7 +283,7 @@ import { useToast } from "@/components/ui/use-toast"
                         control={form.control}
                         name="description"
                         render={({ field }) => (
-                          <FormItem className="mb-4">
+                          <FormItem>
                             <FormLabel>Description</FormLabel>
                             <FormControl>
                               <Textarea name="description" placeholder="Type a short description of what you expect this agent to do." {...field}/>
@@ -273,9 +292,36 @@ import { useToast } from "@/components/ui/use-toast"
                           </FormItem>
                         )}
                       />
+
+                    <FormField
+                      control={form.control}
+                      
+                      name="team"
+                      render={({ field }) => (
+                        <FormItem >
+                          <FormLabel>Team</FormLabel>
+                          <FormControl>
+                              <div className="w-full">
+                                <Input className="hidden" {...field} />
+                                <TeamSelect
+                                  options={teams}
+                                  onValueChange={field.onChange}
+                                  defaultValue={""}
+                                  placeholder="Select the team that will own this channel"
+                                  variant="inverted"
+                                  animation={2}
+                                  maxCount={3}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage>{state?.errors?.team}</FormMessage>
+                        </FormItem>
+                      )}
+                    />
                   
-                    
-                      <SubmitBtn />
+                      <SubmitBtn>
+                        Save Channel
+                      </SubmitBtn>
                       
                     
                   </form>
