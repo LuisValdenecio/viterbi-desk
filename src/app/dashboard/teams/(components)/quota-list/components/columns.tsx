@@ -41,7 +41,7 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => <div className="flex gap-1 w-[60px] items-center">
        <Gauge value={Math.floor(Math.random() * 101)} size="small" showValue={false} />
-       <span>500/120</span>
+       <span>{row.original.playground_quota}/120</span>
     </div>,
     enableSorting: true,
     enableHiding: true,
@@ -54,7 +54,7 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => <div className="flex gap-1 w-[90px] items-center">
        <Gauge value={Math.floor(Math.random() * 101)} size="small" showValue={false} />
-       <span>500/120</span>
+       <span>{row.original.task_quota}/120</span>
     </div>,
     enableSorting: true,
     enableHiding: true,

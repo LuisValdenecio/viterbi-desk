@@ -62,6 +62,18 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: true,
   },
   {
+    accessorKey: "agent",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Agent" />
+    ),
+    cell: ({ row }) => <div className="w-[150px] truncate">
+      
+        <span className="font-medium">{row.original.agent.name}</span>
+    </div>,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "priority",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Priority" />

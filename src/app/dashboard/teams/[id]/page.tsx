@@ -133,6 +133,7 @@ export default function Page() {
 
   if (usersError || inviteesError) return <div>falhou em carregar</div>
   if (usersLoading || inviteesLoading) return <Loader_component />
+  console.log("MEMBER DATA: ", users.people)
 
   return (
     <>

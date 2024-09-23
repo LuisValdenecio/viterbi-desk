@@ -6,6 +6,7 @@ export const taskSchema = z.object({
   agent_id: z.string(),
   name: z.string(),
   channel_id: z.string(),
+  channel : z.any(),
   description: z.string(),
   tasks: z.any()
 })

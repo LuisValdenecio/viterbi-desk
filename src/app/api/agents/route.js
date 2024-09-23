@@ -49,6 +49,11 @@ export const GET = async (req, res) => {
               status : true,
               task_id : true
             }
+          },
+          channel : {
+            select : {
+              name : true
+            }
           }
         }
       })
@@ -82,6 +87,11 @@ export const GET = async (req, res) => {
                 status : true,
                 task_id : true
               }
+            },
+            channel : {
+              select : {
+                name : true
+              }
             }
           }
         })
@@ -91,9 +101,10 @@ export const GET = async (req, res) => {
         const filtered = results.filter((value, index) => 
           results.findIndex((channel) => channel.agent_id == value.agent_id) == index  
         ) 
+        console.log("FILTERED AGENTS: ", agents_owned)
         return Response.json({filtered})
       }
-      
+      console.log("MY AGENTS: ", my_agents)
       return Response.json({my_agents})
     
     } catch (error) {

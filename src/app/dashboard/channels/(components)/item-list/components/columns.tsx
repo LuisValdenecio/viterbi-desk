@@ -13,6 +13,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -41,24 +42,9 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
-          <span className="max-w-[500px] truncate font-normal">
+          <Badge variant="outline">Admin Access</Badge>
+          <span className="max-w-[500px] truncate font-medium">
             {row.getValue("description")}
-          </span>
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "agents",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Agents" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
-          <span className="max-w-[500px] truncate font-normal">
-            {row.getValue("agents").length}
           </span>
         </div>
       )
@@ -112,6 +98,22 @@ export const columns: ColumnDef<Task>[] = [
     enableHiding: true,
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
+    },
+  },
+  {
+    accessorKey: "agents",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Agents" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
+          <span className="max-w-[200px] truncate font-normal">
+            {row.getValue("agents").length}
+          </span>
+        </div>
+      )
     },
   },
   {

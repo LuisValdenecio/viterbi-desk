@@ -65,10 +65,16 @@ export const GET = async (req, res) => {
                 }
             },
             include : {
-                task_schedule : true
+                task_schedule : true,
+                agent : {
+                    select : {
+                        name : true
+                    }
+                }
             }
         })
          
+        console.log("TASKS RETURNED: ", tasks)
         return Response.json({ tasks })
 
     } catch (error) {

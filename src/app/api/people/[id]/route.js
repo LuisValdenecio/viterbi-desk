@@ -24,6 +24,8 @@ export const GET = async (req, { params }) => {
         const people = users_from_team.flatMap((member) => {
             return {
                 name : member.user.name,
+                task_quota : member.task_quota,
+                playground_quota : member.daily_playground_quota,
                 email : member.user.email,
                 img : member.user.img,
                 user_id : member.user.user_id,
@@ -31,8 +33,6 @@ export const GET = async (req, { params }) => {
                 status : member.status
             }
         })
-
-        console.log("PEOPLE: ", people)
 
         return Response.json({ people })
 

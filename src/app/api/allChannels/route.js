@@ -59,7 +59,7 @@ export const GET = async (req, res) => {
         const filtered = results.filter((value, index) =>
             results.findIndex((channel) => channel.channel_id == value.channel_id) == index
         )
-
+        
         return Response.json({ filtered })
 
     } catch (error) {

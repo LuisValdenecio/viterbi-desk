@@ -6,6 +6,7 @@ export const taskSchema = z.object({
   id: z.string(),
   name: z.string(),
   status: z.string(),
+  agent : z.any(),
   priority : z.string(),  
 })
 

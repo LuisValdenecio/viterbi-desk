@@ -78,6 +78,7 @@ model User {
 
   invitation_info Invitation_info[]
   channels Channel[]
+  tasks User_task[]
   user_privilege User_privilege[]
   Stripe_sub Stripe_subscription?
   createdAt  DateTime   @default(now())
@@ -197,12 +198,21 @@ model Task {
   priority Task_priority
   status String @default("functioning")
   agent Agent? @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade, onUpdate : Cascade)
+  tasks User_task[]
   recurrent Boolean?
   task_schedule Task_Schedule? @relation(fields : [schedule], references: [id], onDelete: Cascade, onUpdate: Cascade)
   agent_id String
   schedule String @unique
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+}
+
+model User_task {
+  id String @id @default(cuid())
+  user User? @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate : Cascade)
+  task Task? @relation(fields: [task_id], references: [task_id], onDelete: Cascade, onUpdate : Cascade)
+  task_id String
+  user_id String
 }
 
 model Task_Schedule {

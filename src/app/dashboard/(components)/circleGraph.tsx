@@ -3,7 +3,7 @@ export const Gauge = ({
     size = "small",
     showValue = true,
     color = "text-[hsla(131,41%,46%,1)]",
-    bgcolor = "text-[#f1e3e300]",
+    bgcolor = "text-[#999]",
   }: {
     value: number;
     size: "small" | "medium" | "large";

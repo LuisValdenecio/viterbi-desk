@@ -7,6 +7,8 @@ export const taskSchema = z.object({
   role : z.string(),
   user_id : z.string(),
   img: z.any(), // to cover for null imgs
+  task_quota : z.number(),
+  playground_quota : z.number(),
   email: z.string(),
   status : z.string()
 })
