@@ -9,7 +9,7 @@ export const GET = async (req, { params }) => {
     try {
 
          // give back all the teams I own
-         const my_teams = await prisma.user_privilege.findMany({
+         const my_teams_owner = await prisma.user_privilege.findMany({
             where : {
                 role : 'owner',
                 user_id : session?.user?.id
@@ -19,7 +19,17 @@ export const GET = async (req, { params }) => {
             }
         })
 
-        const my_teams_ids = my_teams.flatMap(team => team.team_id)
+        const my_teams_admin = await prisma.user_privilege.findMany({
+            where : {
+                role : 'admin',
+                user_id : session?.user?.id
+            }, 
+            select : {
+                team_id : true
+            }
+        })
+
+        const my_teams_ids = my_teams_owner.concat(my_teams_admin).flatMap(team => team.team_id)
 
         // fetch all channels related to the teams I own
         const my_channels = await prisma.team_channel.findMany({
