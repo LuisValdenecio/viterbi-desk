@@ -73,6 +73,7 @@ import {
 import Loader_component from '@/components/loader'
 import { deleteInvitations, editInvitation } from "@/server-actions/invitations";
 import path from "path";
+import { ListQuotaTable } from "../(components)/quota-list/tableOfItems";
 //import { Overview } from '../(components)/overview/overview'
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
@@ -166,7 +167,7 @@ export default function Page() {
 
           <TabsContent value="quota">
             <div className="">
-              
+              <ListQuotaTable people={users.people} />
             </div>
           </TabsContent>
 

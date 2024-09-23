@@ -9,6 +9,7 @@ import {
     SidebarSpacer,
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
+import { LightningBoltIcon } from '@radix-ui/react-icons';
   import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users, ListCheckIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -42,7 +43,7 @@ export function SiderBarBody({events}) {
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/tasks"} path={"/dashboard/tasks"}>
-                <ListCheckIcon strokeWidth={path === '/dashboard/tasks' ? 1.75 : 1.25} size={18} />
+                <LightningBoltIcon strokeWidth={path === '/dashboard/tasks' ? 1.75 : 1.25} size={18} />
                 <SidebarLabel className={"font-normal"}>Tasks</SidebarLabel>
               </Sidebar_item>
 
