@@ -271,13 +271,14 @@ export async function getAgent(agentId) {
 }
 
 export async function postAgent(_prevstate, formData) {
+
+  const session = await auth()
+
   const validateFields = AgentCreationSession.safeParse({
     agentName: formData.get('agentName'),
     channel: formData.get('channel'),
     description: formData.get('description')
   })
-
-  console.log("VALIDATED FIELDS", validateFields)
 
   if (!validateFields.success) {
     return {
@@ -294,6 +295,13 @@ export async function postAgent(_prevstate, formData) {
         name: agentName,
         description: description,
         channel_id: channel
+      }
+    })
+
+    const agent_log = await prisma.user_agent.create({
+      data : {
+        user_id : session?.user?.id,
+        agent_id : newAgent.agent_id
       }
     })
 
