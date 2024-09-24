@@ -250,7 +250,7 @@ export function DeleteChannelialog({ open, openChange }) {
   })
 
   const [state, formAction] = useFormState(deleteChannels, initialState);
-  const [incorrectPassword, setIncorrectPassword] = React.useState(false)
+  const [incorrectPassword, setIncorrectPassword] = React.useState<boolean>(false)
   const { toast } = useToast()
 
   React.useEffect(() => {
@@ -307,7 +307,7 @@ export function DeleteChannelialog({ open, openChange }) {
                   <FormControl>
                     <Input type="password" placeholder="type in your password" {...field} />
                   </FormControl>
-                  <FormMessage>{state?.errors?.password}</FormMessage>
+                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
                 </FormItem>
               )}
             />
@@ -320,8 +320,6 @@ export function DeleteChannelialog({ open, openChange }) {
                   <FormControl>
                     <Input type="text" defaultValue={searchParams.get('delete')?.toString()} {...field} />
                   </FormControl>
-                  <FormMessage>{state?.errors?.password}</FormMessage>
-                  {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
                 </FormItem>
               )}
             />

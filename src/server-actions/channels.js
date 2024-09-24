@@ -66,7 +66,7 @@ export async function getChannel(channel_id) {
 }
 
 export async function deleteChannels(_prevstate, formData) {
-
+  console.log("FORM DATA: ", formData)
   const session = await auth()
 
   const validatedFields = DeleteChannelSession.safeParse({
@@ -118,6 +118,7 @@ export async function deleteChannels(_prevstate, formData) {
           message: 'Success'
         }
       } else {
+        console.log("INCORRECT PASSWORD")
         return {
           message: 'incorrect password'
         }
@@ -146,7 +147,7 @@ export async function checkPrivilege(channelId) {
     const my_teams_ids = my_teams.flatMap(team => team.team_id)
 
     // fetch all channels related to the teams I own
-    const my_channels = await prisma.team_channel.findMany({
+    const my_channels = await prisma.channel.findMany({
       where: {
         team_id: {
           in: my_teams_ids
