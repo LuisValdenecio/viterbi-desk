@@ -32,7 +32,7 @@ export const GET = async (req, { params }) => {
         const my_teams_ids = my_teams_owner.concat(my_teams_admin).flatMap(team => team.team_id)
 
         // fetch all channels related to the teams I own
-        const my_channels = await prisma.team_channel.findMany({
+        const my_channels = await prisma.channel.findMany({
             where : {
                 team_id : {
                     in : my_teams_ids
@@ -46,17 +46,18 @@ export const GET = async (req, { params }) => {
         const my_channels_ids = my_channels.flatMap(channel => channel.channel_id)
 
         // get the id of the channel this agent belongs to
-        const channl = await prisma.agent.findUnique({
+        const agent = await prisma.agent.findUnique({
             where : {
-                agent_id : params.id
+                agent_id : params.id,
+                channel_id : {
+                    in : my_channels_ids
+                }
             },
             select : {
                 channel_id : true
             }
         })
 
-        const privilege = my_channels_ids.filter(channel => channel === channl.channel_id)
-        
         // Check if the current user is the owner of the channel
         //const isChannelOwner = channelDetails.owner_id === session?.user?.id;
         
@@ -84,7 +85,7 @@ export const GET = async (req, { params }) => {
             return Response.json("owner")
         } 
 
-        if (privilege.length > 0) {
+        if (agent) {
             return Response.json("owner")
         } else {
             return Response.json("nonowner")
