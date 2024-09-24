@@ -27,11 +27,9 @@ export const GET = async (req, res) => {
                 }
             },
             include : {
-                team : true
+                team : true,
             },
         })
-    
-        console.log("CHANNELS: ", my_channels)
         
         return Response.json({ filtered : my_channels })
 

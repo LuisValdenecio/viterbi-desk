@@ -294,14 +294,8 @@ export async function postAgent(_prevstate, formData) {
       data: {
         name: agentName,
         description: description,
-        channel_id: channel
-      }
-    })
-
-    const agent_log = await prisma.user_agent.create({
-      data : {
-        user_id : session?.user?.id,
-        agent_id : newAgent.agent_id
+        channel_id: channel,
+        user_id : session?.user?.id
       }
     })
 

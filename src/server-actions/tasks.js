@@ -355,14 +355,8 @@ export async function postTask(_prevstate, formData) {
                 priority : priority,
                 status : status,
                 agent_id : agentId,
-                schedule : taskSchedule.id
-            }
-        })
-
-        const task_log = await prisma.user_task.create({
-            data : {
-                user_id : session?.user?.id,
-                task_id : newTask.task_id
+                schedule : taskSchedule.id,
+                user_id : session?.user?.id
             }
         })
 

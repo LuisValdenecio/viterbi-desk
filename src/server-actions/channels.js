@@ -340,13 +340,6 @@ export async function postChannel(_prevstate, formData) {
           }
         })
 
-        const gmail_channel_log = await prisma.user_channel.create({
-          data : {
-            user_id : session?.user?.id,
-            channel_id : newChannel.channel_id
-          }
-        })
-
         return {
           message: 'Success',
           channelId: newChannel.channel_id
@@ -360,13 +353,6 @@ export async function postChannel(_prevstate, formData) {
             description: description,
             owner_id: session?.user?.id,
             team_id : team,
-          }
-        })
-
-        const discord_channel_log = await prisma.user_channel.create({
-          data : {
-            user_id : session?.user?.id,
-            channel_id : newDiscordChannel.channel_id
           }
         })
 
