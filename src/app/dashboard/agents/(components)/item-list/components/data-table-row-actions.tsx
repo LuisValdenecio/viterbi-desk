@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { DotsHorizontalIcon, LightningBoltIcon } from "@radix-ui/react-icons"
 import { Row } from "@tanstack/react-table"
 
 import {
@@ -47,6 +47,7 @@ export function DataTableRowActions<TData>({
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`/dashboard/agents?edit=${row.original?.agent_id}&agent_name=${row.original?.name}&description=${row.original?.description}`}>
              Edit
@@ -54,6 +55,15 @@ export function DataTableRowActions<TData>({
               <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
           </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`?create=${row.original?.agent_id}`}>
+            Create Task
+            <DropdownMenuShortcut>
+              <LightningBoltIcon className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
