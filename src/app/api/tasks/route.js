@@ -20,7 +20,7 @@ export const GET = async (req, res) => {
         const teams_ids = teams.flatMap(team => team.team_id)
 
         // channels from the teams I am member of
-        const channels = await prisma.team_channel.findMany({
+        const channels = await prisma.channel.findMany({
             where : {
                 team_id : {
                     in : teams_ids
@@ -42,7 +42,6 @@ export const GET = async (req, res) => {
         })
 
         const channels_owned_ids = channels_owned.flatMap(channel => channel.channel_id)
-
         const channels_id = channels.flatMap(channel => channel.channel_id)
         
         const agents = await prisma.agent.findMany({
@@ -74,7 +73,6 @@ export const GET = async (req, res) => {
             }
         })
          
-        console.log("TASKS RETURNED: ", tasks)
         return Response.json({ tasks })
 
     } catch (error) {
