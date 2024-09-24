@@ -169,7 +169,7 @@ export async function checkPrivilege(taskId) {
         const my_teams_ids = my_teams.flatMap(team => team.team_id)
 
         // fetch all channels related to the teams I own
-        const my_channels = await prisma.team_channel.findMany({
+        const my_channels = await prisma.channel.findMany({
             where : {
                 team_id : {
                     in : my_teams_ids
