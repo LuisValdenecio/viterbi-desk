@@ -100,6 +100,7 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.getValue(id))
     },
   },
+  /*
   {
     accessorKey: "agents",
     header: ({ column }) => (
@@ -108,7 +109,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          {/*{label && <Badge variant="outline">{label.label}</Badge>}*/}
+          
           <span className="max-w-[200px] truncate font-normal">
             {row.getValue("agents").length}
           </span>
@@ -116,6 +117,7 @@ export const columns: ColumnDef<Task>[] = [
       )
     },
   },
+  */
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,

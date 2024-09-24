@@ -7,7 +7,7 @@ export const taskSchema = z.object({
   name: z.string(),
   provider: z.string(),
   description: z.string(),
-  agents : z.any()
+  //agents : z.any()
 })
 
 export type Task = z.infer<typeof taskSchema>

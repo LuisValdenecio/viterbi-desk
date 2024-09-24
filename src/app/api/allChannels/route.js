@@ -14,53 +14,26 @@ export const GET = async (req, res) => {
                 user_id: session?.user?.id
             },
             include: {
-                team: true
+                team: true,
             }
         })
 
         const team_ids = teams.flatMap(team => team.team_id)
 
-        const my_channels = await prisma.team_channel.findMany({
+        const my_channels = await prisma.channel.findMany({
             where: {
                 team_id: {
                     in: team_ids
                 }
             },
-            select: {
-                channel_id: true
+            include : {
+                team : true
             },
-            distinct: ['channel_id']
         })
-
-        const channel_ids = my_channels.flatMap(channel => channel.channel_id)
-
-
-        const channels = await prisma.channel.findMany({
-            where: {
-                channel_id: {
-                    in: channel_ids
-                }
-            },
-            include: {
-                agents: true
-            }
-        })
-
-        const channels_onwed = await prisma.channel.findMany({
-            where: {
-                owner_id: session?.user?.id
-            },
-            include: {
-                agents: true
-            }
-        })
-
-        const results = channels.concat(channels_onwed)
-        const filtered = results.filter((value, index) =>
-            results.findIndex((channel) => channel.channel_id == value.channel_id) == index
-        )
+    
+        console.log("CHANNELS: ", my_channels)
         
-        return Response.json({ filtered })
+        return Response.json({ filtered : my_channels })
 
     } catch (error) {
         console.log(error)
