@@ -3,7 +3,6 @@ import * as React from "react"
 
 import { Cross2Icon } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
-import useSWR from 'swr'
 
 import { Button } from "@/components/ui/button"
 import { DataTableViewOptions } from "./data-table-view-options"
@@ -19,19 +18,14 @@ import {
 } from "@/components/ui/form"
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
-  AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useFormStatus } from "react-dom";
-
 
 import { priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
@@ -50,20 +44,13 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>
 }
 
-const fetcher = (...args) => fetch(...args).then(res => res.json())
-
 export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
   const path = usePathname()
-  const agentId = path.split("/")[path.split("/").length - 1]
   const [open, openChange] = useState(false)
   
-  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/agents/${agentId}`, fetcher)
-  
-  if (permissionError) return <div>falhou em carregar</div>
-  if (permissionLoading) return <Loader_component />  
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
