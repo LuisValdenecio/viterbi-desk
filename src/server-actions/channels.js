@@ -290,7 +290,6 @@ export async function editChannel(_prevstate, formData) {
 
 export async function postChannel(_prevstate, formData) {
 
-  console.log("CHANNEL FORM DATA: ", formData)
   const session = await auth()
 
   const validateFields = ChannelCreationSession.safeParse({
@@ -308,9 +307,7 @@ export async function postChannel(_prevstate, formData) {
     };
   }
   
-  
   const { channelName, token, provider, description, team } = validateFields.data
-  console.log("VALIDATED FIELDS: ", validateFields)
   
   try {
 
@@ -331,18 +328,6 @@ export async function postChannel(_prevstate, formData) {
           }
         }
 
-        const userOwner = await prisma.user.findFirst({
-          where: {
-            user_id: session?.user?.id
-          }
-        })
-
-        if (!userOwner) {
-          return {
-            message: 'The user attempting to create this channel does not exist'
-          }
-        }
-
         const newChannel = await prisma.channel.create({
           data: {
             name: channelName,
@@ -351,6 +336,13 @@ export async function postChannel(_prevstate, formData) {
             owner_id: session?.user?.id,
             google_token_id: token_id,
             team_id : team,
+          }
+        })
+
+        const gmail_channel_log = await prisma.user_channel.create({
+          data : {
+            user_id : session?.user?.id,
+            channel_id : newChannel.channel_id
           }
         })
 
@@ -367,6 +359,13 @@ export async function postChannel(_prevstate, formData) {
             description: description,
             owner_id: session?.user?.id,
             team_id : team,
+          }
+        })
+
+        const discord_channel_log = await prisma.user_channel.create({
+          data : {
+            user_id : session?.user?.id,
+            channel_id : newDiscordChannel.channel_id
           }
         })
 
