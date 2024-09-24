@@ -56,7 +56,7 @@ import { Label } from "@/components/ui/label"
 
 import { statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { ArchiveIcon, DeleteIcon, PencilIcon, Trash2Icon } from "lucide-react"
+import { ArchiveIcon, DeleteIcon, PencilIcon, PlusIcon, Trash2Icon, UserPlus2 } from "lucide-react"
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -120,11 +120,21 @@ export function DataTableRowActions<TData>({
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`/dashboard/channels?edit=${row.original?.channel_id}&channel_name=${row.original?.name}&description=${row.original?.description}`}>
              Edit
             <DropdownMenuShortcut>
               <PencilIcon className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/channels?create=${row.original?.channel_id}`}>
+             Create Agent
+            <DropdownMenuShortcut>
+              <UserPlus2 className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
           </Link>           
         </DropdownMenuItem>
@@ -137,182 +147,8 @@ export function DataTableRowActions<TData>({
             </DropdownMenuShortcut>
           </Link>
         </DropdownMenuItem>
+
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
-
-export function DeleteChannelDialog({data_to_delete}) {
-  const [open, setOpen] = React.useState(false)
-  const isDesktop = useMediaQuery("(min-width: 768px)")
-  const { data: permission, isLoading: permissionLoading, error: permissionError } = useSWR(`/api/permissions/channel/${data_to_delete}`, fetcher)
-
-  const toggleDeleteDialog = (toggler : boolean) => {
-    setOpen(toggler)
-  }
- 
-  if (permissionError) return <div>falhou em carregar</div>
-  if (permissionLoading) return <div>carregando...</div>
-  if (isDesktop) {
-
-    if (permission === 'owner') {
-      return (
-        
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button
-                  variant="outline"
-                  size="sm"
-                  className="font-normal h-8 lg:flex w-full flex justify-between border-none"
-                >
-                    Delete 
-                  <Trash2Icon className="h-4 w-4 text-muted-foreground" />
-              </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Delete Tasks</DialogTitle>
-              <DialogDescription>
-                Type in your password to delete
-              </DialogDescription>
-            </DialogHeader>
-            <ProfileForm dataToDelete={data_to_delete} closeParentDialog={() => toggleDeleteDialog(false)} />
-          </DialogContent>
-        </Dialog>
-      )
-    } else {
-      return (
-        <OperationDeniedAlert>
-          <Button
-                variant="outline"
-                size="sm"
-                className="font-normal h-8 lg:flex w-full flex justify-between border-none"
-              >
-                  Delete 
-                <Trash2Icon className="h-4 w-4 text-muted-foreground" />
-          </Button>
-        </OperationDeniedAlert>
-      )
-    }
-  }
- 
-  return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button variant="outline">Edit Profile</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
-            Type in your password to delete
-          </DrawerDescription>
-        </DrawerHeader>
-        
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
-  )
-}
-
-const formSchema = z.object({
-  password: z.string().min(1, {
-    message: 'Please type in a valid password'
-  }),
-  channels_ids: z.string().min(1, {
-    message: 'Please type in a valid channel id'
-  }),
-})
- 
-function ProfileForm({closeParentDialog, dataToDelete}) {
-
-  const initialState = {
-    errors : {
-      password : undefined,
-      channels_ids : undefined
-    },
-    message : undefined
-  };
-
-  //console.log("DATA TO DELETE: ", dataToDelete)
-  const channels_ids = [dataToDelete]
-
-  const initialValues : {password : string, channels_ids : string} = {
-    password: "",
-    channels_ids : channels_ids.join(",")
-  }
-
-  const form =  useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialValues
-  })
-
-  const [state, formAction] = useFormState(deleteTeam, initialState);
-  const [ incorrectPassword, setIncorrectPassword ] = useState(false)
-  const { toast } = useToast()
-
-
-  React.useEffect(() => {
-    setIncorrectPassword(false)
-    console.log("STATE: ", state)
-    if (state.message == 'Success') {
-      closeParentDialog()
-      toast({
-        title: "Channel removed",
-        description: `The channel was delted successfully`,
-        action: (
-          <ToastAction altText="Refresh">Undo</ToastAction>
-        ),
-      })
-    }
-
-    if (Array.isArray(state?.errors)) {
-      state.errors.forEach((error) => {
-        form.setError(error.field, { message: error.message });
-      })
-    } else {
-      if (state.message === 'incorrect password') {
-        setIncorrectPassword(true)
-      }
-    }
-  }, [state?.errors]);
-
-  return (
-    <Form {...form}>
-      <form action={formAction} className="grid items-start gap-4">
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <Input type="password" placeholder="type in your password" {...field}/>
-              </FormControl>
-              <FormMessage>{state?.errors?.password}</FormMessage>
-              {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="channels_ids"
-          render={({ field }) => (
-            <FormItem className="hidden">
-              <FormControl>
-                <Input defaultValue={channels_ids.join(",")} {...field}/>
-              </FormControl>
-              <FormMessage>{state?.errors?.password}</FormMessage>
-              {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
-            </FormItem>
-          )}
-        />
-        <SubmitBtn>Remove tasks</SubmitBtn>
-      </form>
-    </Form>
   )
 }

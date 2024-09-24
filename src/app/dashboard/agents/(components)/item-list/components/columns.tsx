@@ -38,7 +38,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
-          <span className="max-w-[500px] truncate font-normal">
+          <span className="max-w-[150px] truncate font-normal">
             {row.getValue("description")}
           </span>
         </div>
@@ -56,7 +56,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
-          <span className="max-w-[500px] truncate font-medium">
+          <span className="max-w-[150px] truncate font-medium">
             {row.original.channel.name}
           </span>
         </div>
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Task>[] = [
       }
 
       return (
-        <div className="flex w-[100px] items-center">
+        <div className="flex w-[120px] items-center">
           {status.icon && (
             <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
           )}
@@ -105,7 +105,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex items-center">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}
-          <span className="max-w-[500px] truncate font-normal">
+          <span className="max-w-[80px] truncate font-normal">
             {row.getValue("tasks").length}
           </span>
         </div>

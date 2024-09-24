@@ -1,10 +1,10 @@
 'use client'
 
 import * as React from "react"
-import { deleteAgents, editAgent, getMyAgents } from '@/server-actions/agents'
+import { deleteAgents, editAgent, getMyAgents, postAgent } from '@/server-actions/agents'
 import useSWR from 'swr'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormStatus } from "react-dom";
 import {
     AlertDialog,
@@ -45,7 +45,7 @@ import {
 import SubmitBtn from "@/components/submit-button"
 import { Textarea } from "@/components/ui/textarea"
 import { ListItemTable } from "../(components)/agent-list-with-select/tableOfItems"
-import { CreateAgentDialog } from "../(components)/createAgentDialog"
+//import { CreateAgentDialog } from "../(components)/createAgentDialog"
 
 import {
     Tabs,
@@ -82,6 +82,7 @@ export default function Page() {
         params.delete('delete')
         params.delete('agent_name')
         params.delete('edit')
+        params.delete('create')
         params.delete('description')
         replace(`${pathname}?${params.toString()}`);
     }
@@ -91,7 +92,7 @@ export default function Page() {
             setDeleteAgentDialog(true)
         } else if (searchParams.get('edit')?.toString()) {
             setEditAgentDialog(true)
-        }
+        } 
     }, [searchParams])
 
     const channelId = pathname.split("/")[pathname.split("/").length - 1]
@@ -116,7 +117,7 @@ export default function Page() {
                     <TabsContent value="agents">
                         <div className="">
                             <DeleteAgentialog open={deleteAgentDialog} openChange={onDialogClose} />
-                            <EditAgentDialog open={editAgentialog} openChange={onDialogClose} /> 
+                            <EditAgentDialog open={editAgentialog} openChange={onDialogClose} />
                             <ListItemTable agents={data.agents} />
                         </div>
                     </TabsContent>

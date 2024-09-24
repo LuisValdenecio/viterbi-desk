@@ -290,6 +290,15 @@ export async function postAgent(_prevstate, formData) {
   const { agentName, channel, description } = validateFields.data
 
   try {
+
+    const privilege = await checkChannelPrivilege(channel)
+
+    if (!privilege) {
+      return {
+        message: 'access denied'
+      }
+    }
+
     const newAgent = await prisma.agent.create({
       data: {
         name: agentName,
@@ -356,4 +365,48 @@ export async function editAgent(_prevstate, formData) {
   }
 }
 
+export async function checkChannelPrivilege(channelId) {
+  const session = await auth()
+  try {
+
+    // give back all the teams I own
+    const my_teams = await prisma.user_privilege.findMany({
+      where: {
+        role: 'owner',
+        user_id: session?.user?.id
+      },
+      select: {
+        team_id: true
+      }
+    })
+
+    const my_teams_ids = my_teams.flatMap(team => team.team_id)
+
+    // fetch all channels related to the teams I own
+    const my_channels = await prisma.channel.findMany({
+      where: {
+        team_id: {
+          in: my_teams_ids
+        }
+      },
+      select: {
+        channel_id: true
+      }
+    })
+
+    const my_channels_ids = my_channels.flatMap(channel => channel.channel_id)
+
+    // get the channel that the agent belongs to:
+    const privileges = my_channels_ids.filter((chnnl) => chnnl === channelId)
+
+    if (privileges.length > 0) {
+      return true
+    } else {
+      return false
+    }
+
+  } catch (error) {
+    console.log(error)
+  }
+}
 

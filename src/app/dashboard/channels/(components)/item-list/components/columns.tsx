@@ -50,7 +50,22 @@ export const columns: ColumnDef<Task>[] = [
       )
     },
   },
-  
+  /*
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Owner" />
+    ),
+    cell: ({ row }) => <div className="w-[180px] flex items-center gap-2 truncate">
+        <Avatar className="size-6">
+          <AvatarFallback>{row.getValue("name").charAt(0).toUpperCase()}</AvatarFallback>
+        </Avatar>
+        <span className="truncate">{row.getValue("name")}</span>
+    </div>,
+    enableSorting: true,
+    enableHiding: true,
+  },
+  */
   {
     accessorKey: "provider",
     header: ({ column }) => (

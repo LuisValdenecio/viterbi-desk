@@ -46,18 +46,18 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-        <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
-          Open
-        </Link>
+          <Link className="flex cursor-pointer" href={`/dashboard/agents/${row.original?.agent_id}`}>
+            Open
+          </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`?edit=${row.original?.agent_id}&agent_name=${row.original?.name}&description=${row.original?.description}`}>
-             Edit
+            Edit
             <DropdownMenuShortcut>
               <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
-          </Link>           
+          </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
