@@ -10,7 +10,7 @@ import {
   } from '@/components/sidebar'
   import Sidebar_item from "@/components/sidebar-item";
 import { LightningBoltIcon } from '@radix-ui/react-icons';
-  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users, ListCheckIcon } from 'lucide-react'
+  import { House, ContactRound, Bot, DatabaseZap, Settings, PencilRuler, Inbox, Search, CircleHelp, Sparkles, CircleUser, Lightbulb, ShieldCheck, LogOut, Eye, Rss, Users, ListCheckIcon, Grid2X2Icon } from 'lucide-react'
 import { useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
@@ -35,6 +35,11 @@ export function SiderBarBody({events}) {
               <Sidebar_item href={"/dashboard/teams"} path={"/dashboard/teams"}>
                 <Users strokeWidth={path === '/dashboard/teams' ? 1.75 : 1.25} size={18} />
                 <SidebarLabel className={"font-normal"}>Teams</SidebarLabel>
+              </Sidebar_item>
+
+              <Sidebar_item href={"/dashboard/members"} path={"/dashboard/members"}>
+                <Grid2X2Icon strokeWidth={path === '/dashboard/teams' ? 1.75 : 1.25} size={18} />
+                <SidebarLabel className={"font-normal"}>Members</SidebarLabel>
               </Sidebar_item>
 
               <Sidebar_item href={"/dashboard/channels"} path={"/dashboard/channels"}>
