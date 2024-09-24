@@ -305,6 +305,8 @@ export async function checkTaskQuota(agentId) {
 }
 
 export async function postTask(_prevstate, formData) {
+
+    const session = await auth()
     
     const validatedFields = TaskCreationSession.safeParse({
         taskName : formData.get('taskName'),
@@ -354,6 +356,13 @@ export async function postTask(_prevstate, formData) {
                 status : status,
                 agent_id : agentId,
                 schedule : taskSchedule.id
+            }
+        })
+
+        const task_log = await prisma.user_task.create({
+            data : {
+                user_id : session?.user?.id,
+                task_id : newTask.task_id
             }
         })
 
