@@ -204,7 +204,7 @@ const DeleteMemberFormSchema = z.object({
     const initialValues: { password: string, member_id: string, team_id : string } = {
       password: "",
       member_id: searchParams.get('delete_member')?.toString(),
-      team_id : pathname.split("/")[pathname.split("/").length - 1]
+      team_id : searchParams.get('team')?.toString(),
     }
   
     const form = useForm<z.infer<typeof DeleteMemberFormSchema>>({
@@ -217,6 +217,7 @@ const DeleteMemberFormSchema = z.object({
     const { toast } = useToast()
   
     React.useEffect(() => {
+      console.log("STATE FROM SERVER: ", state)
       setMember_id(searchParams.get('delete_member')?.toString())
       setIncorrectPassword(false)
       if (state?.message == 'Success') {
@@ -288,7 +289,7 @@ const DeleteMemberFormSchema = z.object({
                 render={({ field }) => (
                   <FormItem className="hidden">
                     <FormControl>
-                      <Input defaultValue={pathname.split("/")[pathname.split("/").length - 1]} {...field} />
+                      <Input defaultValue={searchParams.get('team')?.toString()} {...field} />
                     </FormControl>
                     <FormMessage>{state?.errors?.password}</FormMessage>
                     {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
@@ -375,7 +376,7 @@ const DeleteMemberFormSchema = z.object({
     const initialValues: { role: string, member_id: string, team_id: string } = {
       role: searchParams.get('role')?.toString(),
       member_id: searchParams.get('member')?.toString(),
-      team_id: pathname.split("/")[pathname.split("/").length - 1],
+      team_id: searchParams.get('team')?.toString(),
     };
   
     const form = useForm<z.infer<typeof UpdateMemberRoleSchema>>({
@@ -413,7 +414,7 @@ const DeleteMemberFormSchema = z.object({
                 render={({ field }) => (
                   <FormItem className="hidden">
                     <FormControl>
-                      <Input defaultValue={pathname.split("/")[pathname.split("/").length - 1]} {...field} />
+                      <Input defaultValue={searchParams.get('team')?.toString()} {...field} />
                     </FormControl>
                   </FormItem>
                 )}

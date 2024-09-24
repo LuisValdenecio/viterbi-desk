@@ -52,8 +52,8 @@ export const columns: ColumnDef<Task>[] = [
         {row.getValue("team")}
       </span>
     </div>,
-    enableSorting: false,
-    enableHiding: false,
+    enableSorting: true,
+    enableHiding: true,
   },
 
   {

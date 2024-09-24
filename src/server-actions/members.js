@@ -99,6 +99,7 @@ export async function reassignMemberRole(_prevstate, formData) {
 
 export async function deleteMember(_prevstate, formData) {
 
+    console.log("MEMBER: ", formData)
     const session = await auth()
 
     const validatedFields = DeleteMemberSession.safeParse({

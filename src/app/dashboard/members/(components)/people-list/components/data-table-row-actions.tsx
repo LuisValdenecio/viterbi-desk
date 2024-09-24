@@ -64,7 +64,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-        <Link className="flex cursor-pointer" href={`?delete_member=${row.original?.user_id}&name=${row.original?.name}`
+        <Link className="flex cursor-pointer" href={`?delete_member=${row.original?.user_id}&name=${row.original?.name}&team=${row.original?.team_id}`
             }>
             Delete
             <DropdownMenuShortcut>
