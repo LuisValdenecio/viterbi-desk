@@ -34,6 +34,7 @@ const DeleteMemberSession = DeleteMemberFormSchema.omit({})
 const UpdateMemberRoleSession = UpdateMemberRoleSchema.omit({})
 
 export async function reassignMemberRole(_prevstate, formData) {
+    console.log("FORM DATA: ", formData)
     const session = await auth()
 
     const validatedFields = UpdateMemberRoleSession.safeParse({
@@ -161,6 +162,164 @@ export async function deleteMember(_prevstate, formData) {
                 const deleted_member = await prisma.user_privilege.delete({
                     where: {
                         id: member_to_delete[0].id
+                    }
+                })
+
+                return {
+                    message: 'Success'
+                }
+            } else {
+                return {
+                    message: 'incorrect password'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function suspendMember(_prevstate, formData) {
+
+    const session = await auth()
+
+    const validatedFields = DeleteMemberSession.safeParse({
+        password: formData.get('password'),
+        member_id: formData.get('member_id'),
+        team_id: formData.get('team_id'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields',
+        };
+    }
+
+    const { password, member_id, team_id } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                user_id: session?.user?.id
+            }
+        })
+
+        if (user) {
+            const passwordMatch = await bcrypt.compare(
+                password,
+                user.password
+            )
+
+            if (passwordMatch) {
+
+                // dont delete team founding member
+                const isFoundingMember = await isFoundingMemberUser(member_id, team_id)
+                if (isFoundingMember) {
+                    return {
+                        message: 'suspending founder'
+                    }
+                }
+
+                const privilege = await checkPrivilege(team_id, member_id)
+
+                if (!privilege) {
+                    return {
+                        message: 'access denied'
+                    }
+                }
+
+                const member_to_delete = await prisma.user_privilege.findMany({
+                    where: {
+                        user_id: member_id,
+                        team_id: team_id
+                    },
+                    select: {
+                        id: true
+                    }
+                })
+
+                const suspended_member = await prisma.user_privilege.update({
+                    where: {
+                        id: member_to_delete[0].id
+                    },
+                    data : {
+                        status : 'suspended'
+                    }
+                })
+
+                return {
+                    message: 'Success'
+                }
+            } else {
+                return {
+                    message: 'incorrect password'
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function reactivateMember(_prevstate, formData) {
+
+    const session = await auth()
+
+    const validatedFields = DeleteMemberSession.safeParse({
+        password: formData.get('password'),
+        member_id: formData.get('member_id'),
+        team_id: formData.get('team_id'),
+    })
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: 'Missing Fields',
+        };
+    }
+
+    const { password, member_id, team_id } = validatedFields.data
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                user_id: session?.user?.id
+            }
+        })
+
+        if (user) {
+            const passwordMatch = await bcrypt.compare(
+                password,
+                user.password
+            )
+
+            if (passwordMatch) {
+
+                const privilege = await checkPrivilege(team_id, member_id)
+
+                if (!privilege) {
+                    return {
+                        message: 'access denied'
+                    }
+                }
+
+                const member_to_delete = await prisma.user_privilege.findMany({
+                    where: {
+                        user_id: member_id,
+                        team_id: team_id
+                    },
+                    select: {
+                        id: true
+                    }
+                })
+
+                const suspended_member = await prisma.user_privilege.update({
+                    where: {
+                        id: member_to_delete[0].id
+                    },
+                    data : {
+                        status : 'active'
                     }
                 })
 

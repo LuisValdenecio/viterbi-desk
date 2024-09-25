@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { taskSchema } from "../data/schema"
-import { BlocksIcon, StopCircle, Trash2 } from "lucide-react"
+import { BlocksIcon, PlayIcon, StopCircle, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 interface DataTableRowActionsProps<TData> {
@@ -45,7 +45,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}`}>
+          <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}&team=${row.original?.team_id}`}>
              Re-assign role
             <DropdownMenuShortcut>
               <BlocksIcon className=" h-4 w-4 text-muted-foreground" />
@@ -53,15 +53,26 @@ export function DataTableRowActions<TData>({
           </Link>
            
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`?suspend=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}`}>
-             Suspend
-            <DropdownMenuShortcut>
-              <StopCircle className=" h-4 w-4 text-muted-foreground" />
-            </DropdownMenuShortcut>
-          </Link>
-           
-        </DropdownMenuItem>
+        
+        {(row.original?.status === 'active') ? (
+          <DropdownMenuItem asChild>
+            <Link className="flex cursor-pointer" href={`?suspend=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}&team=${row.original?.team_id}`}>
+              Suspend
+              <DropdownMenuShortcut>
+                <StopCircle className=" h-4 w-4 text-muted-foreground" />
+              </DropdownMenuShortcut>
+            </Link>   
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem asChild>
+            <Link className="flex cursor-pointer" href={`?reactivate=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}&team=${row.original?.team_id}`}>
+              Re-activate
+              <DropdownMenuShortcut>
+                <PlayIcon className=" h-4 w-4 text-muted-foreground" />
+              </DropdownMenuShortcut>
+            </Link>   
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem asChild>
         <Link className="flex cursor-pointer" href={`?delete_member=${row.original?.user_id}&name=${row.original?.name}&team=${row.original?.team_id}`
