@@ -325,21 +325,6 @@ export async function getTask(task_id) {
     }
 }
 
-export async function checkTaskQuota(agentId) {
-    const session = await auth()
-
-    const channel_id = await prisma.agent.findUnique({
-        where: {
-            agent_id: agentId
-        },
-        select: {
-            channel_id: true
-        }
-    })
-
-
-}
-
 export async function postTask(_prevstate, formData) {
 
     const session = await auth()
@@ -382,6 +367,16 @@ export async function postTask(_prevstate, formData) {
         if (!privilege) {
             return {
                 message: 'access denied'
+            }
+        }
+
+        const checkQuota = await checkTaskQuota(agentId)
+
+        if (!checkQuota) {
+            return {
+                message: 'quota limit reached',
+                userId : session?.user?.id,
+                agentId : agentId
             }
         }
 
@@ -495,6 +490,65 @@ export async function editTask(_prevstate, formData) {
         console.log(error)
     }
 
+}
+
+export async function checkTaskQuota(agentId) {
+    const session = await auth()
+
+    try {
+         // 1st check to see if this user is suspended
+         const agent_channel = await prisma.agent.findUnique({
+            where: {
+                agent_id: agentId
+            },
+            select: {
+                channel_id: true
+            }
+        })
+
+        const agent_channel_team = await prisma.channel.findUnique({
+            where: {
+                channel_id: agent_channel.channel_id
+            },
+            select: {
+                team_id: true
+            }
+        })
+
+        const membership_quota = await prisma.user_privilege.findMany({
+            where: {
+                status: 'active',
+                team_id: agent_channel_team.team_id,
+                user_id: session?.user?.id
+            }, 
+            select : {
+                task_quota : true,
+                used_task_quota : true,
+                id : true
+            }
+        })
+
+        if (membership_quota[0].task_quota === membership_quota[0].used_task_quota) {
+            return false
+        }
+
+        // increase the count on used task quota
+        const used = membership_quota[0].used_task_quota + 1
+
+        const updated_quota = await prisma.user_privilege.update({
+            where : {
+                id : membership_quota[0].id
+            },
+            data : {
+                used_task_quota : used
+            }
+        })
+
+        return true
+
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 export async function checkAgentPrivilege(agentId) {

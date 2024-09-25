@@ -429,6 +429,12 @@ export function CreateTaskDialog({ open, openChange }) {
         title: 'Operation blocked',
         description: `You don't have the privileges to complete this.`,
       })
+    } else if (state?.message === 'quota limit reached') {
+      openChange()
+      toast({
+        title: 'Task quota limit reaced',
+        description: `Ask for more credit`,
+      })
     }
   }, [state?.errors])
 
