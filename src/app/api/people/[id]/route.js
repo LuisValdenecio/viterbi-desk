@@ -25,6 +25,10 @@ export const GET = async (req, { params }) => {
             return {
                 name : member.user.name,
                 task_quota : member.task_quota,
+                used_task_quota : member.used_task_quota,
+                playground_quota : member.daily_playground_quota,
+                used_daily_playground_quota : member.used_daily_playground_quota,
+                task_quota : member.task_quota,
                 playground_quota : member.daily_playground_quota,
                 email : member.user.email,
                 img : member.user.img,

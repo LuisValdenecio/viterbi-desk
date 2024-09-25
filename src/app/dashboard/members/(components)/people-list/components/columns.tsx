@@ -14,6 +14,14 @@ import { active_statuses, labels, priorities, statuses } from "../data/data"
 import { Task } from "../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
+import { Gauge } from "@/app/dashboard/(components)/circleGraph"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -47,7 +55,7 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Team" />
     ),
     cell: ({ row }) => 
-    <div className="w-[280px] truncate">
+    <div className="w-[200px] truncate">
       <span className="font-medium">
         {row.getValue("team")}
       </span>
@@ -73,7 +81,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex w-[80px] items-center">
           {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+            <status.icon className="mr-1 h-4 w-4 text-muted-foreground" />
           )}
           <span>{status.label}</span>
         </div>
@@ -101,7 +109,7 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex w-[90px] items-center">
           {status.icon && (
-            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+            <status.icon className="mr-1 h-4 w-4 text-muted-foreground" />
           )}
           <span>{status.label}</span>
         </div>
@@ -111,6 +119,44 @@ export const columns: ColumnDef<Task>[] = [
       console.log("ROW: ", row, id, value)
       return value.includes(row.original["status"])
     },
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Task Quota" />
+    ),
+    cell: ({ row }) => {
+      
+      if (row?.original?.task_quota > 0) {
+        return (
+          <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex gap-1 w-[60px] items-center">
+                    <Gauge value={Math.floor((row?.original?.used_task_quota/row?.original?.task_quota) * 100)} size="small" showValue={false} />
+                    <span>{Math.floor((row?.original?.used_task_quota/row?.original?.task_quota) * 100)}%</span>
+                  </div> 
+                </TooltipTrigger>
+                <TooltipContent>
+                <p>
+                    {row?.original?.used_task_quota +"/"+ row?.original?.task_quota}
+                </p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+        )
+      } else {
+        return (
+          <div className="flex w-[90px] items-center">
+              <ExclamationTriangleIcon color="orange" className="mr-1 h-4 w-4 text-muted-foreground" />
+              <span>No quota</span>
+          </div>
+        )
+      }
+
+    },
+    enableSorting: false,
+    enableHiding: true,
   },
   {
     id: "actions",

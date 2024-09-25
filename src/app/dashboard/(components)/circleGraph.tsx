@@ -57,7 +57,7 @@ export const Gauge = ({
             cy="60"
           />
           <circle
-            className={`animate-gauge_fill ${color}`}
+            className={`animate-gauge_fill ${(value > 0 && value <= 50) ? "text-[hsla(131,41%,46%,1)]" : (value > 50 && value <= 75) ? "text-[#f09936]" : "text-[#e62424]"}`}
             strokeWidth="12"
             strokeDasharray={strokeDasharray}
             strokeDashoffset={initialOffset}

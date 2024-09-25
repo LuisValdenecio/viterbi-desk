@@ -16,6 +16,14 @@ import {
 } from "@/components/ui/avatar"
 import { trusted } from "mongoose"
 import AvatarsStacked from "@/app/dashboard/(components)/avatarStacked"
+import { Gauge } from "@/app/dashboard/(components)/circleGraph"
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -96,6 +104,45 @@ export const columns: ColumnDef<Task>[] = [
       return value.includes(row.original["user_role"])
     },
   },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Task Quota" />
+    ),
+    cell: ({ row }) => {
+      
+      if (row?.original?.task_quota > 0) {
+        return (
+          <TooltipProvider>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex gap-1 w-[60px] items-center">
+                    <Gauge value={Math.floor((row?.original?.used_task_quota/row?.original?.task_quota) * 100)} size="small" showValue={false} />
+                    <span>{Math.floor((row?.original?.used_task_quota/row?.original?.task_quota) * 100)}%</span>
+                  </div> 
+                </TooltipTrigger>
+                <TooltipContent>
+                <p>
+                    {row?.original?.used_task_quota +"/"+ row?.original?.task_quota}
+                </p>
+                </TooltipContent>
+            </Tooltip>
+        </TooltipProvider>
+        )
+      } else {
+        return (
+          <div className="flex w-[90px] items-center">
+              <ExclamationTriangleIcon color="orange" className="mr-1 h-4 w-4 text-muted-foreground" />
+              <span>No quota</span>
+          </div>
+        )
+      }
+
+    },
+    enableSorting: false,
+    enableHiding: true,
+  },
+
   {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,

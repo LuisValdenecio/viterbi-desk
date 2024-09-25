@@ -148,10 +148,10 @@ export default function Page() {
   return (
     <>
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-        <Tabs defaultValue="active">
+        <Tabs defaultValue="members">
           <div className="flex justify-between items-center">
             <TabsList>
-              <TabsTrigger value="active">Members</TabsTrigger>
+              <TabsTrigger value="members">Members</TabsTrigger>
               <TabsTrigger value="invitations">Invitations</TabsTrigger>
               <TabsTrigger value="logs">Logs</TabsTrigger>
               <TabsTrigger value="quota">Quota</TabsTrigger>
@@ -160,7 +160,7 @@ export default function Page() {
           <TabsContent value="overview" >
 
           </TabsContent>
-          <TabsContent value="active">
+          <TabsContent value="members">
             <div className="">
               <DeleteTeamMemberDialog open={deleteTeamMemberDialog} openChange={onDialogClose} />
               <ReassignMemberRole open={reassignMemberRole} openChange={onDialogClose} />

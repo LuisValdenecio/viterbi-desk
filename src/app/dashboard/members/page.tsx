@@ -16,7 +16,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
 
@@ -41,10 +40,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from 'react'
-import { EyeIcon, KeySquare, Loader2, MoveDown, MoveRight, MoveUp, ShieldCheck } from "lucide-react"
+import { EyeIcon, KeySquare, Loader2,ShieldCheck } from "lucide-react"
 
 import { useEffect } from 'react'
-import { deleteTaks, editTask } from '@/server-actions/tasks'
 import { deleteMember, reactivateMember, reassignMemberRole, suspendMember } from '@/server-actions/members'
 import {
   Select,
@@ -52,25 +50,14 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  SelectGroup,
-  SelectLabel,
-
 } from "@/components/ui/select"
 import SubmitBtn from "@/components/submit-button";
 
 import useSWR from 'swr'
 //import { ListItemTable } from "../(components)/agents-list/tableOfItems"
 import { ListItemTable } from "./(components)/people-list/tableOfItems"
-
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
 import Loader_component from '@/components/loader'
-import { deleteInvitations, editInvitation } from "@/server-actions/invitations";
-import path from "path";
+
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -91,9 +78,6 @@ export default function Page() {
   const searchParams = useSearchParams()
   const teamId = pathname.split("/")[pathname.split("/").length - 1]
   const { data: users, isLoading: usersLoading, error: usersError } = useSWR(`/api/allPeople/`, fetcher)
-  const { data: invitees, isLoading: inviteesLoading, error: inviteesError } = useSWR(`/api/invitees/${teamId}`, fetcher)
-  const [deleteInvitationDialog, setDeleteInvitationDialog] = useState(false)
-  const [editInvitationDialog, setEditInvitationDialog] = useState(false)
   const [deleteTeamMemberDialog, setDeleteTeamMemberDialog] = useState(false)
   const [reassignMemberRole, setReassignMemberRole ] = useState(false)
   const [suspendMember, setSuspendMember] = useState(false)
@@ -102,11 +86,7 @@ export default function Page() {
   const params = new URLSearchParams(searchParams);
 
   useEffect(() => {
-    if (searchParams.get('delete')?.toString()) {
-      setDeleteInvitationDialog(true)
-    } else if (searchParams.get('edit')?.toString()) {
-      setEditInvitationDialog(true)
-    } else if (searchParams.get('delete_member')?.toString()) {
+    if (searchParams.get('delete_member')?.toString()) {
       setDeleteTeamMemberDialog(true)
     } else if (searchParams.get('member')?.toString()) {
       setReassignMemberRole(true)
@@ -118,9 +98,7 @@ export default function Page() {
   }, [searchParams])
 
   const onDialogClose = () => {
-    setDeleteInvitationDialog(false)
     setDeleteTeamMemberDialog(false)
-    setEditInvitationDialog(false)
     setReassignMemberRole(false)
     setSuspendMember(false)
     setReactivateMember(false)
@@ -137,8 +115,8 @@ export default function Page() {
     replace(`${pathname}?${params.toString()}`);
   }
 
-  if (usersError || inviteesError) return <div>falhou em carregar</div>
-  if (usersLoading || inviteesLoading) return <Loader_component />
+  if (usersError) return <div>falhou em carregar</div>
+  if (usersLoading) return <Loader_component />
   console.log("MEMBER DATA: ", users.people)
 
   return (

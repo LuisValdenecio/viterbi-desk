@@ -10,7 +10,9 @@ export const taskSchema = z.object({
   team : z.string(),
   team_id : z.string(),
   email: z.string(),
-  status : z.string()
+  status : z.string(),
+  task_quota : z.number(),
+  used_task_quota : z.number(),
 })
 
 export type Task = z.infer<typeof taskSchema>

@@ -43,6 +43,8 @@ export const GET = async (req, res) => {
             return {
                 team_id: team.team_id,
                 name: team.team.name,
+                task_quota : team.task_quota,
+                used_task_quota : team.used_task_quota,
                 members: unique_members.filter(currentTeam => currentTeam.team_id == team.team_id)[0].members,
                 actual_members : unique_members.filter(currentTeam => currentTeam.team_id == team.team_id)[0].actual_members,
                 description: team.team.description,
