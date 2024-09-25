@@ -370,7 +370,7 @@ export async function checkChannelPrivilege(channelId) {
   try {
 
     // give back all the teams I own
-    const my_teams = await prisma.user_privilege.findMany({
+    const teams_i_own = await prisma.user_privilege.findMany({
       where: {
         role: 'owner',
         user_id: session?.user?.id
@@ -379,8 +379,18 @@ export async function checkChannelPrivilege(channelId) {
         team_id: true
       }
     })
+    
+    const teams_im_admin = await prisma.user_privilege.findMany({
+      where: {
+        role: 'admin',
+        user_id: session?.user?.id
+      },
+      select: {
+        team_id: true
+      }
+    })
 
-    const my_teams_ids = my_teams.flatMap(team => team.team_id)
+    const my_teams_ids = teams_i_own.concat(teams_im_admin).flatMap(team => team.team_id)
 
     // fetch all channels related to the teams I own
     const my_channels = await prisma.channel.findMany({
