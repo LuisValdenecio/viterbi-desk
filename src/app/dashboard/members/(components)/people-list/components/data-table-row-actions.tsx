@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { taskSchema } from "../data/schema"
-import { BlocksIcon, PlayIcon, StopCircle, Trash2 } from "lucide-react"
+import { BlocksIcon, DollarSign, PlayIcon, StopCircle, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 interface DataTableRowActionsProps<TData> {
@@ -44,6 +44,15 @@ export function DataTableRowActions<TData>({
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&team=${row.original?.team_id}`}>
+             Quotas
+            <DropdownMenuShortcut>
+              <DollarSign className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&role=${row.original?.role}&team=${row.original?.team_id}`}>
              Re-assign role
