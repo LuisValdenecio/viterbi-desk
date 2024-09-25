@@ -207,6 +207,37 @@ export async function checkPrivilege(agentId) {
 
   try {
 
+    // 1st check to see if this user is suspended
+    const agent_channel = await prisma.agent.findUnique({
+      where : {
+        agent_id : agentId
+      },
+      select : {
+        channel_id : true
+      }
+    })
+
+    const agent_channel_team = await prisma.channel.findUnique({
+      where : {
+        channel_id : agent_channel.channel_id
+      },
+      select : {
+        team_id : true
+      }
+    })
+
+    const account_status = await prisma.user_privilege.findMany({
+      where : {
+        status : 'active',
+        team_id : agent_channel_team.team_id,
+        user_id : session?.user?.id
+      }
+    })
+
+    if (account_status.length === 0) {
+      return false
+    }
+
     // give back all the teams I own
     const my_teams = await prisma.user_privilege.findMany({
       where: {
@@ -368,6 +399,27 @@ export async function editAgent(_prevstate, formData) {
 export async function checkChannelPrivilege(channelId) {
   const session = await auth()
   try {
+    
+    const agent_channel_team = await prisma.channel.findUnique({
+      where : {
+        channel_id : channelId
+      },
+      select : {
+        team_id : true
+      }
+    })
+
+    const account_status = await prisma.user_privilege.findMany({
+      where : {
+        status : 'active',
+        team_id : agent_channel_team.team_id,
+        user_id : session?.user?.id
+      }
+    })
+
+    if (account_status.length === 0) {
+      return false
+    }
 
     // give back all the teams I own
     const teams_i_own = await prisma.user_privilege.findMany({

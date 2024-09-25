@@ -346,6 +346,18 @@ export async function checkPrivilege(team_id, member_id) {
 
     try {
 
+        const account_status = await prisma.user_privilege.findMany({
+            where : {
+                team_id : team_id,
+                user_id : session?.user?.id,
+                status : 'active'
+            }
+        })
+
+        if (account_status.length === 0) {
+            return false
+        }
+
         // check your role on this team:
         const my_role = await prisma.user_privilege.findMany({
             where: {
@@ -407,6 +419,18 @@ export async function checkRolePrivilege(team_id, member_id, role) {
     const session = await auth()
 
     try {
+
+        const account_status = await prisma.user_privilege.findMany({
+            where : {
+                team_id : team_id,
+                user_id : session?.user?.id,
+                status : 'active'
+            }
+        })
+
+        if (account_status.length === 0) {
+            return false
+        }
 
         // check your role on this team:
         const my_role = await prisma.user_privilege.findMany({

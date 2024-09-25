@@ -318,6 +318,18 @@ export async function checkRolePrivilege(team_id, role) {
 
     try {
 
+        const account_status = await prisma.user_privilege.findMany({
+            where : {
+                team_id : team_id,
+                user_id : session?.user?.id,
+                status : 'active'
+            }
+        })
+
+        if (account_status.length === 0) {
+            return false
+        }
+
         // check your role on this team:
         const my_role = await prisma.user_privilege.findMany({
             where: {

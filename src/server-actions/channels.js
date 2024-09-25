@@ -133,6 +133,27 @@ export async function checkPrivilege(channelId) {
   const session = await auth()
   try {
 
+    const agent_channel_team = await prisma.channel.findUnique({
+      where : {
+        channel_id : channelId
+      },
+      select : {
+        team_id : true
+      }
+    })
+
+    const account_status = await prisma.user_privilege.findMany({
+      where : {
+        status : 'active',
+        team_id : agent_channel_team.team_id,
+        user_id : session?.user?.id
+      }
+    })
+
+    if (account_status.length === 0) {
+      return false
+    }
+
     // give back all the teams I own
     const my_teams = await prisma.user_privilege.findMany({
       where: {
