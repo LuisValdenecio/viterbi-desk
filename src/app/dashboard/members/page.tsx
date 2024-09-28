@@ -38,7 +38,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useState } from 'react'
 import { EyeIcon, KeySquare, Loader2,ShieldCheck } from "lucide-react"
 
@@ -57,7 +56,24 @@ import useSWR from 'swr'
 //import { ListItemTable } from "../(components)/agents-list/tableOfItems"
 import { ListItemTable } from "./(components)/people-list/tableOfItems"
 import Loader_component from '@/components/loader'
+import { SliderProps } from "@radix-ui/react-slider"
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar"
 
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { Label } from "@/components/ui/label"
+import { Slider } from "@/components/ui/slider"
+
+interface TopPSelectorProps {
+  defaultValue: SliderProps["defaultValue"]
+}
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -82,6 +98,7 @@ export default function Page() {
   const [reassignMemberRole, setReassignMemberRole ] = useState(false)
   const [suspendMember, setSuspendMember] = useState(false)
   const [reactivateMember, setReactivateMember] = useState(false)
+  const [taskQuotaMember, setTaskQuotaMember] = useState(false)
 
   const params = new URLSearchParams(searchParams);
 
@@ -94,6 +111,8 @@ export default function Page() {
       setSuspendMember(true)
     } else if (searchParams.get('reactivate')?.toString()) {
       setReactivateMember(true)
+    } else if (searchParams.get('quota')?.toString()) {
+      setTaskQuotaMember(true)
     }
   }, [searchParams])
 
@@ -102,6 +121,7 @@ export default function Page() {
     setReassignMemberRole(false)
     setSuspendMember(false)
     setReactivateMember(false)
+    setTaskQuotaMember(false)
     params.delete('delete')
     params.delete('delete_member')
     params.delete('name')
@@ -110,6 +130,13 @@ export default function Page() {
     params.delete('suspend')
     params.delete('reactivate')
     params.delete('edit')
+    params.delete('img')
+    params.delete('quota')
+    params.delete('task_quota')
+    params.delete('play_quota')
+    params.delete('team_task_quota')
+    params.delete('team_play_quota')
+    params.delete('team')
     params.delete('role')
     params.delete('guest_role')
     replace(`${pathname}?${params.toString()}`);
@@ -126,6 +153,7 @@ export default function Page() {
             <div className="">
               <DeleteTeamMemberDialog open={deleteTeamMemberDialog} openChange={onDialogClose} />
               <ReassignMemberRole open={reassignMemberRole} openChange={onDialogClose} />
+              <SetTaskQuotaForMember open={taskQuotaMember} openChange={onDialogClose} />
               <SuspendTeamMemberDialog open={suspendMember} openChange={onDialogClose} />
               <ReactivateTeamMemberDialog open={reactivateMember} openChange={onDialogClose} />
               <ListItemTable people={users.people} />
@@ -471,6 +499,204 @@ const DeleteMemberFormSchema = z.object({
   
               <SubmitBtn>
                 Update Role
+              </SubmitBtn>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    )
+  
+  }
+
+  export function SetTaskQuotaForMember({ open, openChange }) {
+  
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+    const [taskQuota, setTaskQuota] = React.useState([searchParams.get('task_quota') / searchParams.get('team_task_quota')])
+    const [playQuota, setPlayQuota] = React.useState([searchParams.get('play_quota') / searchParams.get('team_play_quota')])
+    const { toast } = useToast()
+    
+    const initialState = {
+      errors: {
+        role: undefined,
+        member_id: undefined,
+        team_id: undefined,
+      },
+      message: undefined
+    };
+  
+    const [state, formAction] = useFormState(reassignMemberRole, initialState);
+  
+    useEffect(() => {
+      console.log("STATE FROM SERVER: ", state)
+      console.log("USER TASK QUOTAS: ", searchParams.get('task_quota'), "TEAM TASK QUOTAS: ", searchParams.get('team_task_quota'))
+      console.log("USER PLAY QUOTAS: ", searchParams.get('play_quota'), "TEAM PLAY QUOTAS: ", searchParams.get('team_play_quota'))
+      if (state?.message) {
+        if (state?.message === 'Success') {
+          openChange()
+          toast({
+            title: "Member reinstated",
+            description: "Friday, February 10, 2023 at 5:57 PM",
+          })
+        }
+  
+        if (Array.isArray(state?.errors)) {
+          state.errors.forEach((error) => {
+            form.setError(error.field, { message: error.message });
+          })
+        } else if (state.message == 'access denied') {
+            openChange()
+            toast({
+              title: "Operation blocked",
+              description: `You don't have the privileges to complete this.`,
+            })
+        } else if (state.message == 'reassigning founder') {
+          openChange()
+            toast({
+              title: "Operation blocked",
+              description: `You can't re-assign the role of the team founder`,
+            })
+        }
+      }
+    }, [state?.errors]);
+  
+    const initialValues: { role: string, member_id: string, team_id: string } = {
+      role: searchParams.get('role')?.toString(),
+      member_id: searchParams.get('quota')?.toString(),
+      team_id: searchParams.get('team')?.toString(),
+    };
+  
+    const form = useForm<z.infer<typeof UpdateMemberRoleSchema>>({
+      resolver: zodResolver(UpdateMemberRoleSchema),
+      defaultValues: initialValues
+    })
+  
+    return (
+      <Dialog open={open} onOpenChange={openChange}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <Avatar className="size-12">   
+              <AvatarImage src={searchParams.get('img')?.toString() ? `https://ucarecdn.com/${searchParams.get('img')?.toString()}/-/crop/face/1:1/` : ''} alt="@shadcn" /> 
+              <AvatarFallback>{searchParams.get('name')?.toString().charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <DialogTitle>Tasks / Playground Quotas</DialogTitle>
+            <DialogDescription>
+              Setting quotas for <b>{searchParams.get('name')?.toString()}</b>
+            </DialogDescription>
+          </DialogHeader>
+          <Form {...form}>
+            <form action={formAction}>
+            
+              <FormField
+                control={form.control}
+                name="member_id"
+                render={({ field }) => (
+                  <FormItem className="hidden">
+                    <FormControl>
+                      <Input defaultValue={searchParams.get('quota')?.toString()} {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+  
+              <FormField
+                control={form.control}
+                name="team_id"
+                render={({ field }) => (
+                  <FormItem className="hidden">
+                    <FormControl>
+                      <Input defaultValue={searchParams.get('team')?.toString()} {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid gap-2 pt-2 mb-4">
+                <HoverCard openDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <div className="grid gap-4">
+                      <FormField
+                        control={form.control}
+                        name="task_quota"
+                        render={({ field }) => (
+                          <FormItem className="hidden">
+                            <FormControl>
+                              <Input value={taskQuota * 100} {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="top-p">Tasks Quota</Label>
+                        <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-sm text-muted-foreground hover:border-border">
+                        {Math.floor(taskQuota * 100)}%
+                        </span>
+                      </div>
+                      <Slider
+                        id="top-p"
+                        max={1}
+                        defaultValue={taskQuota}
+                        step={0.01}
+                        onValueChange={setTaskQuota}
+                        className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
+                        aria-label="Top P"
+                      />
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    align="start"
+                    className="w-[260px] text-sm"
+                    side="left"
+                  >
+                    Sets the number of task instances this particular user will be assigned relative to the total of tasks the subscribed plan offers.
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+
+              <div className="grid gap-2 pt-2 mb-4">
+                <HoverCard openDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <div className="grid gap-4">
+                    <FormField
+                        control={form.control}
+                        name="playground_quota"
+                        render={({ field }) => (
+                          <FormItem className="hidden">
+                            <FormControl>
+                              <Input value={playQuota * 100} {...field} />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="top-p">Playground Quota</Label>
+                        <span className="w-12 rounded-md border border-transparent px-2 py-0.5 text-right text-sm text-muted-foreground hover:border-border">
+                          {Math.floor(playQuota * 100)}%
+                        </span>
+                      </div>
+                      <Slider
+                        id="top-p"
+                        max={1}
+                        defaultValue={playQuota}
+                        step={0.01}
+                        onValueChange={setPlayQuota}
+                        className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4"
+                        aria-label="Top P"
+                      />
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    align="start"
+                    className="w-[260px] text-sm"
+                    side="left"
+                  >
+                    Sets the number of task instances this particular user will be assigned relative to the total of tasks the subscribed plan offers.
+                  </HoverCardContent>
+                </HoverCard>
+              </div>
+            
+              <SubmitBtn>
+                Save
               </SubmitBtn>
             </form>
           </Form>

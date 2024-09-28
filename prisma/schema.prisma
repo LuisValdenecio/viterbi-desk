@@ -45,6 +45,8 @@ model Team {
   status String @default("functioning")
   description String @db.VarChar(500)
   person User? @relation(fields: [user_id], references: [user_id] , onDelete: Cascade, onUpdate : Cascade)
+  task_quota Int @default(0)
+  playground_quota Int @default(0)
   user_id String
   user_previlege User_privilege[]
   createdAt  DateTime   @default(now())

@@ -38,7 +38,9 @@ export const GET = async (req, res) => {
                 team : {
                     select : {
                         name : true,
-                        team_id : true
+                        team_id : true,
+                        task_quota : true,
+                        playground_quota : true,
                     }
                 }
             }
@@ -54,6 +56,8 @@ export const GET = async (req, res) => {
                 email : member.user.email,
                 team : member.team.name,
                 team_id : member.team.team_id,
+                team_task_quota : member.team.task_quota,
+                team_play_quota : member.team.playground_quota,
                 img : member.user.img,
                 user_id : member.user.user_id,
                 role : member.role,

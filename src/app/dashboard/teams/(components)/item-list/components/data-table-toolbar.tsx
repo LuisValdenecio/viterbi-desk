@@ -51,6 +51,7 @@ import { deleteTaks } from "@/server-actions/tasks"
 import { useToast } from "@/components/ui/use-toast"
 import { ToastAction } from "@/components/ui/toast"
 import { deleteTeams } from "@/server-actions/teams"
+import { Upload_csv_dialog } from "@/components/upload-csv-dialog"
 import Link from "next/link"
 
 interface DataTableToolbarProps<TData> {
@@ -109,8 +110,8 @@ export function DataTableToolbar<TData>({
               Team
             </span>
           </Link>
-
         </Button>
+        <Upload_csv_dialog button_title="Upload CSV" route="teams" />
         <DataTableViewOptions table={table} />
       </div>
     </div>

@@ -45,7 +45,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`?member=${row.original?.user_id}&name=${row.original?.name}&team=${row.original?.team_id}`}>
+          <Link className="flex cursor-pointer" href={`?quota=${row.original?.user_id}&name=${row.original?.name}&team=${row.original?.team_id}&role=${row.original?.role}&img=${row.original?.img}&task_quota=${row?.original?.task_quota}&play_quota=${row?.original?.playground_quota}&team_task_quota=${row?.original?.team_task_quota}&team_play_quota=${row?.original?.team_play_quota}`}>
              Quotas
             <DropdownMenuShortcut>
               <DollarSign className=" h-4 w-4 text-muted-foreground" />
