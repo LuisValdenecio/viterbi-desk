@@ -54,6 +54,8 @@ import { deleteTeams } from "@/server-actions/teams"
 import { deleteInvitations } from "@/server-actions/invitations"
 import { AddMemberDialog } from "../../createPersonDialog"
 import { AddPeopleDialog } from "../../createPeopleDialog"
+import { Upload_csv_dialog } from "@/components/upload-csv-dialog"
+import { usePathname } from "next/navigation"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -63,6 +65,7 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+  const pathname = usePathname()
 
   return (
     <div className="flex items-center justify-between">
@@ -104,7 +107,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex gap-2">
-        <AddPeopleDialog />
+        <Upload_csv_dialog button_title={"Upload .csv"} route="members" teamId={pathname.split("/")[pathname.split("/").length - 1]} />
         <AddMemberDialog />
         <DataTableViewOptions table={table} />
       </div>

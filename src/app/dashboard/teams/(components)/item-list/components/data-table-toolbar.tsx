@@ -11,46 +11,7 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 
-import { cn } from "@/lib/utils"
-import { useMediaQuery } from "@/hooks/use-media-query"
-import  SubmitBtn  from "@/components/submit-button"
-import { useFormState } from "react-dom"
-import { useForm } from "react-hook-form"
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-
-import { PlusCircle, Trash2Icon } from "lucide-react"
-import { useState } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { deleteTaks } from "@/server-actions/tasks"
-import { useToast } from "@/components/ui/use-toast"
-import { ToastAction } from "@/components/ui/toast"
-import { deleteTeams } from "@/server-actions/teams"
+import { PlusCircle } from "lucide-react"
 import { Upload_csv_dialog } from "@/components/upload-csv-dialog"
 import Link from "next/link"
 
@@ -88,9 +49,6 @@ export function DataTableToolbar<TData>({
             options={priorities}
           />
         )}
-        {(table.getFilteredSelectedRowModel().rows.length > 0) && (
-          <DeleteTasksDialog data_to_delete={table.getFilteredSelectedRowModel().rows} />
-        )}
         {isFiltered && (
           <Button
             variant="ghost"
@@ -111,7 +69,7 @@ export function DataTableToolbar<TData>({
             </span>
           </Link>
         </Button>
-        <Upload_csv_dialog button_title="Upload CSV" route="teams" />
+        <Upload_csv_dialog button_title="Upload .csv" route="teams" teamId={null} />
         <DataTableViewOptions table={table} />
       </div>
     </div>

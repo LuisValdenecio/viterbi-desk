@@ -17,32 +17,55 @@ import { FileUpIcon } from 'lucide-react'
 import { useState } from 'react'
 import Papa from 'papaparse'
 import { useToast } from "@/components/ui/use-toast"
+import { z } from "zod";
+
+const memberSchema = z.object({
+  email: z.string().email(), // ensures the email field is a valid email string
+  role : z.enum(["owner", "reader", "admin"])
+});
+
+const teamSchema = z.object({
+  name : z.string().min(1),
+  description: z.string().min(1)
+})
+
+const membersArraySchema = z.array(memberSchema);
+const teamsArraySchema = z.array(teamSchema)
 
 const acceptedCSVFileTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv"
 
 const validateData = (data) => {
-  if (!Array.isArray(data)) return false;
-  // Check if data has exactly two properties: 'name' and 'description'
-  if (!data.every(item => 
-    Object.keys(item).length === 2 &&
-    'name' in item &&
-    'description' in item
-  )) return false;
-
-  // Check for empty string values for either property
-  if (data.some(item => item.name.trim() === '' || item.description.trim() === '')) return false;
-
-  return data.every(data => 
-    typeof data === 'object' &&
-    data !== null &&
-    'name' in data &&
-    'description' in data &&
-    typeof data.name === 'string' &&
-    typeof data.description === 'string'
-  );
+  if (!teamsArraySchema.safeParse(data).success) return false;
+  return true
 };
 
-export function Upload_csv_dialog({ button_title, route }) {
+const validateMembersInfo = (data) => {
+  if (!membersArraySchema.safeParse(data).success) return false;
+  return true
+}
+
+const uniqueByEmail = (array) => {
+  const filteredArray = array.filter(data => data.email && data.role)
+  const seen = new Set();  // Create a Set to track unique names
+  const noRepeat = filteredArray.filter(invitation => {
+    const duplicate = seen.has(invitation.email);  // Check if name has been seen
+    seen.add(invitation.email);  // Add name to the Set
+    return !duplicate;  // Keep the person only if it's not a duplicate
+  });
+  return noRepeat
+};
+
+const uniqueByName = (array) => {
+  const filteredArray = array.filter(data => data.name && data.description)
+  const seen = new Set();  // Create a Set to track unique names
+  return filteredArray.filter(team => {
+    const duplicate = seen.has(team.name);  // Check if name has been seen
+    seen.add(team.name);  // Add name to the Set
+    return !duplicate;  // Keep the person only if it's not a duplicate
+  });
+};
+
+export function Upload_csv_dialog({ button_title, route, teamId }) {
   const [isOpen, setIsOpen] = useState(false)
   const [contacts, setContacts] = useState('')
   const { toast } = useToast()
@@ -53,43 +76,115 @@ export function Upload_csv_dialog({ button_title, route }) {
         header : true,
         skipEmptyLines : true,
         complete: async function(results) {
-            console.log(results.data, " IS VALID?: ", validateData(results.data))
-            if (validateData(results.data)) {
-              const response = await fetch(`/api/csv-file-upload/${route}`, {
-                method : "POST",
-                headers: {
-                    "content-type" : "application/json",
-                },
-                body: JSON.stringify({
-                    results
-                })
-            })
-
-            if (response.ok) {
-              const data = await response.json()
-              
-              if (data.split(":")[0] === 'Repeated') {
-                setIsOpen()
-                toast({
-                  title: "Repeated Team name",
-                  description: `${data.split(":")[1]} already exists.`,
-                })
+            if (route === 'members' && teamId) {
+              if (validateMembersInfo(uniqueByEmail(results.data))) {
+                
+                const response = await fetch(`/api/csv-file-upload/${route}`, {
+                  method : "POST",
+                  headers: {
+                      "content-type" : "application/json",
+                  },
+                  body: JSON.stringify({
+                      results : uniqueByEmail(results.data),
+                      teamId
+                  })
+                }) 
+  
+                if (response.ok) {
+                  const data = await response.json()
+                  console.log("FROM THE SERVER: ", data)
+                  if (data === 'You lack privileges') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `Your role on this team does not allow you to complete this operation`,
+                    })
+                  } else if (data === 'inviting owner') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `Only the team founder can invite members with 'owner' role`,
+                    })
+                  } else if (data === 'Resending invitations') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `Some of the emails on the list were already invited`,
+                    })
+                  } else if (data === 'Already registered') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `Some of the emails on your file are from users who are already members of this team`,
+                    })
+                  } else if (data.split(":")[0] === 'Repeated invite') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `${data.split(":")[1]} was already invited to join this team`,
+                    })
+                  } else if (data.split(":")[0] === 'Already registered') {
+                    setIsOpen()
+                    toast({
+                      title: "Operation blocked",
+                      description: `${data.split(":")[1]} is the email of a registered user.`,
+                    })
+                  } else {
+                    setIsOpen()
+                    toast({
+                      title: "Operation completed",
+                      description: `All the members on the .csv file were invited successfully.`,
+                    })  
+                  }
+                }
               } else {
                 setIsOpen()
                 toast({
-                  title: "Operation completed",
-                  description: `All the teams on the .csv file were saved successfully.`,
-                })  
+                  title: "Invalid upload",
+                  description: `Makes sure the file is a valid CSV file with exactly two columns: 'email' and 'role'. All the emails must be valid. Roles can be 'owner', 'reader' or 'admin'`,
+                })
               }
-            }
+            } 
 
-            } else {
-              setIsOpen()
-              toast({
-                title: "Invalid upload",
-                description: `Makes sure the file is a valid CSV file with exactly two columns: 'name' and 'description'.`,
-              })
-            }
+            // when uploading .csv files for teams and agents
+            if (route === 'teams' || route === 'agents') {
+
+              if (validateData(uniqueByName(results.data))) {
+                const response = await fetch(`/api/csv-file-upload/${route}`, {
+                  method : "POST",
+                  headers: {
+                      "content-type" : "application/json",
+                  },
+                  body: JSON.stringify({
+                      results : uniqueByName(results.data)
+                  })
+                }) 
+  
+                if (response.ok) {
+                  const data = await response.json()
+                  
+                  if (data.split(":")[0] === 'Repeated') {
+                    setIsOpen()
+                    toast({
+                      title: "Repeated Team name",
+                      description: `${data.split(":")[1]} already exists.`,
+                    })
+                  } else {
+                    setIsOpen()
+                    toast({
+                      title: "Operation completed",
+                      description: `All the teams on the .csv file were saved successfully.`,
+                    })  
+                  }
+                }
+              } else {
+                setIsOpen()
+                toast({
+                  title: "Invalid upload",
+                  description: `Makes sure the file is a valid CSV file with exactly two columns: 'name' and 'description'.`,
+                })
+              }
+            } 
         }
     });    
   }
@@ -117,21 +212,6 @@ export function Upload_csv_dialog({ button_title, route }) {
           </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
-
-
-      {/*<Dialog open={isOpen} onClose={setIsOpen}>
-        <DialogTitle>Add multiple contacts</DialogTitle>
-        <DialogDescription>
-          add contacts through a .csv file. <TextLink href="#">Download an example</TextLink>.
-        </DialogDescription>
-        <DialogBody>
-          <input type="file" name="" id="csvFileSelector" accept={acceptedCSVFileTypes} onChange={handleFileChange}  />
-        </DialogBody>
-        <DialogActions>
-          <Button plain onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button>save</Button>
-        </DialogActions>
-      </Dialog>*/}
     </>
   )
 }

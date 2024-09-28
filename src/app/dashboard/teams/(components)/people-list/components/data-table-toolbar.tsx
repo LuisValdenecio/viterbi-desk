@@ -11,6 +11,8 @@ import { active_statuses, priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { AddMemberDialog } from "../../createPersonDialog"
 import { AddPeopleDialog } from "../../createPeopleDialog"
+import { Upload_csv_dialog } from "@/components/upload-csv-dialog"
+import { usePathname } from "next/navigation"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -20,7 +22,8 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
-
+  const pathname = usePathname()
+  
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -58,8 +61,8 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex gap-2">
+        <Upload_csv_dialog button_title={"Upload .csv"} route="members" teamId={pathname.split("/")[pathname.split("/").length - 1]} />
         <AddMemberDialog />
-        <AddPeopleDialog />
         <DataTableViewOptions table={table} />
       </div>
     </div>
