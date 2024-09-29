@@ -11,9 +11,19 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { priorities, statuses } from "../data/data"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 
-import { PlusCircle } from "lucide-react"
+import { Plus, PlusCircle, PlusIcon, SquareArrowUpIcon } from "lucide-react"
 import { Upload_csv_dialog } from "@/components/upload-csv-dialog"
 import Link from "next/link"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { AzureSvgIcon, GoogleSvgIcon, HubsPotSvgIcon, JiraSvgIcon, SlackSVGIcon, TeamsSvgIcon, WorkDaySvgIcon } from "@/components/svg-icons"
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
@@ -23,6 +33,13 @@ export function DataTableToolbar<TData>({
   table,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
+
+  // I'll keep the Authotization URL in here:
+  const HubsPotAuthUrl =
+  'https://app.hubspot.com/oauth/authorize' +
+  `?client_id=${encodeURIComponent(process.env.NEXT_PUBLIC_HUBSPOT_CLIENT_ID)}` +
+  `&scope=settings.users.teams.read` +
+  `&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_HUBSPOT_REDIRECT_URL)}`; 
 
   return (
     <div className="flex items-center justify-between">
@@ -61,14 +78,94 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex gap-2">
-        <Button size="sm" variant="outline" className="h-8 gap-1" asChild>
-          <Link href="/dashboard/teams/new">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Team
-            </span>
-          </Link>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="outline" className="h-8 gap-1">
+              <PlusIcon className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                Team
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                New Team
+                <DropdownMenuShortcut>
+                  <PlusIcon className=" h-4 w-4 text-muted-foreground" />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Azure AD
+                <DropdownMenuShortcut>
+                  <AzureSvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Microsoft Teams
+                <DropdownMenuShortcut>
+                  <TeamsSvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/slack">
+                Slack
+                <DropdownMenuShortcut>
+                  <SlackSVGIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Google Workspace
+                <DropdownMenuShortcut>
+                  <GoogleSvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Jira
+                <DropdownMenuShortcut>
+                  <JiraSvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href={HubsPotAuthUrl}>
+                Hubspot
+                <DropdownMenuShortcut>
+                  <HubsPotSvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Workday
+                <DropdownMenuShortcut>
+                  <WorkDaySvgIcon />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link className="flex cursor-pointer" href="/dashboard/teams/new">
+                Salesforce
+                <DropdownMenuShortcut>
+                  <PlusIcon className=" h-4 w-4 text-muted-foreground" />
+                </DropdownMenuShortcut>
+              </Link>
+            </DropdownMenuItem>
+            
+
+
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <Upload_csv_dialog button_title="Upload .csv" route="teams" teamId={null} />
         <DataTableViewOptions table={table} />
       </div>
