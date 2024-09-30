@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { Discord, Gmail } from "@/components/svg-icons"
 
 const FormSchema = z.object({
   read_access: z.boolean().default(false),
@@ -29,7 +30,7 @@ const FormSchema = z.object({
   full_access : z.boolean().default(false)
 })
 
-export  function StripeProviderDialog({open, close}) {
+export  function DiscordProviderDialog({open, close}) {
   
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver : zodResolver(FormSchema),
@@ -46,8 +47,9 @@ export  function StripeProviderDialog({open, close}) {
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex gap-1">
+              <Discord />
               <span>
-                Stripe scope Configuration
+                Discord scope Configuration
               </span>
             </DialogTitle>
             <DialogDescription>
@@ -55,13 +57,13 @@ export  function StripeProviderDialog({open, close}) {
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form action={'/api/gmail-oauth-flow'}>
+            <form action={'/api/discord-oauth-flow'}>
               <FormField 
                 control={form.control}
                 name="read_access"
                 render={({ field }) => (
                   <FormItem>
-                    <input className="hidden" type="text" name="read_access" value={field.value ? 'https://www.googleapis.com/auth/gmail.readonly' : ''} />
+                    <input className="hidden" type="text" name="read_access" value={field.value ? process.env.NEXT_PUBLIC_DISCORD_READ_PERMISSION_URL : ''} />
                     <FormControl>
                       <div className="flex items-start justify-between space-x-4 pt-3">
                         <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />
@@ -84,7 +86,7 @@ export  function StripeProviderDialog({open, close}) {
                 name="read_and_write_access"
                 render={({ field }) => (
                   <FormItem>
-                    <input className="hidden" type="text" name="read_and_write_access" value={field.value ? 'https://www.googleapis.com/auth/gmail.modify' : ''} />
+                    <input className="hidden" type="text" name="read_and_write_access" value={field.value ? process.env.NEXT_PUBLIC_DISCORD_READ_AND_WRITE_PERMISSION_URL : ''} />
                     <FormControl>
                       <div className="flex items-start justify-between space-x-4 pt-3">
                         <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />
@@ -107,7 +109,7 @@ export  function StripeProviderDialog({open, close}) {
                 name="full_access"
                 render={({ field }) => (
                   <FormItem>
-                    <input className="hidden" type="text" name="full_access" value={field.value ? 'https://mail.google.com/' : ''} />
+                    <input className="hidden" type="text" name="full_access" value={field.value ? process.env.NEXT_PUBLIC_DISCORD_FULL_ACCESS_PERMISSION_URL : ''} />
                     <FormControl>
                       <div className="flex items-start justify-between space-x-4 pt-3">
                         <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />

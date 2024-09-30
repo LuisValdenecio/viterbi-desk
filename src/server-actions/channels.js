@@ -368,12 +368,25 @@ export async function postChannel(_prevstate, formData) {
         }
       case 'Discord':
 
+        const discord_token = await prisma.discord_token.findFirst({
+          where : {
+            id : token_id
+          }
+        })
+
+        if (!discord_token) {
+          return {
+            message: 'Invalid token'
+          }
+        }
+
         const newDiscordChannel = await prisma.channel.create({
           data: {
             name: channelName,
-            provider: 'Discord',
+            provider: provider,
             description: description,
             owner_id: session?.user?.id,
+            discord_token_id : token_id,
             team_id : team,
           }
         })

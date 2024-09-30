@@ -2,19 +2,8 @@
 
 import * as React from "react"
 import { Dialog } from "@radix-ui/react-dialog"
-import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { useForm } from "react-hook-form"
 
-import { toast } from "@/components/ui/use-toast"
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
   DialogContent,
@@ -23,22 +12,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
 } from "@/components/ui/form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -49,7 +29,6 @@ const FormSchema = z.object({
   read_and_write_access : z.boolean().default(false),
   full_access : z.boolean().default(false)
 })
-
 
 export  function GmailProviderDialog({open, close}) {
   

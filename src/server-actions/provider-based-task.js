@@ -3,17 +3,36 @@ import prisma from '@/lib/prisma'
 import axios from 'axios'
 import { google } from "googleapis"
 
-/*
-export async function executeDiscordTask(formData) {
-    const agentId = formData.get('task-agent')
 
+export async function executeDiscordTask(agentId) {
+   
     try {
-        const agent = await AgentModel.find({_id : agentId})
-        const channel = await ChannelModel.find({_id : agent[0]?.channelId})
-        const discordToken = await DiscordTokenModel.find({_id : channel[0]?.discordToken})
+        const agent = await prisma.agent.findUnique({
+            where : {
+                agent_id : agentId.agent_id
+            },
+            select : {
+                channel_id : true
+            }
+        })
 
-        const access_token = discordToken[0]?.access_token
-        const token_type = discordToken[0]?.token_type
+        const channel = await prisma.channel.findUnique({
+            where : {
+                channel_id : agent.channel_id
+            },
+            select : {
+                discord_token : true
+            }
+        })
+
+        const discord_token = await prisma.discord_token.findUnique({
+            where : {
+                id : channel.discord_token.id
+            }
+        })
+        
+        const access_token = discord_token?.access_token
+        const token_type = discord_token?.token_type
 
         const userDataResponse= await axios.get('https://discord.com/api/users/@me',{
             headers:{
@@ -23,12 +42,11 @@ export async function executeDiscordTask(formData) {
 
         console.log('DISCORD DATA ', userDataResponse.data)
 
-
     } catch (error) {
         console.log(error)
     }
 }
-*/
+
 
 export async function executeGmailTask(channel) {
    

@@ -261,19 +261,19 @@ export async function executeTask(formData) {
 
     try {
         // execute task code based on the provider
-        const task = await prisma.task.findFirst({
+        const task = await prisma.task.findUnique({
             where: {
                 task_id: taskId
             }
         })
 
-        const agent = await prisma.agent.findFirst({
+        const agent = await prisma.agent.findUnique({
             where: {
                 agent_id: task.agent_id
             }
         })
 
-        const channel = await prisma.channel.findFirst({
+        const channel = await prisma.channel.findUnique({
             where: {
                 channel_id: agent.channel_id
             }
@@ -284,7 +284,7 @@ export async function executeTask(formData) {
                 await executeGmailTask(channel)
                 break
             case 'Discord':
-                await executeDiscordTask(formData)
+                await executeDiscordTask(agent)
                 break
             default:
                 break

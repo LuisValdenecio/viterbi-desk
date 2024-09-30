@@ -20,16 +20,23 @@ export const GET = async (req, res) => {
     }  else { // Get access and refresh tokens (if access_type is offline)
         let { tokens } = await auth.getToken(q.code);
 
-        const new_google_token = await prisma.google_token.create({
-            data : {
-                access_token : tokens?.access_token,
-                refresh_token : tokens?.refresh_token,
-                scope : tokens?.scope
-            }
-        })
+        try  {
+            const new_google_token = await prisma.google_token.create({
+                data : {
+                    access_token : tokens?.access_token,
+                    refresh_token : tokens?.refresh_token,
+                    scope : tokens?.scope
+                }
+            })
 
-        const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-${new_google_token.id}`)
-       
+            const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-${new_google_token.id}`)
+            return response       
+
+        } catch (error) {
+            console.log(error)
+        }
+
+        const response = NextResponse.redirect(`http://localhost:3000/dashboard/channels/new?provider=Gmail-error`)
         return response            
     }
 }

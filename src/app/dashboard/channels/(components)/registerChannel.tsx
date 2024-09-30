@@ -68,6 +68,8 @@ import SubmitBtn from "@/components/submit-button"
 import { TeamSelect } from "./team-select-ui/select-ui"
 import { AzureSvgIcon, Discord, Gmail, SlackSVGIcon, StripeSvgIcon } from "@/components/svg-icons"
 import Link from "next/link"
+import { StripeProviderDialog } from "./stripe-provider-dialog/provider"
+import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
   
   function transformResultData (results : Array<any>) {
     console.log("RESULTS", results)
@@ -148,14 +150,14 @@ import Link from "next/link"
             className="w-full justify-between"
           >
             {value
-              ? providers.find((framework) => framework.value === value)?.label
+              ? providers.find((provider) => provider.value === value)?.label
               : "Select provider..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[300px] p-0">
           <Command>
-            <CommandInput placeholder="Search framework..." />
+            <CommandInput placeholder="Search providers..." />
             <CommandList>
               <CommandEmpty>No provider found.</CommandEmpty>
               <CommandGroup>
@@ -188,6 +190,8 @@ import Link from "next/link"
     const router = useRouter()
     const pathname = usePathname()
     const [gmailProvider, setGmailProvider] = useState(false)
+    const [stripeProvider, setStripeProvider] = useState(false)
+    const [discordProvider, setDiscordProvider] = useState(false)
     const searchParams = useSearchParams();
     const params = new URLSearchParams(searchParams);
     const { replace } = useRouter()
@@ -202,6 +206,8 @@ import Link from "next/link"
 
     const onDialogClose = () => {
       setGmailProvider(false)
+      setStripeProvider(false)
+      setDiscordProvider(false)
       params.delete('provider')
       replace(`${pathname}?${params.toString()}`)
     }
@@ -253,7 +259,12 @@ import Link from "next/link"
       setGmailProvider(false)
       if (searchParams.get('provider')?.toString() === 'Gmail') {
         setGmailProvider(true)
+      } else if (searchParams.get('provider')?.toString() === 'Stripe') {
+        setStripeProvider(true)
+      } else if (searchParams.get('provider')?.toString() === 'Discord') {
+        setDiscordProvider(true)
       }
+
 
       if (state?.message) {
         if (state?.message === 'Success') {
@@ -274,6 +285,8 @@ import Link from "next/link"
       <div className="grid">
 
         <GmailProviderDialog open={gmailProvider} close={onDialogClose} />
+        <StripeProviderDialog open={stripeProvider} close={onDialogClose} />
+        <DiscordProviderDialog open={discordProvider} close={onDialogClose} />
        
         <div className="flex flex-col">
          
