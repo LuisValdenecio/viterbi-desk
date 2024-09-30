@@ -19,6 +19,7 @@ export const GET = async (req, res) => {
         })
 
         const team_ids = teams.flatMap(team => team.team_id)
+        console.log("TEAM IDS: ", team_ids.filter(id => id === 'cm1fmrv9q00019shuy38q9hy6'))
 
         const my_channels = await prisma.channel.findMany({
             where: {

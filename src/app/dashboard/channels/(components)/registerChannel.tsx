@@ -95,7 +95,7 @@ import Link from "next/link"
     }),
   })
 
-  const frameworks = [
+  const providers = [
     {
       value: "Gmail",
       label: "Gmail",
@@ -148,8 +148,8 @@ import Link from "next/link"
             className="w-full justify-between"
           >
             {value
-              ? frameworks.find((framework) => framework.value === value)?.label
-              : "Select framework..."}
+              ? providers.find((framework) => framework.value === value)?.label
+              : "Select provider..."}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -157,21 +157,21 @@ import Link from "next/link"
           <Command>
             <CommandInput placeholder="Search framework..." />
             <CommandList>
-              <CommandEmpty>No framework found.</CommandEmpty>
+              <CommandEmpty>No provider found.</CommandEmpty>
               <CommandGroup>
-                {frameworks.map((framework) => (
+                {providers.map((provider) => (
                   <CommandItem
-                    key={framework.value}
-                    value={framework.value}
+                    key={provider.value}
+                    value={provider.value}
                     asChild
                     onSelect={(currentValue) => {
                       setValue(currentValue === value ? "" : currentValue)
                       setOpen(false)
                     }}
                   >
-                    <Link className="flex gap-1" href={framework.href}>
-                      <framework.icon />
-                      {framework.label}
+                    <Link className="flex gap-1" href={provider.href}>
+                      <provider.icon />
+                      {provider.label}
                     </Link>
                   </CommandItem>
                 ))}

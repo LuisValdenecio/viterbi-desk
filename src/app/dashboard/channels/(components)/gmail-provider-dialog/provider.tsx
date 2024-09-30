@@ -1,34 +1,37 @@
-import * as React from "react"
+"use client"
 
-import { useFormStatus } from "react-dom";
-import { cn } from "@/lib/utils"
-import { useMediaQuery } from "@/hooks/use-media-query"
+import * as React from "react"
+import { Dialog } from "@radix-ui/react-dialog"
+import { DotsHorizontalIcon } from "@radix-ui/react-icons"
+import { useForm } from "react-hook-form"
+
+import { toast } from "@/components/ui/use-toast"
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Label } from "@/components/ui/label"
-
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
- 
+import { Switch } from "@/components/ui/switch"
 import {
   Form,
   FormControl,
@@ -37,160 +40,123 @@ import {
   FormItem,
   FormLabel,
 } from "@/components/ui/form"
-import { Switch } from "@/components/ui/switch"
-import { Loader2 } from "lucide-react"
-import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { Gmail } from "@/components/svg-icons"
 
 const FormSchema = z.object({
-    email_access: z.boolean().default(false),
-  })
+  read_access: z.boolean().default(false),
+  read_and_write_access : z.boolean().default(false),
+  full_access : z.boolean().default(false)
+})
 
-export function GmailProviderDialog({open, close}) {
-  //const [open, setOpen] = React.useState(false)
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+
+export  function GmailProviderDialog({open, close}) {
   
-  if (isDesktop) {
-    return (
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver : zodResolver(FormSchema),
+    defaultValues : {
+      read_access : false,
+      read_and_write_access : false,
+      full_access : false,
+    }
+  })
+  
+  return (
+    <>
       <Dialog open={open} onOpenChange={close}>
-        
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>Configure Permission</DialogTitle>
+            <DialogTitle className="flex gap-1">
+              <Gmail />
+              <span>
+                Gmail scope Configuration
+              </span>
+            </DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
+            This channel needs certain permissions to access your Gmail account. Review the requested access levels below.
             </DialogDescription>
           </DialogHeader>
-          <SwitchForm />
+          <Form {...form}>
+            <form action={'/api/gmail-oauth-flow'}>
+              <FormField 
+                control={form.control}
+                name="read_access"
+                render={({ field }) => (
+                  <FormItem>
+                    <input className="hidden" type="text" name="read_access" value={field.value ? 'https://www.googleapis.com/auth/gmail.readonly' : ''} />
+                    <FormControl>
+                      <div className="flex items-start justify-between space-x-4 pt-3">
+                        <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />
+                        <Label className="grid gap-1 font-normal" htmlFor="show">
+                          <span className="font-semibold">
+                            Read 
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                          Read all resources and their metadata, without write operations. Appropriate for tasks that just read emails.
+                          </span>
+                        </Label>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField 
+                control={form.control}
+                name="read_and_write_access"
+                render={({ field }) => (
+                  <FormItem>
+                    <input className="hidden" type="text" name="read_and_write_access" value={field.value ? 'https://www.googleapis.com/auth/gmail.modify' : ''} />
+                    <FormControl>
+                      <div className="flex items-start justify-between space-x-4 pt-3">
+                        <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />
+                        <Label className="grid gap-1 font-normal" htmlFor="show">
+                          <span className="font-semibold">
+                            Read & Write
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            Read all emails and their respective metadata, without write operations.
+                          </span>
+                        </Label>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField 
+                control={form.control}
+                name="full_access"
+                render={({ field }) => (
+                  <FormItem>
+                    <input className="hidden" type="text" name="full_access" value={field.value ? 'https://mail.google.com/' : ''} />
+                    <FormControl>
+                      <div className="flex items-start justify-between space-x-4 pt-3">
+                        <Switch name="show" id="show" checked={field.value} onCheckedChange={field.onChange} />
+                        <Label className="grid gap-1 font-normal" htmlFor="show">
+                          <span className="font-semibold">
+                            Full Access
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            Full access to the mailbox, including permanent deletion of threads and messages.
+                          </span>
+                        </Label>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <DialogFooter className="mt-6">
+                <Button type="submit" disabled={(!form.getValues('full_access') && !form.getValues('read_access') && !form.getValues('read_and_write_access')) ? true : false}>
+                  Connect
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+          
         </DialogContent>
       </Dialog>
-    )
-  }
-
-  return (
-    <Drawer open={open} onOpenChange={close}>
-      
-      <DrawerContent>
-        <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
-            Make changes to your profile here. Click save when you're done.
-          </DrawerDescription>
-        </DrawerHeader>
-        <SwitchForm className="px-4" />
-        <DrawerFooter className="pt-2">
-          <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DrawerClose>
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+    </>
   )
 }
-
-function ProfileForm({ className }: React.ComponentProps<"form">) {
-  return (
-    <form className={cn("grid items-start gap-4", className)}>
-      <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input type="email" id="email" defaultValue="shadcn@example.com" />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="username">Username</Label>
-        <Input id="username" defaultValue="@shadcn" />
-      </div>
-      <Button type="submit">Save changes</Button>
-    </form>
-  )
-}
-
-export function SubmitBtn() {
-  const { pending } = useFormStatus();
-  return (
-    <Button className="w-full" type="submit" disabled={pending}>
-      {pending ? (<Loader2 className="mr-2 h-4 w-4 animate-spin" />) : 'Connect'}
-    </Button>
-  )
-}
-
-function simulateAsyncOperation() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve("Operation completed!");
-    }, 10000); // Simulates a 2-second delay
-  });
-}
-
-export function SwitchForm() {
-    const form = useForm<z.infer<typeof FormSchema>>({
-      resolver: zodResolver(FormSchema),
-      defaultValues: {
-        email_access: true,
-      },
-    })
-   
-    async function onSubmit(data: z.infer<typeof FormSchema>) {
-      await fetch('/api/gmail-oauth-flow')
-      .then((data) => {
-        console.log(data)
-      })
-    }
-   
-    return (
-      <Form {...form}>
-        <form action={'/api/gmail-oauth-flow'} className="w-full space-y-6">
-          <div>
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email_access"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Read Emails
-                      </FormLabel>
-                      <FormDescription>
-                        Alows tasks to read all your inbox
-                      </FormDescription>
-                    </div>
-                    <input className="hidden" type="text" name="read" value={field.value ? 'https://www.googleapis.com/auth/gmail.readonly' : ''} />
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email_access"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border border-red-200 p-4">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-base">
-                        Write Emails
-                      </FormLabel>
-                      <FormDescription>
-                      Alows tasks to reoly to messages
-                      </FormDescription>
-                    </div>
-                    <input className="hidden" type="text" name="write" value={field.value ? 'https://mail.google.com/' : ''} />
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-              
-            </div>
-          </div>
-          <SubmitBtn/>
-        </form>
-      </Form>
-    )
-  }
