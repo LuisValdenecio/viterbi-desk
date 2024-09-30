@@ -313,6 +313,7 @@ export async function editChannel(_prevstate, formData) {
 export async function postChannel(_prevstate, formData) {
 
   const session = await auth()
+  console.log("FORMDATA: ", formData)
 
   const validateFields = ChannelCreationSession.safeParse({
     channelName: formData.get('channelName'),
