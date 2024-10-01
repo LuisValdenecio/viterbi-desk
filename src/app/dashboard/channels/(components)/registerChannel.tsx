@@ -66,10 +66,11 @@ import { useToast } from "@/components/ui/use-toast"
 import Loader_component from "@/components/loader"
 import SubmitBtn from "@/components/submit-button"
 import { TeamSelect } from "./team-select-ui/select-ui"
-import { AzureSvgIcon, Discord, Gmail, SlackSVGIcon, StripeSvgIcon } from "@/components/svg-icons"
+import { AzureSvgIcon, Discord, Gmail, SlackSVGIcon, StripeSvgIcon, ShopifySvgIcon } from "@/components/svg-icons"
 import Link from "next/link"
 import { StripeProviderDialog } from "./stripe-provider-dialog/provider"
 import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
+import { ShopifyProviderDialog } from "./shopify-provider-dialog/provider"
   
   function transformResultData (results : Array<any>) {
     console.log("RESULTS", results)
@@ -109,6 +110,12 @@ import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
       label: "Discord",
       icon : Discord,
       href : '/dashboard/channels/new?provider=Discord'
+    },
+    {
+      value: "Shopify",
+      label: "Shopify",
+      icon : ShopifySvgIcon,
+      href : '/dashboard/channels/new?provider=Shopify'
     },
     {
       value: "Stripe",
@@ -192,6 +199,7 @@ import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
     const [gmailProvider, setGmailProvider] = useState(false)
     const [stripeProvider, setStripeProvider] = useState(false)
     const [discordProvider, setDiscordProvider] = useState(false)
+    const [shopifyProvider, setShopifyProvider] = useState(false)
     const searchParams = useSearchParams();
     const params = new URLSearchParams(searchParams);
     const { replace } = useRouter()
@@ -208,6 +216,7 @@ import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
       setGmailProvider(false)
       setStripeProvider(false)
       setDiscordProvider(false)
+      setShopifyProvider(false)
       params.delete('provider')
       replace(`${pathname}?${params.toString()}`)
     }
@@ -263,8 +272,9 @@ import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
         setStripeProvider(true)
       } else if (searchParams.get('provider')?.toString() === 'Discord') {
         setDiscordProvider(true)
+      }  else if (searchParams.get('provider')?.toString() === 'Shopify') {
+        setShopifyProvider(true)
       }
-
 
       if (state?.message) {
         if (state?.message === 'Success') {
@@ -287,6 +297,7 @@ import { DiscordProviderDialog } from "./discord-provider-dialog/provider"
         <GmailProviderDialog open={gmailProvider} close={onDialogClose} />
         <StripeProviderDialog open={stripeProvider} close={onDialogClose} />
         <DiscordProviderDialog open={discordProvider} close={onDialogClose} />
+        <ShopifyProviderDialog open={shopifyProvider} close={onDialogClose} />
        
         <div className="flex flex-col">
          

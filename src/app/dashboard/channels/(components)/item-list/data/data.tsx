@@ -8,7 +8,7 @@ import {
   QuestionMarkCircledIcon,
   StopwatchIcon,
 } from "@radix-ui/react-icons"
-import { Gmail, Discord, GDrive, AwsS3, Dropbox } from '@/components/svg-icons'
+import { Gmail, Discord, GDrive, AwsS3, Dropbox, ShopifySvgIcon } from '@/components/svg-icons'
 import { Mail } from "lucide-react"
 
 
@@ -38,6 +38,11 @@ export const statuses = [
     value: "AWS S3",
     label: "AWS S3",
     icon: AwsS3,
+  },
+  {
+    value : "Shopify",
+    label : "Shopify",
+    icon : ShopifySvgIcon
   },
   {
     value: "Dropbox",
