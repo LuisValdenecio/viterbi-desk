@@ -1,5 +1,8 @@
 "use client"
 
+import * as React from "react"
+import { PencilIcon, Trash2, UserPlus2 } from "lucide-react"
+
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { Row } from "@tanstack/react-table"
 
@@ -8,21 +11,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { labels } from "../data/data"
 import { taskSchema } from "../data/schema"
-import { CalendarClock, Clock, Edit2Icon, PencilIcon, Play, ScrollTextIcon, SquareArrowUp, SquareArrowUpRight, Trash2 } from "lucide-react"
 import Link from "next/link"
-import { EditTaskDialog } from "../../editTaskDialog"
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -31,7 +26,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  //const task = taskSchema.parse(row.original)
+  const task = taskSchema.parse(row.original)
   console.log("ROW INFO", row)
   return (
     <DropdownMenu>
@@ -46,23 +41,32 @@ export function DataTableRowActions<TData>({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
-        <Link className="flex cursor-pointer" href={`/dashboard/tasks/${row.original?.task_id}`}>
-          Details
+        <Link className="flex cursor-pointer" href={`/dashboard/teams/${row.original?.team_id}`}>
+          Open
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        
         <DropdownMenuItem asChild>
-          <Link className="flex cursor-pointer" href={`?edit=${row.original?.task_id}&task_name=${row.original?.name}&priority=${row.original?.priority}&timezone=${row.original?.task_schedule?.timezone}&schedule_id=${row.original?.task_schedule?.id}&day=${row.original?.task_schedule?.day}&day_period=${row.original?.task_schedule?.dayPeriod}&hour_minute=${row.original?.task_schedule?.hourAndMinute}`}>
+          <Link className="flex cursor-pointer" href={`/dashboard/teams?edit=${row.original?.team_id}&team_name=${row.original?.name}&description=${row.original?.description}`}>
              Edit
             <DropdownMenuShortcut>
               <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
-          </Link>
+          </Link>           
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-        <Link className="flex cursor-pointer" href={`?delete=${row.original?.task_id}&task_name=${row.original?.name}`
-            }>
+          <Link className="flex cursor-pointer" href={`/dashboard/teams?member=${row.original?.team_id}`}>
+             Add member
+            <DropdownMenuShortcut>
+              <UserPlus2 className=" h-4 w-4 text-muted-foreground" />
+            </DropdownMenuShortcut>
+          </Link>           
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link className="flex cursor-pointer" href={`/dashboard/teams?delete=${row.original?.team_id}&team_name=${row.original?.name}`}>
             Delete
             <DropdownMenuShortcut>
               <Trash2 className=" h-4 w-4 text-muted-foreground" color="red"></Trash2>

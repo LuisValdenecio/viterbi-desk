@@ -197,6 +197,7 @@ model Task {
   task_id String @id @default(cuid())
   name String @db.VarChar(255)
   priority Task_priority
+  task_history Task_history[]
   status String @default("functioning")
   agent Agent? @relation(fields: [agent_id], references: [agent_id], onDelete: Cascade, onUpdate : Cascade)
   recurrent Boolean?
@@ -207,6 +208,15 @@ model Task {
   schedule String @unique
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
+}
+
+model Task_history {
+  id String @id @default(cuid())
+  task Task? @relation(fields: [task_id], references: [task_id], onDelete: Cascade, onUpdate: Cascade)
+  asset_url String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  task_id String?
 }
 
 model Task_Schedule {

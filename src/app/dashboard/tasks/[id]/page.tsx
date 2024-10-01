@@ -1,9 +1,8 @@
-import PlaygroundPage from "./(components)/playground/page";
 
 export default function Page() {
   return (
     <>
-      <PlaygroundPage />
+      <h1>All data in here</h1>
     </>
   )
 }

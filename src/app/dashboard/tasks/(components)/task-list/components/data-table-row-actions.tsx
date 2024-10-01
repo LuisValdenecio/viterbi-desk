@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { PencilIcon, Trash2 } from "lucide-react"
+import { CalendarClock, Clock, PencilIcon, ScrollTextIcon, Trash2 } from "lucide-react"
 import Link from "next/link"
 
 interface DataTableRowActionsProps<TData> {
@@ -39,7 +39,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align="end" className="w-[160px]">
         <DropdownMenuItem asChild>
         <Link className="flex cursor-pointer" href={`/dashboard/tasks/${row.original?.task_id}`}>
-          Open
+          Details
         </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -50,9 +50,8 @@ export function DataTableRowActions<TData>({
               <PencilIcon className=" h-4 w-4 text-muted-foreground" />
             </DropdownMenuShortcut>
           </Link>
-           
         </DropdownMenuItem>
-
+ 
         <DropdownMenuItem asChild>
         <Link className="flex cursor-pointer" href={`/dashboard/tasks?delete=${row.original?.task_id}&task_name=${row.original?.name}`
             }>
