@@ -249,7 +249,7 @@ export async function sendInvitation(_prevstate, formData) {
         })
 
         return {
-            message : 'Success'
+            message : `Success:${member_invitation.guest_email}`,
         }
 
     } catch (error) {

@@ -60,6 +60,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import SubmitBtn from "@/components/submit-button";
 import { sendInvitation } from "@/server-actions/invitations";
+import Link from "next/link";
 
 const fetcher = (...args) => fetch(...args).then(res => res.json())
 
@@ -403,14 +404,16 @@ export function AddMemberDialog({ open, openChange }) {
 
         if (state?.message) {
             console.log("RETURNED STATE: ", state)
-            if (state?.message === 'Success') {
+            if (state?.message.split(':')[0] === 'Success') {
                 openChange()
                 toast({
-                    title: "Scheduled: Catch up ",
-                    description: "Friday, February 10, 2023 at 5:57 PM",
-                    action: (
-                        <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
-                    ),
+                  title: "Invitation sent!",
+                  description: `${state?.message.split(':')[1]} invited to join`,
+                  action: (
+                    <Button asChild variant="outline">
+                      <Link href="#">see invitation</Link>
+                    </Button>
+                  ),
                 })
             }
 
@@ -439,7 +442,7 @@ export function AddMemberDialog({ open, openChange }) {
             }
 
         }
-    }, [state?.errors]);
+    }, [state?.errors, state?.message]);
 
 
 

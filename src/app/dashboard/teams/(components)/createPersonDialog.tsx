@@ -41,6 +41,7 @@ import { z } from "zod"
 import { useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 const formSchema = z.object({
   email: z.string().email({
@@ -89,13 +90,15 @@ export function AddMemberDialog() {
 
     if (state?.message) {
 
-      if (state?.message === 'Success') {
+      if (state?.message.split(':')[0] === 'Success') {
         setOpen(false)
         toast({
-          title: "Scheduled: Catch up ",
-          description: "Friday, February 10, 2023 at 5:57 PM",
+          title: "Invitation sent!",
+          description: `${state?.message.split(':')[1]} invited to join`,
           action: (
-            <ToastAction altText="Goto schedule to undo">Undo</ToastAction>
+            <Button asChild variant="outline">
+              <Link href="#">see invitation</Link>
+            </Button>
           ),
         })
       }
@@ -125,7 +128,7 @@ export function AddMemberDialog() {
       }
 
     }
-  }, [state?.errors]);
+  }, [state?.errors, state?.message]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
