@@ -151,6 +151,7 @@ export default function Page() {
       <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
 
             <div className="">
+              <BreadCrumpComponent description={'View members, edit their privileges, suspend accounts and more'} />
               <DeleteTeamMemberDialog open={deleteTeamMemberDialog} openChange={onDialogClose} />
               <ReassignMemberRole open={reassignMemberRole} openChange={onDialogClose} />
               <SetTaskQuotaForMember open={taskQuotaMember} openChange={onDialogClose} />

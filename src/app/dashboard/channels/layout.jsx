@@ -11,7 +11,7 @@ import { BreadCrumpComponent } from '@/components/breadcrump'
 export default async function layout({ children }) {
 
     return <>
-        <BreadCrumpComponent />
+        <BreadCrumpComponent description={'Manage your channels, add agents, configure providers, and more'} />
         <div className='mt-2'>
             {children}
         </div>    

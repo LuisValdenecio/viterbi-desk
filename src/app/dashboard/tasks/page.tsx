@@ -108,7 +108,7 @@ export default function Page() {
     <>
       <DeleteTaskDialog open={deleteTaskDialog} openChange={onDialogClose} />
       <EditTaskDialog open={editTaskDialog} openChange={onDialogClose} />
-      <BreadCrumpComponent />
+      <BreadCrumpComponent description={'Manage your tasks, modify their scope and functionality with natural language.'}/>
       <div className="grid mt-2 auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
 
 

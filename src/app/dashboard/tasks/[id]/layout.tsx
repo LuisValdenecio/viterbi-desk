@@ -4,9 +4,9 @@ import Tabs from '../(components)/tabs'
 export default async function layout({ children }) {
 
     return <>
-       <BreadCrumpComponent /> 
+       <BreadCrumpComponent description={'Manage this task instructions, history, settings reports, and more'} /> 
        <Tabs />
-       <div className='mt-2'>
+       <div className=''>
             {children}
        </div>
     </>

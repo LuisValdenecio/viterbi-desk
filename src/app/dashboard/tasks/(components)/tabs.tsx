@@ -82,7 +82,7 @@ export default function Tabs() {
             </div>
             <div className="hidden sm:block">
                 <div className="inline-block">
-                    <nav aria-label="Tabs" className="flex p-1 mt-4 space-x-2 border rounded-md">
+                    <nav aria-label="Tabs" className="flex p-1 mb-2 space-x-2 border rounded-md">
                         {tabsObject.map((tab) => (
                             <Link
                                 key={tab.name}
