@@ -185,7 +185,8 @@ export async function sendInvitation(_prevstate, formData) {
 
         const email_used = await prisma.member_invitation.findMany({
             where : {
-                guest_email : email
+                guest_email : email,
+                team_id : teamId
             }
         })
 
