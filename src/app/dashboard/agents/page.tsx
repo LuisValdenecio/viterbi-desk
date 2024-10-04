@@ -69,6 +69,7 @@ export default function Page() {
     const [deleteAgentDialog, setDeleteAgentDialog] = useState(false)
     const [createTaskDialog, setCreateTaskDialog] = useState(false)
 
+
     const params = new URLSearchParams(searchParams);
 
     const onDialogClose = () => {
@@ -379,7 +380,7 @@ export function CreateTaskDialog({ open, openChange }) {
     const router = useRouter()
     const { toast } = useToast()
     const searchParams = useSearchParams()
-  
+    
     const initialState = {
       errors: {
         taskName: undefined,
@@ -427,8 +428,14 @@ export function CreateTaskDialog({ open, openChange }) {
           title: 'Operation blocked',
           description: `You don't have the privileges to complete this.`,
         })
+      } else if (state?.message === 'quota limit reached') {
+        openChange()
+        toast({
+          title: 'Operation blocked',
+          description: `You have exceed your quota on this team`,
+        })
       }
-    }, [state?.errors])
+    }, [state?.errors, state?.message, state?.retryTime])
   
     return (
       <Dialog open={open} onOpenChange={openChange}>

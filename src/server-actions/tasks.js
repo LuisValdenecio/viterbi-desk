@@ -327,6 +327,7 @@ export async function getTask(task_id) {
 
 export async function postTask(_prevstate, formData) {
 
+    console.log("PREV STATE: ", _prevstate)
     const session = await auth()
 
     const validatedFields = TaskCreationSession.safeParse({
@@ -365,19 +366,37 @@ export async function postTask(_prevstate, formData) {
         const privilege = await checkAgentPrivilege(agentId)
 
         if (!privilege) {
-            return {
-                message: 'access denied'
+            if (_prevstate?.message === 'access denied') {
+                return {
+                    message: 'access denied',
+                    retryTime : new Date()
+                }
+            } else {
+                return {
+                    message: 'access denied'
+                }
             }
         }
 
         const checkQuota = await checkTaskQuota(agentId)
 
         if (!checkQuota) {
-            return {
-                message: 'quota limit reached',
-                userId : session?.user?.id,
-                agentId : agentId
+
+            if (_prevstate?.message === 'quota limit reached') {
+                return {
+                    message: 'quota limit reached',
+                    userId : session?.user?.id,
+                    agentId : agentId,
+                    retryTime : new Date()
+                }
+            } else {
+                return {
+                    message: 'quota limit reached',
+                    userId : session?.user?.id,
+                    agentId : agentId,
+                }
             }
+
         }
 
         const taskSchedule = await prisma.task_Schedule.create({
@@ -400,11 +419,21 @@ export async function postTask(_prevstate, formData) {
             }
         })
 
-        return {
-            message: 'Success',
-            taskId: newTask.task_id,
-            taskName: newTask.name,
+        if (_prevstate?.message === 'Success') {
+            return {
+                message: 'Success',
+                taskId: newTask.task_id,
+                taskName: newTask.name,
+                retryTime : new Date()
+            }
+        } else {
+            return {
+                message: 'Success',
+                taskId: newTask.task_id,
+                taskName: newTask.name,
+            }
         }
+
 
 
     } catch (error) {

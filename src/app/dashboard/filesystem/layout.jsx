@@ -1,20 +1,12 @@
-import { Dashboard } from '@/components/data-template'
+import { BreadCrumpComponent } from "@/components/breadcrump"
 
 export default async function layout({ children }) {
 
-    const links = [
-        {name : 'All files', href: '/dashboard/filesystem'},
-        {name : 'Active', href: '#'},
-    ]
-
-    const cta_button = {
-        name : 'New Agent',
-        href : '/dashboard/agents/new'
-    }
-
+    
     return <> 
-       <Dashboard cta_button={cta_button} links={links} addDataStorage={true}>
+        <BreadCrumpComponent description={'Manage your knowledge base, databases and much more'} />
+        <div>
             {children}
-       </Dashboard>
+        </div>
     </>
 }
