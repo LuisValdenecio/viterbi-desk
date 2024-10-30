@@ -64,7 +64,6 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Members" />
     ),
     cell: ({ row }) => {
-      console.log("ROW DATA: ", row.original)
       return (
         <div className="flex space-x-2">
           {/*label && <Badge variant="outline">{label.label}</Badge>*/}

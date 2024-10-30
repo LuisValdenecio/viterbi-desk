@@ -4,6 +4,7 @@ import GitHubProvider from "next-auth/providers/github";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcrypt"
 import prisma from "./lib/prisma";
+import authConfig from "../auth.config";
 
 async function getUser(email) {
     try {
@@ -114,4 +115,5 @@ export const {
             return token
         }
     },
+    ...authConfig,
 })

@@ -27,10 +27,12 @@ import { AzureSvgIcon, GoogleSvgIcon, HubsPotSvgIcon, JiraSvgIcon, SlackSVGIcon,
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>
+  mutate : any
 }
 
 export function DataTableToolbar<TData>({
   table,
+  mutate
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
@@ -40,7 +42,7 @@ export function DataTableToolbar<TData>({
   `?client_id=${encodeURIComponent(process.env.NEXT_PUBLIC_HUBSPOT_CLIENT_ID)}` +
   `&scope=settings.users.teams.read` +
   `&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_HUBSPOT_REDIRECT_URL)}`; 
-
+  
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -166,7 +168,7 @@ export function DataTableToolbar<TData>({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Upload_csv_dialog button_title="Upload .csv" route="teams" teamId={null} />
+        <Upload_csv_dialog button_title="Upload .csv" route="teams" teamId={null} mutate={mutate}  />
         <DataTableViewOptions table={table} />
       </div>
     </div>

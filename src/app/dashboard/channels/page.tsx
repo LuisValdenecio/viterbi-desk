@@ -248,7 +248,6 @@ export function EditChannelDialog({ open, openChange }) {
 export function DeleteChannelialog({ open, openChange }) {
 
   const searchParams = useSearchParams()
-  const [tasks_id, setTasks_id] = useState(searchParams.get('delete')?.toString())
 
   const initialState = {
     errors: {
@@ -273,8 +272,8 @@ export function DeleteChannelialog({ open, openChange }) {
   const { toast } = useToast()
 
   React.useEffect(() => {
-    setTasks_id(searchParams.get('delete')?.toString())
-    setIncorrectPassword(false)
+    console.log("SERVER STATE: ", state)
+    //setIncorrectPassword(false)
     if (state.message == 'Success') {
       openChange()
       toast({
@@ -326,6 +325,7 @@ export function DeleteChannelialog({ open, openChange }) {
                   <FormControl>
                     <Input type="password" placeholder="type in your password" {...field} />
                   </FormControl>
+                  <FormMessage>{state?.errors?.password}</FormMessage>
                   {incorrectPassword && (<FormMessage>Incorrect password</FormMessage>)}
                 </FormItem>
               )}

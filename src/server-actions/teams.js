@@ -80,8 +80,15 @@ export async function editTeam(_prevstate, formData) {
     const privilege = await checkPrivilege(teamId)
 
     if (!privilege) {
-      return {
-        message : 'access denied'
+      if (_prevstate?.message === 'access denied') {
+        return {
+            message: 'access denied',
+            retryTime : new Date()
+        }
+      } else {
+          return {
+              message: 'access denied'
+          }
       }
     }
 
@@ -95,8 +102,15 @@ export async function editTeam(_prevstate, formData) {
       }
     }) 
     
-    return {
-      message : 'Success'
+    if (_prevstate?.message === 'Success') {
+      return {
+          message: 'Success',
+          retryTime : new Date()
+      }
+    } else {
+        return {
+          message: 'Success',
+        }
     }
 
   } catch (error) {
@@ -172,6 +186,7 @@ export async function postTeam(_prevstate, formData) {
 
 export async function deleteTeams(_prevstate, formData) {
 
+  console.log("PREV STATE: ", _prevstate)
   const session = await auth()
 
   const validatedFields = DeleteTeamSession.safeParse({
@@ -205,8 +220,15 @@ export async function deleteTeams(_prevstate, formData) {
 
               const privilege = await checkPrivilege(teams_id.split(",")[0])
               if (!privilege) {
-                return {
-                  message : 'access denied'
+                if (_prevstate?.message === 'access denied') {
+                  return {
+                    message : 'access denied-second',
+                    retryTime : new Date()
+                  }
+                } else {
+                  return {
+                    message : 'access denied',
+                  }
                 }
               }
 
@@ -218,10 +240,18 @@ export async function deleteTeams(_prevstate, formData) {
                       }
                   }
               })
-
-              return {
-                  message : 'Success'
+              
+              if (_prevstate?.message === 'Success') {
+                return {
+                  message : 'Success-second',
+                  retryTime : new Date()
+                }
+              } else {
+                return {
+                    message : 'Success'
+                }
               }
+
           } else {
               return {
                   message : 'incorrect password'

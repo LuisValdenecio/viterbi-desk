@@ -10,8 +10,8 @@ import {
     SelectValue,
     SelectGroup,
     SelectLabel,
-  
-  } from "@/components/ui/select"
+
+} from "@/components/ui/select"
 import {
     Dialog,
     DialogContent,
@@ -69,12 +69,12 @@ export default function Page() {
     const pathname = usePathname()
     const { replace } = useRouter()
     const searchParams = useSearchParams()
-    const { data, isLoading, error } = useSWR('/api/allTeams', fetcher)
+    const { data, isLoading, error, mutate } = useSWR('/api/allTeams', fetcher)
     const [editTeamDialog, setEditTeamDialog] = useState(false)
     const [deleteTeamDialog, setDeleteTeamDialog] = useState(false)
     const [addMemberDialog, setAddMemberDialog] = useState(false)
-
     const params = new URLSearchParams(searchParams);
+
 
     const onDialogClose = () => {
         setDeleteTeamDialog(false)
@@ -102,10 +102,10 @@ export default function Page() {
     if (isLoading) return <Loader_component />
     return (
         <>
-            <DeleteTeamDialog open={deleteTeamDialog} openChange={onDialogClose} />
-            <EditTeamDialog open={editTeamDialog} openChange={onDialogClose} />
-            <AddMemberDialog open={addMemberDialog} openChange={onDialogClose} />
-            <ListItemTable teams={data.teams} />
+            <DeleteTeamDialog open={deleteTeamDialog} openChange={onDialogClose} mutate={mutate} />
+            <EditTeamDialog open={editTeamDialog} openChange={onDialogClose}  />
+            <AddMemberDialog open={addMemberDialog} openChange={onDialogClose} mutate={mutate} data={data}  />
+            <ListItemTable teams={data?.teams} mutate={mutate} />
         </>
     )
 }
@@ -171,11 +171,8 @@ export function EditTeamDialog({ open, openChange }) {
         if (state.message == 'Success') {
             openChange()
             toast({
-                title: "Team removed",
-                description: `The task was delted successfully`,
-                action: (
-                    <ToastAction altText="Refresh">Undo</ToastAction>
-                ),
+                title: "Task edited",
+                description: `The task was successfully edited`
             })
         }
 
@@ -190,7 +187,7 @@ export function EditTeamDialog({ open, openChange }) {
                 description: `You don't have the privileges to complete this.`,
             })
         }
-    }, [state?.errors]);
+    }, [state?.errors, state?.message, state?.retryTime]);
 
     return (
         <Dialog open={open} onOpenChange={openChange}>
@@ -253,10 +250,9 @@ export function EditTeamDialog({ open, openChange }) {
     )
 }
 
-export function DeleteTeamDialog({ open, openChange }) {
+export function DeleteTeamDialog({ open, openChange, mutate }) {
 
     const searchParams = useSearchParams()
-    const [tasks_id, setTasks_id] = useState(searchParams.get('delete')?.toString())
 
     const initialState = {
         errors: {
@@ -278,20 +274,22 @@ export function DeleteTeamDialog({ open, openChange }) {
 
     const [state, formAction] = useFormState(deleteTeams, initialState);
     const [incorrectPassword, setIncorrectPassword] = React.useState(false)
+    const [lastStateMessage, setLastStateMessage] = React.useState('')
     const { toast } = useToast()
 
     React.useEffect(() => {
-        setTasks_id(searchParams.get('delete')?.toString())
-        setIncorrectPassword(false)
-        if (state.message == 'Success') {
+        if (state?.message && state?.message != lastStateMessage && (state?.message === 'Success' || state?.message === 'Success-second')) {
+
             openChange()
             toast({
                 title: "Task removed",
-                description: `The task was delted successfully`,
-                action: (
-                    <ToastAction altText="Refresh">Undo</ToastAction>
-                ),
+                description: `The task was delted successfully`
             })
+            mutate()
+            setLastStateMessage(state?.message)
+            
+            form.setValue('password', '')
+
         }
 
         if (Array.isArray(state?.errors)) {
@@ -301,15 +299,17 @@ export function DeleteTeamDialog({ open, openChange }) {
         } else {
             if (state.message === 'incorrect password') {
                 setIncorrectPassword(true)
-            } else if (state?.message === 'access denied') {
+            } else if (state?.message && state?.message != lastStateMessage && (state?.message === 'access denied' || state?.message === 'access denied-second')) {
                 openChange()
                 toast({
                     title: "Operation blocked",
                     description: `You don't have the privileges to complete this.`,
                 })
+                setLastStateMessage(state?.message)
+                form.setValue('password', '')
             }
         }
-    }, [state?.errors, searchParams]);
+    }, [state?.errors, state?.message, state?.retryTime, searchParams]);
 
     return (
         <AlertDialog open={open} onOpenChange={openChange}>
@@ -373,7 +373,7 @@ export function EditSubmitBtn() {
     )
 }
 
-export function AddMemberDialog({ open, openChange }) {
+export function AddMemberDialog({ open, openChange, mutate, data }) {
     const searchParams = useSearchParams()
 
     const { toast } = useToast()
@@ -401,19 +401,19 @@ export function AddMemberDialog({ open, openChange }) {
     const [state, formAction] = useFormState(sendInvitation, initialState);
 
     React.useEffect(() => {
-
+        mutate()
         if (state?.message) {
             console.log("RETURNED STATE: ", state)
             if (state?.message.split(':')[0] === 'Success') {
                 openChange()
                 toast({
-                  title: "Invitation sent!",
-                  description: `${state?.message.split(':')[1]} invited to join`,
-                  action: (
-                    <Button asChild variant="outline">
-                      <Link href="#">see invitation</Link>
-                    </Button>
-                  ),
+                    title: "Invitation sent!",
+                    description: `${state?.message.split(':')[1]} invited to join`,
+                    action: (
+                        <Button asChild variant="outline">
+                            <Link href="#">see invitation</Link>
+                        </Button>
+                    ),
                 })
             }
 

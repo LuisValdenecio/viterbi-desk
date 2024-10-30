@@ -310,7 +310,7 @@ export const TeamSelect = React.forwardRef<
                 </CommandItem>
                 ) : 
                   <div className="flex items-center justify-center">
-                    <span className="text-sm block">You don't own any channels</span>
+                    <span className="text-sm block">You don't own any teams</span>
                   </div>
                 }
                 {options.map((option) => {
